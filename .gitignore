@@ -1,0 +1,6 @@
+# macOS
+.DS_Store
+
+# Stato locale degli agenti (sessioni, preferenze per-macchina)
+.claude/settings.local.json
+.impeccable/
