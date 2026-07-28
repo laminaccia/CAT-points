@@ -48,20 +48,22 @@ service-worker.js       Cache offline
 manifest.webmanifest    Installazione PWA
 assets/map-placeholder.jpg   La mappa servita (4,4 MB)
 assets/map-placeholder.pdf   Sorgente con livello testuale ricercabile
-assets/streets.json          Indice dei punti: label, tags, coordinate x/y
+assets/streets.json          Indice dei punti — GENERATO, vedi §5-bis
 assets/icons/                icon-192.png, icon-512.png
+data/sorgenti/               Le sorgenti dell'indice, curate a mano
+tools/merge-streets.py       Ricostruisce assets/streets.json dalle sorgenti
 ```
 
 Per sostituire la mappa: cambiare `assets/map-placeholder.jpg` mantenendo lo
 stesso nome, oppure aggiornare il riferimento in `index.html` **e** in
 `service-worker.js` (compare in due punti: `MAP_PATH` e `ASSETS`).
 
-`assets/streets.json` è la sola fonte dei punti ricercabili. Ogni voce ha
-`label` (il testo mostrato nei risultati), `tags` (le parole e gli alias su cui
-si cerca) e coordinate **normalizzate** `x`/`y` da 0 a 1 — `x` cresce da
-sinistra a destra, `y` dall'alto verso il basso. Se una via compare più volte
-sulla mappa, la ricerca mostra tutte le occorrenze numerate e non ne sceglie
-una automaticamente: è voluto.
+`assets/streets.json` alimenta la ricerca. Ogni voce ha `label` (il testo
+mostrato nei risultati), `tags` (le parole e gli alias su cui si cerca) e
+coordinate **normalizzate** `x`/`y` da 0 a 1 — `x` cresce da sinistra a destra,
+`y` dall'alto verso il basso. Se una via compare più volte sulla mappa, la
+ricerca mostra tutte le occorrenze numerate e non ne sceglie una
+automaticamente: è voluto.
 
 ---
 
@@ -121,6 +123,62 @@ un guscio HTML nudo e inerte. Questo **viola il criterio di accettazione
 Vedi §9: è un problema noto e ancora aperto, non correggerlo di nascosto —
 ma soprattutto **non aggiungere nuovi file versionati** finché non è risolto,
 perché ognuno peggiora l'offline.
+
+---
+
+## 5-bis. L'indice delle vie — `assets/streets.json` è generato
+
+**Non modificarlo a mano: la modifica sparisce alla prima ricostruzione.** Le
+sorgenti stanno in `data/sorgenti/` e sono due tipi di file molto diversi.
+
+| Sorgente | Che cos'è | Qualità |
+|----------|-----------|---------|
+| `estrazione-pdf.json` | i 161 punti estratti dal livello testo del PDF | grezza |
+| `lotto-NN.json` | i punti segnati a mano con lo strumento dell'app | curata |
+
+L'estrazione copre tutta la mappa, ma le etichette sono come le ha lasciate il
+PDF: abbreviate («c/da FRANCO», «C.LE AMARI»), troncate sugli a capo («Via Sac.
+Giuseppe» in sei punti diversi, «Via Ben.») e raddoppiate — ogni «c/da X»
+esisteva anche come «Contrada X» alle stesse identiche coordinate.
+
+I lotti manuali contengono invece i nomi giusti e, soprattutto, **gli alias
+dialettali che nessuna estrazione automatica potrà mai produrre**:
+*Chianipodda* per Piazza Nicolò Mazzara, *U Signuri* per la chiesa del
+Santissimo Crocifisso, *A Circiara*, *Lu Burgo*, *l'acquanova*. Sono quelli che
+un calatafimese digiterebbe davvero.
+
+**Decisione presa con l'utente il 2026-07-29: vince sempre il lotto manuale.**
+L'estrazione dal PDF contiene errori che l'utente ha corretto a mano, quindi
+dove i due si contraddicono la versione curata è quella buona. L'estrazione
+sopravvive solo dove *aggiunge* un posto che i lotti non coprono ancora.
+
+### Aggiungere un lotto
+
+1. Nell'app: **Aggiungi punto** per ogni luogo, poi **Scarica JSON**.
+2. Salvare il file come `data/sorgenti/lotto-NN.json` (numero successivo).
+3. `python3 tools/merge-streets.py` — ricostruisce l'indice da zero.
+4. **Bumpare `CACHE` in `service-worker.js`** (vedi §5): senza quello il
+   service worker continua a servire l'indice vecchio dalla cache e il lavoro
+   non arriva a nessuno.
+
+`--dry-run` stampa il rapporto senza scrivere. La ricostruzione riparte sempre
+da zero: se leggesse l'indice già fuso, al lotto successivo i punti curati la
+volta prima verrebbero scambiati per dati grezzi. Così invece il risultato non
+dipende dall'ordine dei lotti ed è ripetibile.
+
+### Cosa decide lo script, e cosa lascia decidere a te
+
+Il criterio è che **nome e distanza vanno usati insieme, mai da soli**: solo il
+nome faceva finire «Strada Patti» su «Ponte Patti», distanti mezza mappa; sola
+la distanza non riconosceva «C/le Sciaffino» come la «Cortile Schiaffino»
+curata a 0.0026, per via di una lettera. Le soglie e il controllo sul tipo di
+luogo (una contrada non diventa una chiesa) sono commentati nello script.
+
+Il rapporto separa quello che ha deciso da solo — **scartate**, **riqualificate**
+— da quello che vuole occhi umani: **da decidere** (nome imparentato ma punto
+lontano), **tipo diverso**, **possibili varianti di grafia**, **solo PDF**
+(etichette grezze ancora da curare). Quelle voci restano nell'indice com'erano:
+meglio un nome brutto che un posto sparito.
 
 ---
 

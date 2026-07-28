@@ -5,6 +5,88 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-29 — Primo lotto di punti curati fuso nell'indice delle vie
+
+*Agente: Claude. Toccati `assets/streets.json` (rigenerato) e `CACHE` nel
+service worker.*
+
+L'utente ha passato un lotto di **216 punti raccolti a mano** con lo strumento
+dell'app, chiedendo di pulirli, confrontarli con `assets/streets.json` e
+unificarli — annunciando che ne arriveranno altri. Da qui la scelta di scrivere
+uno strumento invece di fare il lavoro una volta sola a mano.
+
+### Com'è cambiato l'impianto
+
+`assets/streets.json` **non si modifica più a mano: è generato.** Le sorgenti
+stanno in `data/sorgenti/` (`estrazione-pdf.json` intoccata + `lotto-NN.json`) e
+`tools/merge-streets.py` ricostruisce l'indice da zero a ogni lancio.
+
+La ricostruzione da zero non è un dettaglio: la prima versione dello script
+leggeva `assets/streets.json` e ci riscriveva sopra, e al secondo lotto i punti
+curati la volta prima sarebbero stati trattati come dati grezzi — quindi
+rinominabili. Ora il risultato non dipende dall'ordine dei lotti ed è ripetibile
+(verificato: due lanci di fila danno lo stesso file).
+
+### Risultato
+
+161 voci PDF (145 dopo aver collassato i doppioni interni) + 216 curate →
+**321 voci**. Nessuna voce curata persa, verificato.
+
+- **40 scartate** — l'estrazione aveva lo stesso posto con un nome peggiore.
+- **18 riqualificate** — altri tratti della stessa via: tengono le coordinate
+  del PDF e adottano il nome curato, così le occorrenze compaiono tutte con
+  la stessa etichetta.
+- **68 solo PDF** — tutta la zona est e sud che i lotti non coprono ancora
+  (contrade Affacciatura, Cannizza, Franco, Granatello, Margi, Rina, Vignazzi,
+  Piazza Cannolicchio, Viale Europa, i cortili Amari/Anello/Canova/Etna/
+  Farini/Genovese/Gianni/Milana).
+
+### Decisione presa con l'utente
+
+**Vince sempre il lotto manuale**: «il PDF ha errori che io ho corretto».
+Scritto in `AGENTS.md` §5-bis.
+
+### Due errori di metodo, corretti prima di scrivere l'indice
+
+1. **Abbinare per solo nome è troppo grossolano.** «Strada Patti» finiva su
+   «Ponte Patti» perché condividono il tag *Patti*: distano 0.60, mezza mappa.
+   Stessa cosa per «Contrada Cappuccini» → «Chiesa dei Cappuccini».
+2. **Abbinare per sola distanza non basta.** «C/le Sciaffino» non si agganciava
+   alla «Cortile Schiaffino» curata a 0.0026, per via di una `h`.
+
+Rimedio: nome e distanza insieme, tre soglie (stesso spillo / stesso posto /
+stessa via) e un controllo sul **tipo** di luogo — una contrada non diventa una
+via né una chiesa. Tutto commentato nello script.
+
+### Consegna: attenzione al service worker
+
+Aggiornare `assets/streets.json` **da solo non serve a niente**: il service
+worker lo serve dalla cache. Bumpato `CACHE` a `mappa-squadra-v18`. Va fatto a
+ogni ricostruzione dell'indice.
+
+### Verificato in browser
+
+321 voci caricate, cache `mappa-squadra-v18` attiva, nessun errore in console.
+Ricerche provate: `chianipodda` → Piazza dottor Nicolò Mazzara, `u signuri` →
+Chiesa del Santissimo Crocifisso, `cassara` → Cortile Pietro Cassarà (accenti
+ok), `granatello` e `cannolicchio` (solo PDF) trovati, `via` → nessun risultato
+com'è giusto, `gallo` → 4 punti numerati distinti nell'interfaccia.
+
+### Da valutare
+
+- **18 voci «da decidere»**: nome imparentato ma punto lontano. I casi veri:
+  `Dottor Biagio Gallo` è una persona diversa da Leonardo Gallo (via mancante
+  dai lotti, non un doppione); `Via Garibaldi` ×3 e `Corso Vittorio Emanuele`
+  ×2 potrebbero essere tratti lontani o vie distinte; `Via Autuori` ×2 sta fra
+  Giovanni e Fernando. `python3 tools/merge-streets.py --dry-run` li rielenca.
+- **`Via Padre Pio` accanto a `Villa Padre Pio`** (0.0078): quasi certamente la
+  stessa cosa, tenute separate dal controllo sul tipo.
+- **`Via Acquanuova` ~ `Via Acquanova`** (96% simili, distanti 0.018): variante
+  di grafia, probabilmente da fondere.
+- Le **68 etichette solo-PDF** restano grezze finché un lotto non le copre.
+
+---
+
 ## 2026-07-28 — Il progetto passa sotto git; regole condivise Claude/Codex
 
 *Agente: Claude. Nessuna modifica al codice dell'app.*

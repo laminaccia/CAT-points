@@ -1,8 +1,1304 @@
 {
-  "source": "map-placeholder.pdf",
+  "source": "map-placeholder.pdf + punti raccolti a mano",
   "pageWidth": 2383.994,
   "pageHeight": 1683.978,
   "streets": [
+    {
+      "label": "Contrada Carabona",
+      "x": 0.228312,
+      "tags": ["Contrada Carabona","Carabona"],
+      "y": 0.380655
+    },
+    {
+      "label": "Bosco Roccazzelle",
+      "x": 0.188357,
+      "tags": ["Bosco Roccazzelle","Roccazzelle"],
+      "y": 0.120721
+    },
+    {
+      "label": "Contrada Marzuko",
+      "x": 0.147123,
+      "tags": ["Contrada Marzuko","Contrada Marzuco","Marzuko","Marzuco"],
+      "y": 0.1
+    },
+    {
+      "label": "Strada Statale 113",
+      "x": 0.114094,
+      "tags": ["Strada Statale 113","SS113","SS 113","113"],
+      "y": 0.173503
+    },
+    {
+      "label": "Depuratore Carabona",
+      "x": 0.117402,
+      "tags": ["Depuratore Carabona","Depuratore"],
+      "y": 0.387606
+    },
+    {
+      "label": "Ponte Patti",
+      "x": 0.096201,
+      "tags": ["Ponte Patti","Patti"],
+      "y": 0.676631
+    },
+    {
+      "label": "Contrada Rio",
+      "x": 0.167307,
+      "tags": ["Contrada Rio","Rio"],
+      "y": 0.843543
+    },
+    {
+      "label": "Contrada Canale",
+      "x": 0.226727,
+      "tags": ["Contrada Canale","Canale"],
+      "y": 0.806892
+    },
+    {
+      "label": "Contrada Castelluzzo",
+      "x": 0.228075,
+      "tags": ["Contrada Castelluzzo","Castelluzzo"],
+      "y": 0.873653
+    },
+    {
+      "label": "Contrada Conceria",
+      "x": 0.227476,
+      "tags": ["Contrada Conceria","Conceria"],
+      "y": 0.723034
+    },
+    {
+      "label": "Via Ippolito Nievo",
+      "x": 0.133565,
+      "tags": ["Via Ippolito Nievo","Ippolito Nievo","Ippolito","Nievo"],
+      "y": 0.544201
+    },
+    {
+      "label": "Nucleo Abitato Carabona",
+      "x": 0.231836,
+      "tags": ["Nucleo Abitato Carabona","Nucleo Abitato"],
+      "y": 0.375264
+    },
+    {
+      "label": "Pineta Castello",
+      "x": 0.193516,
+      "tags": ["Pineta Castello","Pineta"],
+      "y": 0.488302
+    },
+    {
+      "label": "Nucleo Abitato Castello",
+      "x": 0.170503,
+      "tags": ["Nucleo Abitato Castello","Nucleo Abitato","Castello"],
+      "y": 0.531994
+    },
+    {
+      "label": "SP 12 del Busecchio",
+      "x": 0.152457,
+      "tags": ["SP 12 del Busecchio","Strada Provinciale 12","Strada Provinciale","SP12","SP 12","Busecchio","Strada Provinciale 12 del Busecchio","SP12 del Busecchio"],
+      "y": 0.544887
+    },
+    {
+      "label": "Strada Statale 188 per Santa Ninfa",
+      "x": 0.223636,
+      "tags": ["Strada Statale 188 per Santa Ninfa","Strada Statale 188","SS188","SS 188","Strada Statale per Santa Ninfa","Santa Ninfa"],
+      "y": 0.89994
+    },
+    {
+      "label": "Centro Abitato Giummarito",
+      "x": 0.235113,
+      "tags": ["Centro Abitato Giummarito","Centro Abitato","Giummarito"],
+      "y": 0.244764
+    },
+    {
+      "label": "Via Valle dei Mulini",
+      "x": 0.217461,
+      "tags": ["Via Valle dei Mulini","Valle dei Mulini"],
+      "y": 0.247472
+    },
+    {
+      "label": "Via Giummarito",
+      "x": 0.241239,
+      "tags": ["Via Giummarito","Giummarito"],
+      "y": 0.272474
+    },
+    {
+      "label": "Strada Provinciale 33 del Fiumefreddo",
+      "x": 0.21651,
+      "tags": ["Strada Provinciale 33 del Fiumefreddo","Strada Provinciale 33","SP33","SP 33","Fiumefreddo"],
+      "y": 0.296576
+    },
+    {
+      "label": "Benvenuti a Calatafimi",
+      "x": 0.107603,
+      "tags": ["Benvenuti a Calatafimi","Ingresso del Paese"],
+      "y": 0.226382
+    },
+    {
+      "label": "Via Camogli",
+      "x": 0.121807,
+      "tags": ["Via Camogli","Camogli"],
+      "y": 0.557341
+    },
+    {
+      "label": "Via Teano",
+      "x": 0.13069,
+      "tags": ["Via Teano","Teano"],
+      "y": 0.555563
+    },
+    {
+      "label": "Via Giuseppe Fanelli",
+      "x": 0.138879,
+      "tags": ["Via Giuseppe Fanelli","Giuseppe Fanelli","Fanelli","Via G. Fanelli","G. Fanelli"],
+      "y": 0.553323
+    },
+    {
+      "label": "Strada Santa Maria per il Bosco Roccazzelle",
+      "x": 0.322902,
+      "tags": ["Strada Santa Maria per il Bosco Roccazzelle","Strada Santa Maria","Santa Maria","Bosco Santa Maria","Roccazzelle","Bosco Roccazzelle"],
+      "y": 0.224365
+    },
+    {
+      "label": "Strada per Marzuco e Bosco Roccazzelle",
+      "x": 0.431631,
+      "tags": ["Strada per Marzuco e Bosco Roccazzelle","Strada per Marzuco","Marzuco","Bosco Roccazzelle","Roccazzelle"],
+      "y": 0.245055
+    },
+    {
+      "label": "Contrada Santa Maria",
+      "x": 0.464866,
+      "tags": ["Contrada Santa Maria","Santa Maria"],
+      "y": 0.166347
+    },
+    {
+      "label": "Via Cubicella",
+      "x": 0.402531,
+      "tags": ["Via Cubicella","Cubicella"],
+      "y": 0.428124
+    },
+    {
+      "label": "Via Segesta",
+      "x": 0.426087,
+      "tags": ["Via Segesta"],
+      "y": 0.404937
+    },
+    {
+      "label": "PalaSegesta",
+      "x": 0.427077,
+      "tags": ["PalaSegesta","Palazzetto dello Sport"],
+      "y": 0.375851
+    },
+    {
+      "label": "Parcheggio Segesta",
+      "x": 0.377788,
+      "tags": ["Parcheggio Segesta","Parcheggio Grande","Parcheggio Entrata"],
+      "y": 0.351733
+    },
+    {
+      "label": "Quartiere Circiara",
+      "x": 0.370028,
+      "tags": ["Quartiere Circiara","A Circiara","Circiara"],
+      "y": 0.442341
+    },
+    {
+      "label": "Via Panoramica Diocles Phimes",
+      "x": 0.236859,
+      "tags": ["Via Panoramica Diocles Phimes","Diocles Phimes","Panoramica","Via Phimes"],
+      "y": 0.497854
+    },
+    {
+      "label": "Castello Eufemio",
+      "x": 0.241897,
+      "tags": ["Castello Eufemio","Castello"],
+      "y": 0.53827
+    },
+    {
+      "label": "Colle Eufemio",
+      "x": 0.267574,
+      "tags": ["Colle Eufemio","Colle"],
+      "y": 0.561493
+    },
+    {
+      "label": "Belvedere Francesco Vivona",
+      "x": 0.231702,
+      "tags": ["Belvedere Francesco Vivona","Belvedere","Vivona"],
+      "y": 0.620595
+    },
+    {
+      "label": "Quartiere Terravecchia",
+      "x": 0.23736,
+      "tags": ["Quartiere Terravecchia","Terravecchia","A Terravecchia"],
+      "y": 0.659828
+    },
+    {
+      "label": "Mura Medievali",
+      "x": 0.269593,
+      "tags": ["Mura Medievali"],
+      "y": 0.66939
+    },
+    {
+      "label": "Via Truglio",
+      "x": 0.259468,
+      "tags": ["Via Truglio","Truglio"],
+      "y": 0.621012
+    },
+    {
+      "label": "Viale Oberdan",
+      "x": 0.275698,
+      "tags": ["Viale Oberdan","Oberdan"],
+      "y": 0.603035
+    },
+    {
+      "label": "Via Mandre",
+      "x": 0.285166,
+      "tags": ["Via Mandre","Mandre"],
+      "y": 0.61155
+    },
+    {
+      "label": "Via Capre",
+      "x": 0.270314,
+      "tags": ["Via Capre","Capre"],
+      "y": 0.623296
+    },
+    {
+      "label": "Via Nicolò Mancuso",
+      "x": 0.269336,
+      "tags": ["Via Nicolò Mancuso","Nicolò Mancuso","Via Mancuso","Via N. Mancuso"],
+      "y": 0.633448
+    },
+    {
+      "label": "Via Giuseppe Mancuso",
+      "x": 0.270528,
+      "tags": ["Via Giuseppe Mancuso","Giuseppe Mancuso","Via Mancuso","Via G. Mancuso"],
+      "y": 0.641077
+    },
+    {
+      "label": "Via Ospedale",
+      "x": 0.294109,
+      "tags": ["Via Ospedale","Ospedale"],
+      "y": 0.633931
+    },
+    {
+      "label": "Ex Ospedale Civico",
+      "x": 0.313748,
+      "tags": ["Ex Ospedale Civico","Ex Ospedale","Ospedale","Ospedale Civico"],
+      "y": 0.581756
+    },
+    {
+      "label": "Via Trieste",
+      "x": 0.325313,
+      "tags": ["Via Trieste","Trieste"],
+      "y": 0.561029
+    },
+    {
+      "label": "Via Verdisca",
+      "x": 0.321747,
+      "tags": ["Via Verdisca","Virdisca","Verdisca","Via Virdisca"],
+      "y": 0.530875
+    },
+    {
+      "label": "Via Disciplina",
+      "x": 0.313115,
+      "tags": ["Via Disciplina","Disciplina"],
+      "y": 0.601899
+    },
+    {
+      "label": "Via Pietro Longo",
+      "x": 0.333368,
+      "tags": ["Via Pietro Longo","Via Parroco Pietro Longo","Parroco","Parroco Pietro Longo","Via P. Longo","Via Longo","Pietro Longo"],
+      "y": 0.584536
+    },
+    {
+      "label": "Ex Convento di San Francesco",
+      "x": 0.346782,
+      "tags": ["Ex Convento di San Francesco","San Francesco","Ex Convento","S. Francesco"],
+      "y": 0.568305
+    },
+    {
+      "label": "Orfanotrofio Blundo",
+      "x": 0.299431,
+      "tags": ["Orfanotrofio Blundo","Orfanotrofio","il Blundo"],
+      "y": 0.545647
+    },
+    {
+      "label": "Chiesa del Santissimo Crocifisso",
+      "x": 0.27792,
+      "tags": ["Chiesa del Santissimo Crocifisso","Santissimo Crocifisso","U Signuri","al Signore"],
+      "y": 0.59488
+    },
+    {
+      "label": "Via dei Mille",
+      "x": 0.320075,
+      "tags": ["Via dei Mille","via dei 1000","Mille","i Mille","1000"],
+      "y": 0.611859
+    },
+    {
+      "label": "Cortile Croci",
+      "x": 0.339021,
+      "tags": ["Cortile Croci","Croci","Cortile"],
+      "y": 0.589283
+    },
+    {
+      "label": "Via Gervasi",
+      "x": 0.354059,
+      "tags": ["Via Gervasi","Gervasi"],
+      "y": 0.58222
+    },
+    {
+      "label": "Via Antonino Colombo",
+      "x": 0.342681,
+      "tags": ["Via Antonino Colombo","Antonino Colombo","Via Colombo","Via A. Colombo","Via Nino Colombo","Nino Colombo"],
+      "y": 0.556435
+    },
+    {
+      "label": "Via Filippo Vivona",
+      "x": 0.346921,
+      "tags": ["Via Filippo Vivona","Via Vivona","Filippo Vivona","Via F. Vivona","F. Vivona","Vivona"],
+      "y": 0.526673
+    },
+    {
+      "label": "Via Sicomo",
+      "x": 0.354634,
+      "tags": ["Via Sicomo","Sicomo"],
+      "y": 0.5355
+    },
+    {
+      "label": "Via Tenente Scandariato",
+      "x": 0.357111,
+      "tags": ["Via Tenente Scandariato","Via Scandariato","tenente Scandariato","Scandariato"],
+      "y": 0.562038
+    },
+    {
+      "label": "Via Notar Vito Pellegrino",
+      "x": 0.371251,
+      "tags": ["Via Notar Vito Pellegrino","Via Notar Pellegrino","Via Vito Pellegrino","Notar Pellegrino","Notar Vito Pellegrino","Notaio","Notaio Vito Pellegrino","Via Notaio Pellegrino"],
+      "y": 0.557602
+    },
+    {
+      "label": "Teatro Felice Cavallotti",
+      "x": 0.345704,
+      "tags": ["Teatro Felice Cavallotti","Teatro","Teatro Cavallotti","Felice Cavallotti","Cavallotti"],
+      "y": 0.542636
+    },
+    {
+      "label": "Centro Sociale e Culturale Luigia Scimemi",
+      "x": 0.348853,
+      "tags": ["Centro Sociale e Culturale Luigia Scimemi","Luigia Scimemi","Scimemi","Luigia","Centro Sociale","Centro Scimemi"],
+      "y": 0.536634
+    },
+    {
+      "label": "Chiesa di San Silvestro Papa (Chiesa Madre)",
+      "x": 0.316668,
+      "tags": ["Chiesa di San Silvestro Papa (Chiesa Madre)","Chiesa Madre","Madrice","Matrice","La Matrice","San Silvestro Papa","Chiesa Madrice"],
+      "y": 0.543428
+    },
+    {
+      "label": "Chiesa di San Francesco",
+      "x": 0.352781,
+      "tags": ["Chiesa di San Francesco","Chiesa","San Francesco"],
+      "y": 0.556917
+    },
+    {
+      "label": "Quartiere Borgo",
+      "x": 0.392465,
+      "tags": ["Quartiere Borgo","Quartiere","Borgo","A U Burgo","Lu Burgo"],
+      "y": 0.616351
+    },
+    {
+      "label": "Via XV Maggio",
+      "x": 0.374969,
+      "tags": ["Via XV Maggio","Via Quindici Maggio","Via 15 Maggio","Acchianata du Signuri","XV Maggio"],
+      "y": 0.535087
+    },
+    {
+      "label": "Cortile Cenci",
+      "x": 0.371656,
+      "tags": ["Cortile Cenci","Cortile","Cenci"],
+      "y": 0.571382
+    },
+    {
+      "label": "Via Curatolo",
+      "x": 0.335696,
+      "tags": ["Via Curatolo","Curatolo"],
+      "y": 0.605966
+    },
+    {
+      "label": "Via Giurlanda",
+      "x": 0.345793,
+      "tags": ["Via Giurlanda","Giurlanda"],
+      "y": 0.61152
+    },
+    {
+      "label": "Via Ciullo",
+      "x": 0.355326,
+      "tags": ["Via Ciullo","Ciullo"],
+      "y": 0.608383
+    },
+    {
+      "label": "Via Tenente Giuseppe Bortiglio",
+      "x": 0.36398,
+      "tags": ["Via Tenente Giuseppe Bortiglio","Via Bortiglio","tenente","tenente Giuseppe Bortiglio","tenente Bortiglio","Giuseppe Bortiglio"],
+      "y": 0.603074
+    },
+    {
+      "label": "Via Rosolino Pilo",
+      "x": 0.387392,
+      "tags": ["Via Rosolino Pilo","Rosolino Pilo","Pilo"],
+      "y": 0.615389
+    },
+    {
+      "label": "Via Arciprete Nicolò Cosentino",
+      "x": 0.37593,
+      "tags": ["Via Arciprete Nicolò Cosentino","Arciprete Cosentino","Nicolò Cosentino","Via Cosentino","Via Nicolò Cosentino"],
+      "y": 0.619417
+    },
+    {
+      "label": "Via Arimondi",
+      "x": 0.386956,
+      "tags": ["Via Arimondi","Arimondi"],
+      "y": 0.59475
+    },
+    {
+      "label": "Via Toselli",
+      "x": 0.384289,
+      "tags": ["Via Toselli","Toselli"],
+      "y": 0.58854
+    },
+    {
+      "label": "Via Pozzo",
+      "x": 0.389139,
+      "tags": ["Via Pozzo","Pozzo"],
+      "y": 0.572811
+    },
+    {
+      "label": "Via Giove",
+      "x": 0.38931,
+      "tags": ["Via Giove","Giove"],
+      "y": 0.556815
+    },
+    {
+      "label": "Villa Padre Pio",
+      "x": 0.417092,
+      "tags": ["Villa Padre Pio","Pagoda","Padre Pio"],
+      "y": 0.553545
+    },
+    {
+      "label": "Via Leonora",
+      "x": 0.354735,
+      "tags": ["Via Leonora","Leonora"],
+      "y": 0.50954
+    },
+    {
+      "label": "Via Tenente Melchiorre Parisi",
+      "x": 0.362438,
+      "tags": ["Via Tenente Melchiorre Parisi","Via M. Parisi","Tenente Parisi","M. Parisi","Via Tenente Parisi","Melchiorre Parisi","Parisi"],
+      "y": 0.496984
+    },
+    {
+      "label": "Cortile Circiara",
+      "x": 0.369201,
+      "tags": ["Cortile Circiara","Circiara","Cortile"],
+      "y": 0.494206
+    },
+    {
+      "label": "Cortile Bonanno",
+      "x": 0.377283,
+      "tags": ["Cortile Bonanno","Cortile","Bonanno"],
+      "y": 0.485981
+    },
+    {
+      "label": "Via Guicciardini",
+      "x": 0.373467,
+      "tags": ["Via Guicciardini","Guicciardini"],
+      "y": 0.475106
+    },
+    {
+      "label": "Via Notar Giacomo Renda",
+      "x": 0.374075,
+      "tags": ["Via Notar Giacomo Renda","Via Notar Renda","Via Giacomo Renda","Notar Renda","Notar Giacomo Renda","Notaio","Notaio Giacomo Renda","Via Notaio Renda"],
+      "y": 0.519429
+    },
+    {
+      "label": "Via Pietro Novelli",
+      "x": 0.373973,
+      "tags": ["Via Pietro Novelli","Via Novelli","Novelli","Pietro Novelli"],
+      "y": 0.507139
+    },
+    {
+      "label": "Via Sacerdote Mucaria",
+      "x": 0.377995,
+      "tags": ["Via Sacerdote Mucaria","Via Sac. Mucaria","Mucaria","Sacerdote Mucaria"],
+      "y": 0.498563
+    },
+    {
+      "label": "Via Tenente Saladino",
+      "x": 0.394367,
+      "tags": ["Via Tenente Saladino","Via Ten. Saladino","Tenente Saladino","Saladino"],
+      "y": 0.490401
+    },
+    {
+      "label": "Via Galliano",
+      "x": 0.402327,
+      "tags": ["Via Galliano","Galliano"],
+      "y": 0.487568
+    },
+    {
+      "label": "Via Vincenzo Blundo",
+      "x": 0.409954,
+      "tags": ["Via Vincenzo Blundo","Via Blundo","Vincenzo Blundo","Blundo"],
+      "y": 0.496353
+    },
+    {
+      "label": "Via Giglio",
+      "x": 0.406974,
+      "tags": ["Via Giglio","Giglio"],
+      "y": 0.477416
+    },
+    {
+      "label": "Cortile Schiaffino",
+      "x": 0.404504,
+      "tags": ["Cortile Schiaffino","Cortile Simone Schiaffino","Schiaffino","Simone Schiaffino"],
+      "y": 0.465828
+    },
+    {
+      "label": "Via Masaniello",
+      "x": 0.396526,
+      "tags": ["Via Masaniello","Masaniello"],
+      "y": 0.450395
+    },
+    {
+      "label": "Via Balilla",
+      "x": 0.40372,
+      "tags": ["Via Balilla","Balilla"],
+      "y": 0.473756
+    },
+    {
+      "label": "Via Arciprete Ignazio Mollica",
+      "x": 0.413376,
+      "tags": ["Via Arciprete Ignazio Mollica","Via Arc. Mollica","Ignazio Mollica","Mollica"],
+      "y": 0.460603
+    },
+    {
+      "label": "Piazza Francesco Nullo",
+      "x": 0.422718,
+      "tags": ["Piazza Francesco Nullo","Piazza Nullo","Francesco Nullo","Nullo"],
+      "y": 0.468738
+    },
+    {
+      "label": "Chiesa del Carmine",
+      "x": 0.421068,
+      "tags": ["Chiesa del Carmine","Carmine"],
+      "y": 0.455983
+    },
+    {
+      "label": "Piazza Pietro Nocito",
+      "x": 0.415344,
+      "tags": ["Piazza Pietro Nocito","Piazza Nocito","Pietro Nocito","Piazza Maggiore","Piazza Grande"],
+      "y": 0.504465
+    },
+    {
+      "label": "Piazza dottor Nicolò Mazzara",
+      "x": 0.426332,
+      "tags": ["Piazza dottor Nicolò Mazzara","Piazza Nicolò Mazzara","Piazza Mazzara","Piano Perollo","Chianipodda","Chianu di Podda","Chianu di Poddani","Chianu Perollu"],
+      "y": 0.528276
+    },
+    {
+      "label": "Via Como",
+      "x": 0.459297,
+      "tags": ["Via Como","Como"],
+      "y": 0.541077
+    },
+    {
+      "label": "Via dottor Benedetto Gallo",
+      "x": 0.443937,
+      "tags": ["Via dottor Benedetto Gallo","Via Gallo","Gallo","Benedetto Gallo","dottor B. Gallo"],
+      "y": 0.516178
+    },
+    {
+      "label": "Via Avvocato Giovanni Gallo",
+      "x": 0.422453,
+      "tags": ["Via Avvocato Giovanni Gallo","Gallo","Giovanni Gallo","Avvocato Gallo","Avvocato G. Gallo","Avv. G. Gallo"],
+      "y": 0.48905
+    },
+    {
+      "label": "Via dottor Natale Maria Macaddino",
+      "x": 0.436113,
+      "tags": ["Via dottor Natale Maria Macaddino","Via Macaddino","Natale Maria","dottore Macaddino","Macaddino"],
+      "y": 0.468093
+    },
+    {
+      "label": "Cortile Purgatorio",
+      "x": 0.436817,
+      "tags": ["Cortile Purgatorio","Purgatorio","Cortile"],
+      "y": 0.475004
+    },
+    {
+      "label": "Ex Chiesa del Purgatorio",
+      "x": 0.43335,
+      "tags": ["Ex Chiesa del Purgatorio","Chiesa del Purgatorio","Purgatorio"],
+      "y": 0.48688
+    },
+    {
+      "label": "Corso Giuseppe Garibaldi",
+      "x": 0.476782,
+      "tags": ["Corso Giuseppe Garibaldi","Corso Garibaldi","la Rua Ranni"],
+      "y": 0.477061
+    },
+    {
+      "label": "Quartiere Maddalena",
+      "x": 0.471966,
+      "tags": ["Quartiere Maddalena","Quartiere","Maddalena"],
+      "y": 0.611261
+    },
+    {
+      "label": "Via Pietro Adamo",
+      "x": 0.463084,
+      "tags": ["Via Pietro Adamo","Pietro Adamo"],
+      "y": 0.464114
+    },
+    {
+      "label": "Via Tiro a Segno",
+      "x": 0.447704,
+      "tags": ["Via Tiro a Segno","Tiro a Segno"],
+      "y": 0.352068
+    },
+    {
+      "label": "Museo",
+      "x": 0.428002,
+      "tags": ["Museo"],
+      "y": 0.333479
+    },
+    {
+      "label": "Via S. Maria",
+      "x": 0.459329,
+      "tags": ["Via S. Maria"],
+      "y": 0.40928
+    },
+    {
+      "label": "Via Santa Maria",
+      "x": 0.481297,
+      "tags": ["Via Santa Maria","Santa Maria"],
+      "y": 0.448853
+    },
+    {
+      "label": "Piazza Falcone e Borsellino",
+      "x": 0.492261,
+      "tags": ["Piazza Falcone e Borsellino","Piazza Santa Maria","Santa Maria"],
+      "y": 0.443244
+    },
+    {
+      "label": "Cortile Menotti",
+      "x": 0.469003,
+      "tags": ["Cortile Menotti","Menotti","Cortile"],
+      "y": 0.473736
+    },
+    {
+      "label": "Via Donna Brigida Milazzo",
+      "x": 0.480456,
+      "tags": ["Via Donna Brigida Milazzo","Via Milazzo","Sotto la vota","Brigida Milazzo","Vicolo della Sciabica"],
+      "y": 0.462761
+    },
+    {
+      "label": "Piazza Beato Arcangelo Placenza",
+      "x": 0.515704,
+      "tags": ["Piazza Beato Arcangelo Placenza","Piazzetta"],
+      "y": 0.451257
+    },
+    {
+      "label": "Largo Duca degli Abruzzi",
+      "x": 0.541777,
+      "tags": ["Largo Duca degli Abruzzi","Duca degli Abruzzi","l'acquanova","all'obelisco","Obelisco","Acquanova"],
+      "y": 0.425094
+    },
+    {
+      "label": "Via Antonino Mucaria",
+      "x": 0.518675,
+      "tags": ["Via Antonino Mucaria","Via Mucaria","Mucaria","Antonino Mucaria"],
+      "y": 0.415428
+    },
+    {
+      "label": "Via Sergente Giuseppe Tagliavia",
+      "x": 0.527653,
+      "tags": ["Via Sergente Giuseppe Tagliavia","Sergente Tagliavia","Via sergente Tagliavia","Giuseppe Tagliavia","Tagliavia"],
+      "y": 0.401463
+    },
+    {
+      "label": "Via Acquanova",
+      "x": 0.52571,
+      "tags": ["Via Acquanova"],
+      "y": 0.382062
+    },
+    {
+      "label": "Via Giacomo Puccini",
+      "x": 0.481209,
+      "tags": ["Via Giacomo Puccini","Giacomo Puccini","Via Puccini","Puccini"],
+      "y": 0.378846
+    },
+    {
+      "label": "Via Giovanni Autuori",
+      "x": 0.51013,
+      "tags": ["Via Giovanni Autuori","Via Giovanni Autori","Via Autori","Giovanni Autuori","Giovanni Autori","Autori","Autuori"],
+      "y": 0.391037
+    },
+    {
+      "label": "Via Gorizia",
+      "x": 0.509233,
+      "tags": ["Via Gorizia","Gorizia"],
+      "y": 0.371015
+    },
+    {
+      "label": "Via Commendatore Sebastiano Simone",
+      "x": 0.505957,
+      "tags": ["Via Commendatore Sebastiano Simone","Via Sebastiano Simone","Sebastiano Simone","Commendatore"],
+      "y": 0.354804
+    },
+    {
+      "label": "Via Edmondo De Amicis",
+      "x": 0.530185,
+      "tags": ["Via Edmondo De Amicis","Edmondo De Amicis","Via De Amicis","De Amicis"],
+      "y": 0.333997
+    },
+    {
+      "label": "Via Giuseppe Cosentino",
+      "x": 0.508663,
+      "tags": ["Via Giuseppe Cosentino","Via G. Cosentino","Giuseppe Cosentino","Cosentino"],
+      "y": 0.331767
+    },
+    {
+      "label": "Scuola Elementare Edmondo De Amicis",
+      "x": 0.502463,
+      "tags": ["Scuola Elementare Edmondo De Amicis","Scuola De Amicis","Scuola Elementare"],
+      "y": 0.313785
+    },
+    {
+      "label": "Via Giovanni Palatucci",
+      "x": 0.499604,
+      "tags": ["Via Giovanni Palatucci","Via Palatucci"],
+      "y": 0.285483
+    },
+    {
+      "label": "Scuola Media Francesco Vivona",
+      "x": 0.525311,
+      "tags": ["Scuola Media Francesco Vivona","Scuola Media","Scuola Media Vivona","Francesco Vivona"],
+      "y": 0.265085
+    },
+    {
+      "label": "Parco Peppino Impastato",
+      "x": 0.516961,
+      "tags": ["Parco Peppino Impastato","Peppino Impastato","Cocorito"],
+      "y": 0.208749
+    },
+    {
+      "label": "Via Silvio Pellico NORD",
+      "x": 0.538791,
+      "tags": ["Via Silvio Pellico NORD","Via Silvio Pellico"],
+      "y": 0.228396
+    },
+    {
+      "label": "Contrada Cappuccini",
+      "x": 0.552936,
+      "tags": ["Contrada Cappuccini","Cappuccini","Scapuccini"],
+      "y": 0.216824
+    },
+    {
+      "label": "Via Fernando Autuori",
+      "x": 0.609757,
+      "tags": ["Via Fernando Autuori","Fernando Autuori","Via F. Autuori"],
+      "y": 0.281208
+    },
+    {
+      "label": "Via Silvio Pellico",
+      "x": 0.583477,
+      "tags": ["Via Silvio Pellico","Silvio Pellico","Via Pellico"],
+      "y": 0.327419
+    },
+    {
+      "label": "Via Alcide De Gasperi",
+      "x": 0.605496,
+      "tags": ["Via Alcide De Gasperi","Via De Gasperi","Alcide De Gasperi"],
+      "y": 0.354594
+    },
+    {
+      "label": "Via Silvio Pellico SUD",
+      "x": 0.586389,
+      "tags": ["Via Silvio Pellico SUD","Via Pellico Sud","Cadduso"],
+      "y": 0.388463
+    },
+    {
+      "label": "Salita Tre Croci",
+      "x": 0.717479,
+      "tags": ["Salita Tre Croci","Monte Tre Croci","Tre Croci"],
+      "y": 0.105295
+    },
+    {
+      "label": "Via Federico II",
+      "x": 0.674881,
+      "tags": ["Via Federico II","Federico II"],
+      "y": 0.100246
+    },
+    {
+      "label": "Via Simone Fimetta",
+      "x": 0.639555,
+      "tags": ["Via Simone Fimetta","Simone Fimetta","Via Fimetta"],
+      "y": 0.130056
+    },
+    {
+      "label": "Via del Belice",
+      "x": 0.720451,
+      "tags": ["Via del Belice","Via Belice","Belice"],
+      "y": 0.180102
+    },
+    {
+      "label": "Via Fratelli Guastella",
+      "x": 0.757972,
+      "tags": ["Via Fratelli Guastella","Fratelli Guastella"],
+      "y": 0.180503
+    },
+    {
+      "label": "Via del Santuario Madonna di Giubino",
+      "x": 0.788604,
+      "tags": ["Via del Santuario Madonna di Giubino","Via del Santuario","Via Santuario","Madonna di Giubino","Giubino"],
+      "y": 0.149911
+    },
+    {
+      "label": "Chiesa dei Cappuccini",
+      "x": 0.585935,
+      "tags": ["Chiesa dei Cappuccini","Chiesa Cappuccini","Cappuccini"],
+      "y": 0.272652
+    },
+    {
+      "label": "Via Nicolò Zuaro",
+      "x": 0.541479,
+      "tags": ["Via Nicolò Zuaro","Via Notaio Zuaro","Via Zuaro","Notaro Zuaro","Notaio Zuaro","Zuaro"],
+      "y": 0.39231
+    },
+    {
+      "label": "Largo Scaduto",
+      "x": 0.584644,
+      "tags": ["Largo Scaduto","Piazzetta Gialla"],
+      "y": 0.352972
+    },
+    {
+      "label": "Chiesa della Madonna Addolorata",
+      "x": 0.483494,
+      "tags": ["Chiesa della Madonna Addolorata","Chiesa di Maria Santissima Addolorata","Addolorata","Chiesa dell'Addolorata","Maria Addolorata"],
+      "y": 0.485611
+    },
+    {
+      "label": "Cortile Michele Patti",
+      "x": 0.451354,
+      "tags": ["Cortile Michele Patti","Michele Patti","Marchese Michele Patti","Cortile Marchese Patti"],
+      "y": 0.492383
+    },
+    {
+      "label": "Cortile Francesco Bentivegna",
+      "x": 0.474989,
+      "tags": ["Cortile Francesco Bentivegna","Cortile Bentivegna","Bentivegna"],
+      "y": 0.488584
+    },
+    {
+      "label": "Via Sebastiano Marchese",
+      "x": 0.480341,
+      "tags": ["Via Sebastiano Marchese","Via Marchese","Sebastiano Marchese","Marchese"],
+      "y": 0.494431
+    },
+    {
+      "label": "Cortile delle Scuole",
+      "x": 0.473774,
+      "tags": ["Cortile delle Scuole","Cortile Scuole"],
+      "y": 0.506149
+    },
+    {
+      "label": "Via Macello Vecchio",
+      "x": 0.456274,
+      "tags": ["Via Macello Vecchio","Macello Vecchio","Macello"],
+      "y": 0.571336
+    },
+    {
+      "label": "Via Francesco Perollo",
+      "x": 0.45369,
+      "tags": ["Via Francesco Perollo","Via Perollo","Francesco Perollo","Perollo"],
+      "y": 0.605028
+    },
+    {
+      "label": "Cortile Giacomo Leopardi",
+      "x": 0.459818,
+      "tags": ["Cortile Giacomo Leopardi","Cortile Leopardi","Leopardi"],
+      "y": 0.598574
+    },
+    {
+      "label": "Via Gregoli",
+      "x": 0.465399,
+      "tags": ["Via Gregoli","Gregoli"],
+      "y": 0.588457
+    },
+    {
+      "label": "Via Oliveri",
+      "x": 0.465916,
+      "tags": ["Via Oliveri","Oliveri"],
+      "y": 0.577712
+    },
+    {
+      "label": "Via Calderaro",
+      "x": 0.463845,
+      "tags": ["Via Calderaro","Calderaro"],
+      "y": 0.565087
+    },
+    {
+      "label": "Via Giuseppe Verdi",
+      "x": 0.48002,
+      "tags": ["Via Giuseppe Verdi","Via Verdi","Giuseppe Verdi","Verdi"],
+      "y": 0.565691
+    },
+    {
+      "label": "Cortile Lissa",
+      "x": 0.476094,
+      "tags": ["Cortile Lissa","Lissa"],
+      "y": 0.58547
+    },
+    {
+      "label": "Via Cellini",
+      "x": 0.477232,
+      "tags": ["Via Cellini","Cellini"],
+      "y": 0.593358
+    },
+    {
+      "label": "Via Canale",
+      "x": 0.49124,
+      "tags": ["Via Canale","Canale"],
+      "y": 0.586078
+    },
+    {
+      "label": "Cortile Cialdini",
+      "x": 0.492922,
+      "tags": ["Cortile Cialdini","Cialdini"],
+      "y": 0.556994
+    },
+    {
+      "label": "Chiesa di Maria Maddalena",
+      "x": 0.48286,
+      "tags": ["Chiesa di Maria Maddalena"],
+      "y": 0.547261
+    },
+    {
+      "label": "Chiesa della Madonna di Giubino",
+      "x": 0.493575,
+      "tags": ["Chiesa della Madonna di Giubino","Bataranni"],
+      "y": 0.502123
+    },
+    {
+      "label": "Piazza Plebiscito",
+      "x": 0.501401,
+      "tags": ["Piazza Plebiscito","Villa Comunale"],
+      "y": 0.505027
+    },
+    {
+      "label": "Villa Garibaldi",
+      "x": 0.502733,
+      "tags": ["Villa Garibaldi","Chiosco"],
+      "y": 0.529867
+    },
+    {
+      "label": "Via Cesare Abba",
+      "x": 0.50866,
+      "tags": ["Via Cesare Abba","Via Abba","Cesare Abba","Abba"],
+      "y": 0.520502
+    },
+    {
+      "label": "Via Abate Meli",
+      "x": 0.516526,
+      "tags": ["Via Abate Meli","Via Meli","Abate Meli","Meli Abate"],
+      "y": 0.524642
+    },
+    {
+      "label": "Via Foscari",
+      "x": 0.520333,
+      "tags": ["Via Foscari","Foscari"],
+      "y": 0.521558
+    },
+    {
+      "label": "Cortile Marrone",
+      "x": 0.525932,
+      "tags": ["Cortile Marrone","Marrone","Cortile"],
+      "y": 0.505027
+    },
+    {
+      "label": "Via Giuseppe Mazzini",
+      "x": 0.466449,
+      "tags": ["Via Giuseppe Mazzini","Via Mazzini","Giuseppe Mazzini","Mazzini"],
+      "y": 0.497926
+    },
+    {
+      "label": "Via Tenente Giuseppe Renda",
+      "x": 0.497762,
+      "tags": ["Via Tenente Giuseppe Renda","Via Tenente Renda","Via G. Renda","Giuseppe Renda","Renda","Tenente Renda"],
+      "y": 0.481944
+    },
+    {
+      "label": "Via Tenente Gaetano Barresi",
+      "x": 0.49302,
+      "tags": ["Via Tenente Gaetano Barresi","Via Tenente Barresi","Via Gaetano Barresi","Via Barresi","Tenente Barresi","Gaetano Barresi","Barresi"],
+      "y": 0.459361
+    },
+    {
+      "label": "Via Avvocato Leonardo Gallo",
+      "x": 0.506236,
+      "tags": ["Via Avvocato Leonardo Gallo","Via Avv. Gallo","Leonardo Gallo","Via Avvocato Gallo","Gallo"],
+      "y": 0.472527
+    },
+    {
+      "label": "Via Capitano Biagio Pumo",
+      "x": 0.51427,
+      "tags": ["Via Capitano Biagio Pumo","Via Capitano Pumo","Via Biagio Pumo","Via Pumo","Biagio Pumo","Pumo"],
+      "y": 0.473991
+    },
+    {
+      "label": "Cortile Sacerdote Antonino Filogamo",
+      "x": 0.519078,
+      "tags": ["Cortile Sacerdote Antonino Filogamo","Cortile Filogamo","Cortile Antonino Filogamo","Sacerdote Filogamo","Sacerdote Antonino Filogamo"],
+      "y": 0.466698
+    },
+    {
+      "label": "Arco Parroco Antonino Pampalone",
+      "x": 0.529299,
+      "tags": ["Arco Parroco Antonino Pampalone","Arco A. Pampalone","Arco Pampalone","Antonino Pampalone","Vicolo dei Proverbi","Proverbi"],
+      "y": 0.4689
+    },
+    {
+      "label": "Via Augusto Elia",
+      "x": 0.532781,
+      "tags": ["Via Augusto Elia","Augusto Elia","Via Elia"],
+      "y": 0.505517
+    },
+    {
+      "label": "Piazza Unità d'Italia",
+      "x": 0.537951,
+      "tags": ["Piazza Unità d'Italia","Unità di Italia","Unita d'Italia"],
+      "y": 0.486136
+    },
+    {
+      "label": "Via Salvatore Cabasino",
+      "x": 0.586588,
+      "tags": ["Via Salvatore Cabasino","Via Cabasino","Salvatore Cabasino","Cabasino"],
+      "y": 0.538406
+    },
+    {
+      "label": "Via Tenente Giuseppe Li Bassi",
+      "x": 0.543731,
+      "tags": ["Via Tenente Giuseppe Li Bassi","Via Tenente Li Bassi","Via Li Bassi","Giuseppe Li Bassi","Li Bassi"],
+      "y": 0.511284
+    },
+    {
+      "label": "Via Massimo D'Azeglio",
+      "x": 0.546357,
+      "tags": ["Via Massimo D'Azeglio","Via D'Azeglio","Massimo D'Azeglio","D'Azeglio"],
+      "y": 0.534733
+    },
+    {
+      "label": "Cortile Pietro Cassarà",
+      "x": 0.550748,
+      "tags": ["Cortile Pietro Cassarà","Pietro Cassarà","Cortile Cassarà","Cortile"],
+      "y": 0.522724
+    },
+    {
+      "label": "Via San Giuliano",
+      "x": 0.547956,
+      "tags": ["Via San Giuliano","San Giuliano"],
+      "y": 0.510055
+    },
+    {
+      "label": "Chiesa di San Giuliano",
+      "x": 0.548549,
+      "tags": ["Chiesa di San Giuliano","San Giuliano","Chiesa"],
+      "y": 0.47462
+    },
+    {
+      "label": "Chiesa di San Michele",
+      "x": 0.517697,
+      "tags": ["Chiesa di San Michele","San Michele","Chiesa"],
+      "y": 0.494424
+    },
+    {
+      "label": "Via Avvocato Giovanni Mazara",
+      "x": 0.53834,
+      "tags": ["Via Avvocato Giovanni Mazara","Via Avv. G. Mazara","Via Mazara","Giovanni Mazara","Avvocato","Mazara"],
+      "y": 0.472084
+    },
+    {
+      "label": "Via Guido Sylva",
+      "x": 0.545065,
+      "tags": ["Via Guido Sylva","Via Guido Sjlva","Guido Sylva","Guido Sjlva","Silva","Sylva","Sjlva"],
+      "y": 0.461715
+    },
+    {
+      "label": "Via Giuseppe Garibaldi",
+      "x": 0.546996,
+      "tags": ["Via Giuseppe Garibaldi","Garibaldi"],
+      "y": 0.455609
+    },
+    {
+      "label": "Via Giovanni Riso",
+      "x": 0.56497,
+      "tags": ["Via Giovanni Riso","Giovanni Riso","Riso","Via Riso"],
+      "y": 0.430021
+    },
+    {
+      "label": "Piazza Torre",
+      "x": 0.571771,
+      "tags": ["Piazza Torre","Torre"],
+      "y": 0.434114
+    },
+    {
+      "label": "Cortile Giuseppe La Masa",
+      "x": 0.563222,
+      "tags": ["Cortile Giuseppe La Masa","Cortile La Masa","La Masa","Giuseppe La Masa","Cortile"],
+      "y": 0.454685
+    },
+    {
+      "label": "Cortile Girolamo Savonarola",
+      "x": 0.556317,
+      "tags": ["Cortile Girolamo Savonarola","Cortile Savonarola","Girolamo Savonarola","Cortile"],
+      "y": 0.46015
+    },
+    {
+      "label": "Corso Vittorio Emanuele II",
+      "x": 0.600698,
+      "tags": ["Corso Vittorio Emanuele II","Corso Vittorio","Corso Vittorio Emanuele","Vittorio Emanuele","Re d'Italia"],
+      "y": 0.483152
+    },
+    {
+      "label": "Quartiere Spagnolo",
+      "x": 0.566219,
+      "tags": ["Quartiere Spagnolo","Spagnolo","Quartiere"],
+      "y": 0.501369
+    },
+    {
+      "label": "Contrada Fontana Airazza",
+      "x": 0.577052,
+      "tags": ["Contrada Fontana Airazza","Contrada Airazza"],
+      "y": 0.606523
+    },
+    {
+      "label": "Via Pilade",
+      "x": 0.610137,
+      "tags": ["Via Pilade","Via del Pilade"],
+      "y": 0.543016
+    },
+    {
+      "label": "Via Padre Gioacchino Ventura",
+      "x": 0.581112,
+      "tags": ["Via Padre Gioacchino Ventura","Via Gioacchino Ventura","Via Ventura","Padre Ventura","Padre Gioacchino Ventura"],
+      "y": 0.53517
+    },
+    {
+      "label": "Via Gioberti",
+      "x": 0.590926,
+      "tags": ["Via Gioberti","Gioberti"],
+      "y": 0.521032
+    },
+    {
+      "label": "Via Bellini",
+      "x": 0.597537,
+      "tags": ["Via Bellini","Bellini"],
+      "y": 0.511107
+    },
+    {
+      "label": "Via Paolo Ponzo",
+      "x": 0.578564,
+      "tags": ["Via Paolo Ponzo","Via Ponzo","Paolo Ponzo","Ponzo"],
+      "y": 0.509492
+    },
+    {
+      "label": "Via Vito Vasile",
+      "x": 0.561474,
+      "tags": ["Via Vito Vasile","Via Vasile","Vito Vasile","Vasile"],
+      "y": 0.514407
+    },
+    {
+      "label": "Via Matteo Mazara",
+      "x": 0.550678,
+      "tags": ["Via Matteo Mazara","Via Matteo Mazzara","Via M. Mazzara","Mazzara","Matteo Mazzara","Matteo Mazara"],
+      "y": 0.497815
+    },
+    {
+      "label": "Via Professore Giuliano Mollica",
+      "x": 0.550132,
+      "tags": ["Via Professore Giuliano Mollica","Via Giuliano Mollica","Via Mollica","Professore Mollica","Mollica"],
+      "y": 0.486229
+    },
+    {
+      "label": "Via Felice Cavallotti",
+      "x": 0.573906,
+      "tags": ["Via Felice Cavallotti","Via Cavallotti","Avvocato","Cavallotti"],
+      "y": 0.527589
+    },
+    {
+      "label": "Via Arciprete Giuseppe Cangemi",
+      "x": 0.567337,
+      "tags": ["Via Arciprete Giuseppe Cangemi","Via Arciprete Cangemi","Arciprete Cangemi","Arc. G. Cangemi","Cangemi"],
+      "y": 0.494171
+    },
+    {
+      "label": "Via Sacerdote Pasquale Grazia",
+      "x": 0.56995,
+      "tags": ["Via Sacerdote Pasquale Grazia","Via Pasquale Grazia","Via Sacerdote Grazia","Pasquale Grazia","Grazia","Sacerdote Grazia"],
+      "y": 0.483926
+    },
+    {
+      "label": "Via Michelangelo Buonarroti",
+      "x": 0.572195,
+      "tags": ["Via Michelangelo Buonarroti","Via Buonarroti","Acchianata Turi"],
+      "y": 0.447911
+    },
+    {
+      "label": "Via Ugo Foscolo",
+      "x": 0.581324,
+      "tags": ["Via Ugo Foscolo","Ugo Foscolo","Via Foscolo"],
+      "y": 0.445252
+    },
+    {
+      "label": "Cortile Naduri",
+      "x": 0.586782,
+      "tags": ["Cortile Naduri","Naduri","Cortile"],
+      "y": 0.455028
+    },
+    {
+      "label": "Via Raffaello",
+      "x": 0.596415,
+      "tags": ["Via Raffaello","Raffaello"],
+      "y": 0.460985
+    },
+    {
+      "label": "Via Padre Angelo Secchi",
+      "x": 0.596128,
+      "tags": ["Via Padre Angelo Secchi","Via Secchi","Angelo Secchi","Parroco Secchi"],
+      "y": 0.487824
+    },
+    {
+      "label": "Via Silvestro Simone",
+      "x": 0.610989,
+      "tags": ["Via Silvestro Simone","Silvestro Simone"],
+      "y": 0.501035
+    },
+    {
+      "label": "Via Pergole",
+      "x": 0.606446,
+      "tags": ["Via Pergole","Pergole","Pergola"],
+      "y": 0.50345
+    },
+    {
+      "label": "Via Pumo",
+      "x": 0.594874,
+      "tags": ["Via Pumo","Pumo"],
+      "y": 0.50244
+    },
+    {
+      "label": "Via Ciantro Pampalone",
+      "x": 0.582469,
+      "tags": ["Via Ciantro Pampalone","Ciantro Pampalone","Vicolo delle Farfalle"],
+      "y": 0.480997
+    },
+    {
+      "label": "Via Morghen",
+      "x": 0.617274,
+      "tags": ["Via Morghen","Morghen"],
+      "y": 0.51118
+    },
     {
       "label": "PIAZZA CANNOLICCHIO",
       "x": 0.741548,
@@ -10,964 +1306,628 @@
       "y": 0.661006
     },
     {
-      "label": "c/da FRANCO",
-      "x": 0.906003,
-      "tags": ["C DA FRANCO","FRANCO"],
-      "y": 0.961566
-    },
-    {
-      "label": "c/da CANNIZZA",
-      "x": 0.895304,
-      "tags": ["C DA CANNIZZA","CANNIZZA"],
-      "y": 0.799922
-    },
-    {
-      "label": "c/da CANNIZZA",
-      "x": 0.899353,
-      "tags": ["C DA CANNIZZA","CANNIZZA"],
-      "y": 0.680269
-    },
-    {
-      "label": "c/da GRANATELLO",
-      "x": 0.769918,
-      "tags": ["C DA GRANATELLO","GRANATELLO"],
-      "y": 0.760781
-    },
-    {
-      "label": "c/da AFFACCIATURA",
-      "x": 0.869359,
-      "tags": ["C DA AFFACCIATURA","AFFACCIATURA"],
-      "y": 0.720664
-    },
-    {
-      "label": "c/da AFFACCIATURA",
-      "x": 0.868866,
-      "tags": ["C DA AFFACCIATURA","AFFACCIATURA"],
-      "y": 0.934832
-    },
-    {
-      "label": "C/da Vignazzi",
-      "x": 0.843614,
-      "tags": ["C DA VIGNAZZI","VIGNAZZI"],
-      "y": 0.063175
-    },
-    {
-      "label": "C.LE FARINI",
-      "x": 0.664893,
-      "tags": ["C LE FARINI","FARINI"],
-      "y": 0.413568
-    },
-    {
-      "label": "Strada Comunale",
-      "x": 0.828098,
-      "tags": ["STRADA COMUNALE"],
-      "y": 0.893633
-    },
-    {
-      "label": "Strada Comunale",
-      "x": 0.548624,
-      "tags": ["STRADA COMUNALE"],
-      "y": 0.88459
-    },
-    {
-      "label": "Strada Comunale",
-      "x": 0.491503,
-      "tags": ["STRADA COMUNALE"],
-      "y": 0.847106
-    },
-    {
-      "label": "Contrada MAZZAFORTE - BELVEDERE",
-      "x": 0.513546,
-      "tags": ["CONTRADA MAZZAFORTE BELVEDERE","MAZZAFORTE BELVEDERE","MAZZAFORTE","BELVEDERE"],
-      "y": 0.921143
-    },
-    {
-      "label": "Contrada MAZZAFORTE - BELVEDERE",
-      "x": 0.491503,
-      "tags": ["CONTRADA MAZZAFORTE BELVEDERE","MAZZAFORTE BELVEDERE","MAZZAFORTE","BELVEDERE"],
-      "y": 0.847106
-    },
-    {
-      "label": "Contrada MAZZAFORTE - BELVEDERE",
-      "x": 0.652745,
-      "tags": ["CONTRADA MAZZAFORTE BELVEDERE","MAZZAFORTE BELVEDERE","MAZZAFORTE","BELVEDERE"],
-      "y": 0.866098
-    },
-    {
-      "label": "contrada FONTANA AIRAZZA",
-      "x": 0.571952,
-      "tags": ["CONTRADA FONTANA AIRAZZA","FONTANA AIRAZZA","FONTANA","AIRAZZA"],
-      "y": 0.616593
-    },
-    {
-      "label": "Contrada SANTA MARIA",
-      "x": 0.46553,
-      "tags": ["CONTRADA SANTA MARIA","SANTA MARIA","SANTA","MARIA"],
-      "y": 0.151158
-    },
-    {
-      "label": "Contrada SANTA MARIA",
-      "x": 0.331362,
-      "tags": ["CONTRADA SANTA MARIA","SANTA MARIA","SANTA","MARIA"],
-      "y": 0.185998
-    },
-    {
-      "label": "Contrada SANTA MARIA",
-      "x": 0.491925,
-      "tags": ["CONTRADA SANTA MARIA","SANTA MARIA","SANTA","MARIA"],
-      "y": 0.451089
-    },
-    {
-      "label": "Contrada CAPPUCCINI",
-      "x": 0.551075,
-      "tags": ["CONTRADA CAPPUCCINI","CAPPUCCINI"],
-      "y": 0.209872
-    },
-    {
-      "label": "Contrada CAPPUCCINI",
-      "x": 0.601207,
-      "tags": ["CONTRADA CAPPUCCINI","CAPPUCCINI"],
-      "y": 0.388877
-    },
-    {
-      "label": "C.LE CENCI",
-      "x": 0.371806,
-      "tags": ["C LE CENCI","CENCI"],
-      "y": 0.568317
-    },
-    {
-      "label": "C.LE CIRCIARA",
-      "x": 0.366496,
-      "tags": ["C LE CIRCIARA","CIRCIARA"],
-      "y": 0.489402
-    },
-    {
-      "label": "C/le Sciaffino",
-      "x": 0.405923,
-      "tags": ["C LE SCIAFFINO","SCIAFFINO"],
-      "y": 0.463701
-    },
-    {
-      "label": "Contrada RIO",
-      "x": 0.167398,
-      "tags": ["CONTRADA RIO","RIO"],
-      "y": 0.863128
-    },
-    {
-      "label": "Contrada CANALE",
-      "x": 0.227774,
-      "tags": ["CONTRADA CANALE","CANALE"],
-      "y": 0.800552
-    },
-    {
-      "label": "Contrada CANALE",
-      "x": 0.496133,
-      "tags": ["CONTRADA CANALE","CANALE"],
-      "y": 0.618505
-    },
-    {
-      "label": "Contrada CANALE",
-      "x": 0.501707,
-      "tags": ["CONTRADA CANALE","CANALE"],
-      "y": 0.554449
-    },
-    {
-      "label": "Contrada CONCERIA",
-      "x": 0.226339,
-      "tags": ["CONTRADA CONCERIA","CONCERIA"],
-      "y": 0.708744
-    },
-    {
-      "label": "Contrada MARZUKO",
-      "x": 0.145924,
-      "tags": ["CONTRADA MARZUKO","MARZUKO"],
-      "y": 0.053872
-    },
-    {
-      "label": "C/da S. Pietro",
-      "x": 0.472234,
-      "tags": ["C DA S PIETRO","S PIETRO","S","PIETRO"],
-      "y": 0.935395
-    },
-    {
-      "label": "C/da S. Pietro",
-      "x": 0.33811,
-      "tags": ["C DA S PIETRO","S PIETRO","S","PIETRO"],
-      "y": 0.58018
-    },
-    {
-      "label": "C/da S. Pietro",
-      "x": 0.464961,
-      "tags": ["C DA S PIETRO","S PIETRO","S","PIETRO"],
-      "y": 0.449001
-    },
-    {
-      "label": "C/da S. Pietro",
-      "x": 0.627685,
-      "tags": ["C DA S PIETRO","S PIETRO","S","PIETRO"],
-      "y": 0.2868
-    },
-    {
-      "label": "C/da Margi",
-      "x": 0.47085,
-      "tags": ["C DA MARGI","MARGI"],
-      "y": 0.939755
-    },
-    {
-      "label": "C/da Margi",
-      "x": 0.481035,
-      "tags": ["C DA MARGI","MARGI"],
-      "y": 0.850372
-    },
-    {
-      "label": "C/da Rina",
-      "x": 0.470098,
-      "tags": ["C DA RINA","RINA"],
-      "y": 0.944098
-    },
-    {
-      "label": "C/da Rina",
-      "x": 0.48239,
-      "tags": ["C DA RINA","RINA"],
-      "y": 0.853587
-    },
-    {
-      "label": "Strada Comunale Mazzaforte -",
-      "x": 0.513546,
-      "tags": ["STRADA COMUNALE MAZZAFORTE","MAZZAFORTE"],
-      "y": 0.921143
-    },
-    {
-      "label": "Strada Comunale Mazzaforte -",
-      "x": 0.491503,
-      "tags": ["STRADA COMUNALE MAZZAFORTE","MAZZAFORTE"],
-      "y": 0.847106
-    },
-    {
-      "label": "Strada Comunale Mazzaforte -",
-      "x": 0.652745,
-      "tags": ["STRADA COMUNALE MAZZAFORTE","MAZZAFORTE"],
-      "y": 0.866098
-    },
-    {
-      "label": "C/da Marzuco",
-      "x": 0.209567,
-      "tags": ["C DA MARZUCO","MARZUCO"],
-      "y": 0.18311
-    },
-    {
-      "label": "PIAZZA P. NOCITO",
-      "x": 0.414015,
-      "tags": ["PIAZZA P NOCITO","P NOCITO","P","NOCITO"],
-      "y": 0.508039
-    },
-    {
-      "label": "C.LE MILANA",
-      "x": 0.636807,
-      "tags": ["C LE MILANA","MILANA"],
-      "y": 0.390585
-    },
-    {
-      "label": "C.LE SAVONAROLA",
-      "x": 0.557355,
-      "tags": ["C LE SAVONAROLA","SAVONAROLA"],
-      "y": 0.458868
-    },
-    {
-      "label": "C.LE NADURI",
-      "x": 0.588002,
-      "tags": ["C LE NADURI","NADURI"],
-      "y": 0.452927
-    },
-    {
-      "label": "C.LE CASSARA'",
-      "x": 0.550572,
-      "tags": ["C LE CASSARA","CASSARA"],
-      "y": 0.520624
-    },
-    {
-      "label": "C.LE GENOVESE",
-      "x": 0.674765,
-      "tags": ["C LE GENOVESE","GENOVESE"],
-      "y": 0.469971
-    },
-    {
-      "label": "C.LE AMARI",
-      "x": 0.586413,
-      "tags": ["C LE AMARI","AMARI"],
-      "y": 0.399747
-    },
-    {
-      "label": "C.LE ETNA",
-      "x": 0.602358,
-      "tags": ["C LE ETNA","ETNA"],
-      "y": 0.410129
-    },
-    {
-      "label": "C.LE GIANNI",
-      "x": 0.664957,
-      "tags": ["C LE GIANNI","GIANNI"],
-      "y": 0.507621
-    },
-    {
-      "label": "CORSO VITT. EMANUELE",
-      "x": 0.655463,
-      "tags": ["CORSO VITT EMANUELE","VITT EMANUELE","VITT","EMANUELE"],
-      "y": 0.512498
-    },
-    {
-      "label": "CORSO VITT. EMANUELE",
-      "x": 0.556142,
-      "tags": ["CORSO VITT EMANUELE","VITT EMANUELE","VITT","EMANUELE"],
-      "y": 0.479384
-    },
-    {
-      "label": "CORSO VITT. EMANUELE",
-      "x": 0.741517,
-      "tags": ["CORSO VITT EMANUELE","VITT EMANUELE","VITT","EMANUELE"],
-      "y": 0.576412
-    },
-    {
-      "label": "C/LE ANELLO",
-      "x": 0.688484,
-      "tags": ["C LE ANELLO","ANELLO"],
-      "y": 0.37496
-    },
-    {
-      "label": "Via Riso",
-      "x": 0.56758,
-      "tags": ["VIA RISO","RISO"],
-      "y": 0.427717
-    },
-    {
-      "label": "Via Riso",
-      "x": 0.571737,
-      "tags": ["VIA RISO","RISO"],
-      "y": 0.416227
-    },
-    {
-      "label": "Via Barresi",
-      "x": 0.49367,
-      "tags": ["VIA BARRESI","BARRESI"],
-      "y": 0.465177
-    },
-    {
-      "label": "Via Antonino",
-      "x": 0.527223,
-      "tags": ["VIA ANTONINO","ANTONINO"],
-      "y": 0.415017
-    },
-    {
-      "label": "Via Antonino",
-      "x": 0.335647,
-      "tags": ["VIA ANTONINO","ANTONINO"],
-      "y": 0.560074
-    },
-    {
-      "label": "Via Autuori",
-      "x": 0.583427,
-      "tags": ["VIA AUTUORI","AUTUORI"],
-      "y": 0.287517
-    },
-    {
-      "label": "Via Autuori",
-      "x": 0.69532,
-      "tags": ["VIA AUTUORI","AUTUORI"],
-      "y": 0.23131
-    },
-    {
-      "label": "Via Fernando",
-      "x": 0.5642,
-      "tags": ["VIA FERNANDO","FERNANDO"],
-      "y": 0.287551
-    },
-    {
-      "label": "Via Fernando",
-      "x": 0.667657,
-      "tags": ["VIA FERNANDO","FERNANDO"],
-      "y": 0.247681
-    },
-    {
-      "label": "Via De Amicis",
-      "x": 0.563981,
-      "tags": ["VIA DE AMICIS","DE AMICIS","DE","AMICIS"],
-      "y": 0.322087
-    },
-    {
-      "label": "Via De Amicis",
-      "x": 0.514394,
-      "tags": ["VIA DE AMICIS","DE AMICIS","DE","AMICIS"],
-      "y": 0.336953
-    },
-    {
-      "label": "Via De Amicis",
-      "x": 0.56939,
-      "tags": ["VIA DE AMICIS","DE AMICIS","DE","AMICIS"],
-      "y": 0.333991
-    },
-    {
-      "label": "Via De Amicis",
-      "x": 0.49747,
-      "tags": ["VIA DE AMICIS","DE AMICIS","DE","AMICIS"],
-      "y": 0.320949
-    },
-    {
-      "label": "Via Capre",
-      "x": 0.260052,
-      "tags": ["VIA CAPRE","CAPRE"],
-      "y": 0.627022
-    },
-    {
-      "label": "Via Capre",
-      "x": 0.289552,
-      "tags": ["VIA CAPRE","CAPRE"],
-      "y": 0.617259
-    },
-    {
-      "label": "Via Palermo",
-      "x": 0.737564,
-      "tags": ["VIA PALERMO","PALERMO"],
-      "y": 0.556245
-    },
-    {
-      "label": "Via Palermo",
-      "x": 0.115774,
-      "tags": ["VIA PALERMO","PALERMO"],
-      "y": 0.073224
-    },
-    {
-      "label": "Via Palermo",
-      "x": 0.763573,
-      "tags": ["VIA PALERMO","PALERMO"],
-      "y": 0.568809
-    },
-    {
-      "label": "Via Brandis",
-      "x": 0.683663,
-      "tags": ["VIA BRANDIS","BRANDIS"],
-      "y": 0.468511
-    },
-    {
-      "label": "Via Brandis",
-      "x": 0.67498,
-      "tags": ["VIA BRANDIS","BRANDIS"],
-      "y": 0.489774
-    },
-    {
-      "label": "Via Brandis",
-      "x": 0.714934,
-      "tags": ["VIA BRANDIS","BRANDIS"],
-      "y": 0.473774
-    },
-    {
-      "label": "Via Pergole",
-      "x": 0.605744,
-      "tags": ["VIA PERGOLE","PERGOLE"],
-      "y": 0.504861
-    },
-    {
-      "label": "Via Perollo",
-      "x": 0.487958,
-      "tags": ["VIA PEROLLO","PEROLLO"],
-      "y": 0.638162
-    },
-    {
-      "label": "Via Perollo",
-      "x": 0.488286,
-      "tags": ["VIA PEROLLO","PEROLLO"],
-      "y": 0.611393
-    },
-    {
-      "label": "Via Beato Arcangelo",
-      "x": 0.518037,
-      "tags": ["VIA BEATO ARCANGELO","BEATO ARCANGELO","BEATO","ARCANGELO"],
-      "y": 0.461798
-    },
-    {
-      "label": "Via Beato Arcangelo",
-      "x": 0.827716,
-      "tags": ["VIA BEATO ARCANGELO","BEATO ARCANGELO","BEATO","ARCANGELO"],
-      "y": 0.226242
-    },
-    {
-      "label": "Via Menotti",
-      "x": 0.471919,
-      "tags": ["VIA MENOTTI","MENOTTI"],
-      "y": 0.470161
-    },
-    {
-      "label": "Via Notaro",
-      "x": 0.379942,
-      "tags": ["VIA NOTARO","NOTARO"],
-      "y": 0.517033
-    },
-    {
-      "label": "Strada Patti",
-      "x": 0.095487,
-      "tags": ["STRADA PATTI","PATTI"],
-      "y": 0.703516
-    },
-    {
-      "label": "Strada Patti",
-      "x": 0.611861,
-      "tags": ["STRADA PATTI","PATTI"],
-      "y": 0.37939
-    },
-    {
-      "label": "Via Dante",
-      "x": 0.721329,
-      "tags": ["VIA DANTE","DANTE"],
-      "y": 0.392044
-    },
-    {
-      "label": "Via Dante",
-      "x": 0.647046,
-      "tags": ["VIA DANTE","DANTE"],
-      "y": 0.435024
-    },
-    {
-      "label": "C.le Canova",
-      "x": 0.665689,
-      "tags": ["C LE CANOVA","CANOVA"],
-      "y": 0.484119
-    },
-    {
-      "label": "Via Padre Pio",
-      "x": 0.420244,
-      "tags": ["VIA PADRE PIO","PADRE PIO","PADRE","PIO"],
-      "y": 0.546384
-    },
-    {
-      "label": "Via Gioberti",
-      "x": 0.582455,
-      "tags": ["VIA GIOBERTI","GIOBERTI"],
-      "y": 0.518783
-    },
-    {
-      "label": "Via Gioberti",
-      "x": 0.601329,
-      "tags": ["VIA GIOBERTI","GIOBERTI"],
-      "y": 0.522752
-    },
-    {
-      "label": "Via Ponzo",
-      "x": 0.583641,
-      "tags": ["VIA PONZO","PONZO"],
-      "y": 0.507864
-    },
-    {
-      "label": "Via Pasquale",
-      "x": 0.563567,
-      "tags": ["VIA PASQUALE","PASQUALE"],
-      "y": 0.485179
-    },
-    {
-      "label": "Avv. Giovanni Gallo",
-      "x": 0.42097,
-      "tags": ["AVV GIOVANNI GALLO","GIOVANNI GALLO","GIOVANNI","GALLO"],
-      "y": 0.483017
-    },
-    {
-      "label": "Dottor Benedetto Gallo",
-      "x": 0.453904,
-      "tags": ["DOTTOR BENEDETTO GALLO","BENEDETTO GALLO","BENEDETTO","GALLO"],
-      "y": 0.519484
-    },
-    {
-      "label": "Avv. Leonardo Gallo",
-      "x": 0.507438,
-      "tags": ["AVV LEONARDO GALLO","LEONARDO GALLO","LEONARDO","GALLO"],
-      "y": 0.481638
-    },
-    {
-      "label": "Dottor Biagio Gallo",
-      "x": 0.60809,
-      "tags": ["DOTTOR BIAGIO GALLO","BIAGIO GALLO","BIAGIO","GALLO"],
-      "y": 0.443696
-    },
-    {
-      "label": "Via Garibaldi",
-      "x": 0.502569,
-      "tags": ["VIA GARIBALDI","GARIBALDI"],
-      "y": 0.533354
-    },
-    {
-      "label": "Via Garibaldi",
-      "x": 0.504191,
-      "tags": ["VIA GARIBALDI","GARIBALDI"],
-      "y": 0.468927
-    },
-    {
-      "label": "Via Garibaldi",
-      "x": 0.553329,
-      "tags": ["VIA GARIBALDI","GARIBALDI"],
-      "y": 0.451401
-    },
-    {
-      "label": "Via Garibaldi",
-      "x": 0.657892,
-      "tags": ["VIA GARIBALDI","GARIBALDI"],
-      "y": 0.351899
-    },
-    {
-      "label": "Via Garibaldi",
-      "x": 0.662495,
-      "tags": ["VIA GARIBALDI","GARIBALDI"],
-      "y": 0.409211
-    },
-    {
-      "label": "Via A. De Gasperi",
-      "x": 0.563274,
-      "tags": ["VIA A DE GASPERI","A DE GASPERI","A","DE","GASPERI"],
-      "y": 0.406175
-    },
-    {
-      "label": "Via A. De Gasperi",
-      "x": 0.664688,
-      "tags": ["VIA A DE GASPERI","A DE GASPERI","A","DE","GASPERI"],
-      "y": 0.299976
-    },
-    {
-      "label": "Via A. De Gasperi",
-      "x": 0.743028,
-      "tags": ["VIA A DE GASPERI","A DE GASPERI","A","DE","GASPERI"],
-      "y": 0.197496
-    },
-    {
-      "label": "Via Acquanuova",
-      "x": 0.50805,
-      "tags": ["VIA ACQUANUOVA","ACQUANUOVA"],
-      "y": 0.379187
-    },
-    {
-      "label": "Via Gervasi",
-      "x": 0.352863,
-      "tags": ["VIA GERVASI","GERVASI"],
-      "y": 0.581773
-    },
-    {
-      "label": "Via Masaniello",
-      "x": 0.395637,
-      "tags": ["VIA MASANIELLO","MASANIELLO"],
-      "y": 0.452217
-    },
-    {
-      "label": "Via Giovanni Palatucci",
-      "x": 0.497088,
-      "tags": ["VIA GIOVANNI PALATUCCI","GIOVANNI PALATUCCI","GIOVANNI","PALATUCCI"],
-      "y": 0.286311
-    },
-    {
-      "label": "Via del Belice",
-      "x": 0.719281,
-      "tags": ["VIA DEL BELICE","DEL BELICE","DEL","BELICE"],
-      "y": 0.180118
-    },
-    {
-      "label": "Via Silvio Pellico",
-      "x": 0.52962,
-      "tags": ["VIA SILVIO PELLICO","SILVIO PELLICO","SILVIO","PELLICO"],
-      "y": 0.202832
-    },
-    {
-      "label": "Via Silvio Pellico",
-      "x": 0.590965,
-      "tags": ["VIA SILVIO PELLICO","SILVIO PELLICO","SILVIO","PELLICO"],
-      "y": 0.383718
-    },
-    {
-      "label": "Via Teano",
-      "x": 0.129268,
-      "tags": ["VIA TEANO","TEANO"],
-      "y": 0.540328
-    },
-    {
-      "label": "Via Ippolito Nievo",
-      "x": 0.130306,
-      "tags": ["VIA IPPOLITO NIEVO","IPPOLITO NIEVO","IPPOLITO","NIEVO"],
-      "y": 0.544842
-    },
-    {
-      "label": "Via Federico II",
-      "x": 0.702275,
-      "tags": ["VIA FEDERICO II","FEDERICO II","FEDERICO","II"],
-      "y": 0.105455
-    },
-    {
-      "label": "Via Federico II",
-      "x": 0.646999,
-      "tags": ["VIA FEDERICO II","FEDERICO II","FEDERICO","II"],
-      "y": 0.111627
-    },
-    {
-      "label": "Via Sac. Giuseppe",
-      "x": 0.693808,
-      "tags": ["VIA SAC GIUSEPPE","SAC GIUSEPPE","SAC","GIUSEPPE"],
-      "y": 0.29903
-    },
-    {
-      "label": "Via Sac. Giuseppe",
-      "x": 0.876212,
-      "tags": ["VIA SAC GIUSEPPE","SAC GIUSEPPE","SAC","GIUSEPPE"],
-      "y": 0.588353
-    },
-    {
-      "label": "Via Sac. Giuseppe",
-      "x": 0.493696,
-      "tags": ["VIA SAC GIUSEPPE","SAC GIUSEPPE","SAC","GIUSEPPE"],
-      "y": 0.333915
-    },
-    {
-      "label": "Via Sac. Giuseppe",
-      "x": 0.26559,
-      "tags": ["VIA SAC GIUSEPPE","SAC GIUSEPPE","SAC","GIUSEPPE"],
-      "y": 0.644577
-    },
-    {
-      "label": "Via Sac. Giuseppe",
-      "x": 0.628419,
-      "tags": ["VIA SAC GIUSEPPE","SAC GIUSEPPE","SAC","GIUSEPPE"],
-      "y": 0.37269
-    },
-    {
-      "label": "Via Sac. Giuseppe",
-      "x": 0.460178,
-      "tags": ["VIA SAC GIUSEPPE","SAC GIUSEPPE","SAC","GIUSEPPE"],
-      "y": 0.482115
-    },
-    {
-      "label": "Via Monti",
-      "x": 0.577125,
-      "tags": ["VIA MONTI","MONTI"],
-      "y": 0.3951
-    },
-    {
-      "label": "Via Cavallotti",
-      "x": 0.57238,
-      "tags": ["VIA CAVALLOTTI","CAVALLOTTI"],
-      "y": 0.5302
-    },
-    {
-      "label": "Via Cavallotti",
-      "x": 0.347196,
-      "tags": ["VIA CAVALLOTTI","CAVALLOTTI"],
-      "y": 0.547055
-    },
-    {
-      "label": "Via Ventura",
-      "x": 0.58029,
-      "tags": ["VIA VENTURA","VENTURA"],
-      "y": 0.532071
-    },
-    {
-      "label": "Via San Giuliano",
-      "x": 0.551716,
-      "tags": ["VIA SAN GIULIANO","SAN GIULIANO","SAN","GIULIANO"],
-      "y": 0.509041
-    },
-    {
-      "label": "Via Crucis",
-      "x": 0.790284,
-      "tags": ["VIA CRUCIS","CRUCIS"],
-      "y": 0.493558
-    },
-    {
-      "label": "Via Valle dei Mulini",
-      "x": 0.214006,
-      "tags": ["VIA VALLE DEI MULINI","VALLE DEI MULINI","VALLE","DEI","MULINI"],
-      "y": 0.249135
-    },
-    {
-      "label": "Via Tiro a Segno",
-      "x": 0.484264,
-      "tags": ["VIA TIRO A SEGNO","TIRO A SEGNO","TIRO","A","SEGNO"],
-      "y": 0.406962
-    },
-    {
-      "label": "Via Tiro a Segno",
-      "x": 0.437422,
-      "tags": ["VIA TIRO A SEGNO","TIRO A SEGNO","TIRO","A","SEGNO"],
-      "y": 0.335578
-    },
-    {
-      "label": "Via Ben.",
-      "x": 0.437347,
-      "tags": ["VIA BEN","BEN"],
-      "y": 0.513032
-    },
-    {
-      "label": "Via Giulio Mollica",
-      "x": 0.417027,
-      "tags": ["VIA GIULIO MOLLICA","GIULIO MOLLICA","GIULIO","MOLLICA"],
-      "y": 0.46836
-    },
-    {
-      "label": "Via Giulio Mollica",
-      "x": 0.550107,
-      "tags": ["VIA GIULIO MOLLICA","GIULIO MOLLICA","GIULIO","MOLLICA"],
-      "y": 0.486495
-    },
-    {
-      "label": "Via Tommaso",
-      "x": 0.684924,
-      "tags": ["VIA TOMMASO","TOMMASO"],
-      "y": 0.481213
-    },
-    {
-      "label": "Via Magg. Rocco Lazzazzera",
-      "x": 0.773785,
-      "tags": ["VIA MAGG ROCCO LAZZAZZERA","MAGG ROCCO LAZZAZZERA","MAGG","ROCCO","LAZZAZZERA"],
-      "y": 0.425087
-    },
-    {
-      "label": "Via Craparotta",
-      "x": 0.724893,
-      "tags": ["VIA CRAPAROTTA","CRAPAROTTA"],
-      "y": 0.514312
-    },
-    {
-      "label": "Via Truglio",
-      "x": 0.25158,
-      "tags": ["VIA TRUGLIO","TRUGLIO"],
-      "y": 0.625183
-    },
-    {
-      "label": "Via Truglio",
-      "x": 0.301154,
-      "tags": ["VIA TRUGLIO","TRUGLIO"],
-      "y": 0.591925
-    },
-    {
       "label": "Contrada Franco",
       "x": 0.906003,
-      "tags": ["CONTRADA FRANCO","FRANCO"],
+      "tags": ["Contrada Franco","FRANCO","c/da FRANCO"],
       "y": 0.961566
     },
     {
       "label": "Contrada Cannizza",
       "x": 0.895304,
-      "tags": ["CONTRADA CANNIZZA","CANNIZZA"],
+      "tags": ["Contrada Cannizza","CANNIZZA","c/da CANNIZZA"],
       "y": 0.799922
     },
     {
       "label": "Contrada Cannizza",
       "x": 0.899353,
-      "tags": ["CONTRADA CANNIZZA","CANNIZZA"],
+      "tags": ["Contrada Cannizza","CANNIZZA","c/da CANNIZZA"],
       "y": 0.680269
     },
     {
       "label": "Contrada Granatello",
       "x": 0.769918,
-      "tags": ["CONTRADA GRANATELLO","GRANATELLO"],
+      "tags": ["Contrada Granatello","GRANATELLO","c/da GRANATELLO"],
       "y": 0.760781
     },
     {
       "label": "Contrada Affacciatura",
       "x": 0.869359,
-      "tags": ["CONTRADA AFFACCIATURA","AFFACCIATURA"],
+      "tags": ["Contrada Affacciatura","AFFACCIATURA","c/da AFFACCIATURA"],
       "y": 0.720664
     },
     {
       "label": "Contrada Affacciatura",
       "x": 0.868866,
-      "tags": ["CONTRADA AFFACCIATURA","AFFACCIATURA"],
+      "tags": ["Contrada Affacciatura","AFFACCIATURA","c/da AFFACCIATURA"],
       "y": 0.934832
     },
     {
       "label": "Contrada Vignazzi",
       "x": 0.843614,
-      "tags": ["CONTRADA VIGNAZZI","VIGNAZZI"],
+      "tags": ["Contrada Vignazzi","VIGNAZZI","C/da Vignazzi"],
       "y": 0.063175
     },
     {
-      "label": "C.le Cassarà",
-      "x": 0.550572,
-      "tags": ["C LE CASSAR","CASSAR"],
-      "y": 0.520624
+      "label": "C.LE FARINI",
+      "x": 0.664893,
+      "tags": ["C.LE FARINI","FARINI"],
+      "y": 0.413568
     },
     {
-      "label": "Via Strozzi",
-      "x": 0.721607,
-      "tags": ["VIA STROZZI","STROZZI"],
-      "y": 0.429198
+      "label": "Strada Comunale",
+      "x": 0.828098,
+      "tags": ["Strada Comunale"],
+      "y": 0.893633
     },
     {
-      "label": "Via Ingroia",
-      "x": 0.687958,
-      "tags": ["VIA INGROIA","INGROIA"],
-      "y": 0.510808
+      "label": "Strada Comunale",
+      "x": 0.548624,
+      "tags": ["Strada Comunale"],
+      "y": 0.88459
     },
     {
-      "label": "Via Zanardelli",
-      "x": 0.72648,
-      "tags": ["VIA ZANARDELLI","ZANARDELLI"],
-      "y": 0.315976
+      "label": "Contrada MAZZAFORTE - BELVEDERE",
+      "x": 0.491503,
+      "tags": ["Contrada MAZZAFORTE - BELVEDERE","MAZZAFORTE BELVEDERE","MAZZAFORTE","BELVEDERE","Strada Comunale","Strada Comunale Mazzaforte"],
+      "y": 0.847106
     },
     {
-      "label": "Via Donatello",
-      "x": 0.70998,
-      "tags": ["VIA DONATELLO","DONATELLO"],
-      "y": 0.499466
+      "label": "Contrada MAZZAFORTE - BELVEDERE",
+      "x": 0.513546,
+      "tags": ["Contrada MAZZAFORTE - BELVEDERE","MAZZAFORTE BELVEDERE","MAZZAFORTE","BELVEDERE","Strada Comunale Mazzaforte"],
+      "y": 0.921143
     },
     {
-      "label": "Via Gaetano Cangemi",
-      "x": 0.722298,
-      "tags": ["VIA GAETANO CANGEMI","GAETANO CANGEMI","GAETANO","CANGEMI"],
-      "y": 0.446731
+      "label": "Contrada MAZZAFORTE - BELVEDERE",
+      "x": 0.652745,
+      "tags": ["Contrada MAZZAFORTE - BELVEDERE","MAZZAFORTE BELVEDERE","MAZZAFORTE","BELVEDERE","Strada Comunale Mazzaforte"],
+      "y": 0.866098
     },
     {
-      "label": "Via Caradonna",
-      "x": 0.694682,
-      "tags": ["VIA CARADONNA","CARADONNA"],
-      "y": 0.472076
+      "label": "Contrada Santa Maria",
+      "x": 0.46553,
+      "tags": ["Contrada Santa Maria","Santa Maria"],
+      "y": 0.151158
     },
     {
-      "label": "Viale Europa",
-      "x": 0.262081,
-      "tags": ["VIALE EUROPA","EUROPA"],
-      "y": 0.611289
+      "label": "Contrada SANTA MARIA",
+      "x": 0.331362,
+      "tags": ["Contrada SANTA MARIA","SANTA MARIA","SANTA","MARIA"],
+      "y": 0.185998
     },
     {
-      "label": "Corso Vittorio Emanuele",
-      "x": 0.709342,
-      "tags": ["CORSO VITTORIO EMANUELE","VITTORIO EMANUELE","VITTORIO","EMANUELE"],
-      "y": 0.560083
+      "label": "Contrada SANTA MARIA",
+      "x": 0.491925,
+      "tags": ["Contrada SANTA MARIA","SANTA MARIA","SANTA","MARIA"],
+      "y": 0.451089
     },
     {
-      "label": "Corso Vittorio Emanuele",
-      "x": 0.796574,
-      "tags": ["CORSO VITTORIO EMANUELE","VITTORIO EMANUELE","VITTORIO","EMANUELE"],
-      "y": 0.565192
+      "label": "Contrada CAPPUCCINI",
+      "x": 0.601207,
+      "tags": ["Contrada CAPPUCCINI","CAPPUCCINI"],
+      "y": 0.388877
     },
     {
-      "label": "Corso Vittorio Emanuele",
-      "x": 0.613326,
-      "tags": ["CORSO VITTORIO EMANUELE","VITTORIO EMANUELE","VITTORIO","EMANUELE"],
-      "y": 0.491996
+      "label": "Contrada Rio",
+      "x": 0.167398,
+      "tags": ["Contrada Rio","Rio"],
+      "y": 0.863128
+    },
+    {
+      "label": "Contrada CANALE",
+      "x": 0.496133,
+      "tags": ["Contrada CANALE","CANALE"],
+      "y": 0.618505
+    },
+    {
+      "label": "Contrada CANALE",
+      "x": 0.501707,
+      "tags": ["Contrada CANALE","CANALE"],
+      "y": 0.554449
+    },
+    {
+      "label": "Contrada Conceria",
+      "x": 0.226339,
+      "tags": ["Contrada Conceria","Conceria"],
+      "y": 0.708744
+    },
+    {
+      "label": "Contrada Marzuko",
+      "x": 0.145924,
+      "tags": ["Contrada Marzuko","Contrada Marzuco","Marzuko","Marzuco"],
+      "y": 0.053872
+    },
+    {
+      "label": "C/da S. Pietro",
+      "x": 0.472234,
+      "tags": ["C/da S. Pietro","S PIETRO","PIETRO"],
+      "y": 0.935395
+    },
+    {
+      "label": "C/da S. Pietro",
+      "x": 0.33811,
+      "tags": ["C/da S. Pietro","S PIETRO","PIETRO"],
+      "y": 0.58018
+    },
+    {
+      "label": "C/da S. Pietro",
+      "x": 0.464961,
+      "tags": ["C/da S. Pietro","S PIETRO","PIETRO"],
+      "y": 0.449001
+    },
+    {
+      "label": "C/da S. Pietro",
+      "x": 0.627685,
+      "tags": ["C/da S. Pietro","S PIETRO","PIETRO"],
+      "y": 0.2868
     },
     {
       "label": "Contrada Margi",
       "x": 0.47085,
-      "tags": ["CONTRADA MARGI","MARGI"],
+      "tags": ["Contrada Margi","MARGI","C/da Margi"],
       "y": 0.939755
     },
     {
       "label": "Contrada Margi",
       "x": 0.481035,
-      "tags": ["CONTRADA MARGI","MARGI"],
+      "tags": ["Contrada Margi","MARGI","C/da Margi"],
       "y": 0.850372
     },
     {
       "label": "Contrada Rina",
       "x": 0.470098,
-      "tags": ["CONTRADA RINA","RINA"],
+      "tags": ["Contrada Rina","RINA","C/da Rina"],
       "y": 0.944098
     },
     {
       "label": "Contrada Rina",
       "x": 0.48239,
-      "tags": ["CONTRADA RINA","RINA"],
+      "tags": ["Contrada Rina","RINA","C/da Rina"],
       "y": 0.853587
+    },
+    {
+      "label": "C/da Marzuco",
+      "x": 0.209567,
+      "tags": ["C/da Marzuco","MARZUCO"],
+      "y": 0.18311
+    },
+    {
+      "label": "C.LE MILANA",
+      "x": 0.636807,
+      "tags": ["C.LE MILANA","MILANA"],
+      "y": 0.390585
+    },
+    {
+      "label": "C.LE GENOVESE",
+      "x": 0.674765,
+      "tags": ["C.LE GENOVESE","GENOVESE"],
+      "y": 0.469971
+    },
+    {
+      "label": "C.LE AMARI",
+      "x": 0.586413,
+      "tags": ["C.LE AMARI","AMARI"],
+      "y": 0.399747
+    },
+    {
+      "label": "C.LE ETNA",
+      "x": 0.602358,
+      "tags": ["C.LE ETNA","ETNA"],
+      "y": 0.410129
+    },
+    {
+      "label": "C.LE GIANNI",
+      "x": 0.664957,
+      "tags": ["C.LE GIANNI","GIANNI"],
+      "y": 0.507621
+    },
+    {
+      "label": "CORSO VITT. EMANUELE",
+      "x": 0.655463,
+      "tags": ["CORSO VITT. EMANUELE","VITT EMANUELE","VITT","EMANUELE"],
+      "y": 0.512498
+    },
+    {
+      "label": "CORSO VITT. EMANUELE",
+      "x": 0.556142,
+      "tags": ["CORSO VITT. EMANUELE","VITT EMANUELE","VITT","EMANUELE"],
+      "y": 0.479384
+    },
+    {
+      "label": "CORSO VITT. EMANUELE",
+      "x": 0.741517,
+      "tags": ["CORSO VITT. EMANUELE","VITT EMANUELE","VITT","EMANUELE"],
+      "y": 0.576412
+    },
+    {
+      "label": "C/LE ANELLO",
+      "x": 0.688484,
+      "tags": ["C/LE ANELLO","ANELLO"],
+      "y": 0.37496
+    },
+    {
+      "label": "Via Giovanni Riso",
+      "x": 0.571737,
+      "tags": ["Via Giovanni Riso","Giovanni Riso","Riso","Via Riso"],
+      "y": 0.416227
+    },
+    {
+      "label": "Via Autuori",
+      "x": 0.583427,
+      "tags": ["Via Autuori","AUTUORI"],
+      "y": 0.287517
+    },
+    {
+      "label": "Via Autuori",
+      "x": 0.69532,
+      "tags": ["Via Autuori","AUTUORI"],
+      "y": 0.23131
+    },
+    {
+      "label": "Via Fernando",
+      "x": 0.5642,
+      "tags": ["Via Fernando","FERNANDO"],
+      "y": 0.287551
+    },
+    {
+      "label": "Via Fernando",
+      "x": 0.667657,
+      "tags": ["Via Fernando","FERNANDO"],
+      "y": 0.247681
+    },
+    {
+      "label": "Via Edmondo De Amicis",
+      "x": 0.563981,
+      "tags": ["Via Edmondo De Amicis","Edmondo De Amicis","Via De Amicis","De Amicis"],
+      "y": 0.322087
+    },
+    {
+      "label": "Via Edmondo De Amicis",
+      "x": 0.514394,
+      "tags": ["Via Edmondo De Amicis","Edmondo De Amicis","Via De Amicis","De Amicis"],
+      "y": 0.336953
+    },
+    {
+      "label": "Via Edmondo De Amicis",
+      "x": 0.56939,
+      "tags": ["Via Edmondo De Amicis","Edmondo De Amicis","Via De Amicis","De Amicis"],
+      "y": 0.333991
+    },
+    {
+      "label": "Via Edmondo De Amicis",
+      "x": 0.49747,
+      "tags": ["Via Edmondo De Amicis","Edmondo De Amicis","Via De Amicis","De Amicis"],
+      "y": 0.320949
+    },
+    {
+      "label": "Via Capre",
+      "x": 0.289552,
+      "tags": ["Via Capre","Capre"],
+      "y": 0.617259
+    },
+    {
+      "label": "Via Palermo",
+      "x": 0.737564,
+      "tags": ["Via Palermo","PALERMO"],
+      "y": 0.556245
+    },
+    {
+      "label": "Via Palermo",
+      "x": 0.115774,
+      "tags": ["Via Palermo","PALERMO"],
+      "y": 0.073224
+    },
+    {
+      "label": "Via Palermo",
+      "x": 0.763573,
+      "tags": ["Via Palermo","PALERMO"],
+      "y": 0.568809
+    },
+    {
+      "label": "Via Brandis",
+      "x": 0.683663,
+      "tags": ["Via Brandis","BRANDIS"],
+      "y": 0.468511
+    },
+    {
+      "label": "Via Brandis",
+      "x": 0.67498,
+      "tags": ["Via Brandis","BRANDIS"],
+      "y": 0.489774
+    },
+    {
+      "label": "Via Brandis",
+      "x": 0.714934,
+      "tags": ["Via Brandis","BRANDIS"],
+      "y": 0.473774
+    },
+    {
+      "label": "Via Francesco Perollo",
+      "x": 0.487958,
+      "tags": ["Via Francesco Perollo","Via Perollo","Francesco Perollo","Perollo"],
+      "y": 0.638162
+    },
+    {
+      "label": "Via Francesco Perollo",
+      "x": 0.488286,
+      "tags": ["Via Francesco Perollo","Via Perollo","Francesco Perollo","Perollo"],
+      "y": 0.611393
+    },
+    {
+      "label": "Via Beato Arcangelo",
+      "x": 0.518037,
+      "tags": ["Via Beato Arcangelo","BEATO ARCANGELO","BEATO","ARCANGELO"],
+      "y": 0.461798
+    },
+    {
+      "label": "Via Beato Arcangelo",
+      "x": 0.827716,
+      "tags": ["Via Beato Arcangelo","BEATO ARCANGELO","BEATO","ARCANGELO"],
+      "y": 0.226242
+    },
+    {
+      "label": "Via Notaro",
+      "x": 0.379942,
+      "tags": ["Via Notaro","NOTARO"],
+      "y": 0.517033
+    },
+    {
+      "label": "Strada Patti",
+      "x": 0.095487,
+      "tags": ["Strada Patti","PATTI"],
+      "y": 0.703516
+    },
+    {
+      "label": "Strada Patti",
+      "x": 0.611861,
+      "tags": ["Strada Patti","PATTI"],
+      "y": 0.37939
+    },
+    {
+      "label": "Via Dante",
+      "x": 0.721329,
+      "tags": ["Via Dante","DANTE"],
+      "y": 0.392044
+    },
+    {
+      "label": "Via Dante",
+      "x": 0.647046,
+      "tags": ["Via Dante","DANTE"],
+      "y": 0.435024
+    },
+    {
+      "label": "C.le Canova",
+      "x": 0.665689,
+      "tags": ["C.le Canova","CANOVA"],
+      "y": 0.484119
+    },
+    {
+      "label": "Via Padre Pio",
+      "x": 0.420244,
+      "tags": ["Via Padre Pio","PADRE PIO","PADRE","PIO"],
+      "y": 0.546384
+    },
+    {
+      "label": "Via Pasquale",
+      "x": 0.563567,
+      "tags": ["Via Pasquale","PASQUALE"],
+      "y": 0.485179
+    },
+    {
+      "label": "Dottor Biagio Gallo",
+      "x": 0.60809,
+      "tags": ["Dottor Biagio Gallo","BIAGIO GALLO","BIAGIO","GALLO"],
+      "y": 0.443696
+    },
+    {
+      "label": "Via Garibaldi",
+      "x": 0.657892,
+      "tags": ["Via Garibaldi","GARIBALDI"],
+      "y": 0.351899
+    },
+    {
+      "label": "Via Garibaldi",
+      "x": 0.662495,
+      "tags": ["Via Garibaldi","GARIBALDI"],
+      "y": 0.409211
+    },
+    {
+      "label": "Via A. De Gasperi",
+      "x": 0.563274,
+      "tags": ["Via A. De Gasperi","A DE GASPERI","DE","GASPERI"],
+      "y": 0.406175
+    },
+    {
+      "label": "Via A. De Gasperi",
+      "x": 0.664688,
+      "tags": ["Via A. De Gasperi","A DE GASPERI","DE","GASPERI"],
+      "y": 0.299976
+    },
+    {
+      "label": "Via A. De Gasperi",
+      "x": 0.743028,
+      "tags": ["Via A. De Gasperi","A DE GASPERI","DE","GASPERI"],
+      "y": 0.197496
+    },
+    {
+      "label": "Via Acquanuova",
+      "x": 0.50805,
+      "tags": ["Via Acquanuova","ACQUANUOVA"],
+      "y": 0.379187
+    },
+    {
+      "label": "Via Silvio Pellico",
+      "x": 0.52962,
+      "tags": ["Via Silvio Pellico","SILVIO PELLICO","SILVIO","PELLICO"],
+      "y": 0.202832
+    },
+    {
+      "label": "Via Teano",
+      "x": 0.129268,
+      "tags": ["Via Teano","Teano"],
+      "y": 0.540328
+    },
+    {
+      "label": "Via Federico II",
+      "x": 0.702275,
+      "tags": ["Via Federico II","Federico II"],
+      "y": 0.105455
+    },
+    {
+      "label": "Via Federico II",
+      "x": 0.646999,
+      "tags": ["Via Federico II","Federico II"],
+      "y": 0.111627
+    },
+    {
+      "label": "Via Sac. Giuseppe",
+      "x": 0.693808,
+      "tags": ["Via Sac. Giuseppe","SAC GIUSEPPE","SAC","GIUSEPPE"],
+      "y": 0.29903
+    },
+    {
+      "label": "Via Sac. Giuseppe",
+      "x": 0.876212,
+      "tags": ["Via Sac. Giuseppe","SAC GIUSEPPE","SAC","GIUSEPPE"],
+      "y": 0.588353
+    },
+    {
+      "label": "Via Sac. Giuseppe",
+      "x": 0.493696,
+      "tags": ["Via Sac. Giuseppe","SAC GIUSEPPE","SAC","GIUSEPPE"],
+      "y": 0.333915
+    },
+    {
+      "label": "Via Sac. Giuseppe",
+      "x": 0.26559,
+      "tags": ["Via Sac. Giuseppe","SAC GIUSEPPE","SAC","GIUSEPPE"],
+      "y": 0.644577
+    },
+    {
+      "label": "Via Sac. Giuseppe",
+      "x": 0.628419,
+      "tags": ["Via Sac. Giuseppe","SAC GIUSEPPE","SAC","GIUSEPPE"],
+      "y": 0.37269
+    },
+    {
+      "label": "Via Sac. Giuseppe",
+      "x": 0.460178,
+      "tags": ["Via Sac. Giuseppe","SAC GIUSEPPE","SAC","GIUSEPPE"],
+      "y": 0.482115
+    },
+    {
+      "label": "Via Monti",
+      "x": 0.577125,
+      "tags": ["Via Monti","MONTI"],
+      "y": 0.3951
+    },
+    {
+      "label": "Via Crucis",
+      "x": 0.790284,
+      "tags": ["Via Crucis","CRUCIS"],
+      "y": 0.493558
+    },
+    {
+      "label": "Via Tiro a Segno",
+      "x": 0.484264,
+      "tags": ["Via Tiro a Segno","Tiro a Segno"],
+      "y": 0.406962
+    },
+    {
+      "label": "Via Tiro a Segno",
+      "x": 0.437422,
+      "tags": ["Via Tiro a Segno","Tiro a Segno"],
+      "y": 0.335578
+    },
+    {
+      "label": "Via Ben.",
+      "x": 0.437347,
+      "tags": ["Via Ben.","BEN"],
+      "y": 0.513032
+    },
+    {
+      "label": "Via Tommaso",
+      "x": 0.684924,
+      "tags": ["Via Tommaso","TOMMASO"],
+      "y": 0.481213
+    },
+    {
+      "label": "Via Magg. Rocco Lazzazzera",
+      "x": 0.773785,
+      "tags": ["Via Magg. Rocco Lazzazzera","MAGG ROCCO LAZZAZZERA","MAGG","ROCCO","LAZZAZZERA"],
+      "y": 0.425087
+    },
+    {
+      "label": "Via Craparotta",
+      "x": 0.724893,
+      "tags": ["Via Craparotta","CRAPAROTTA"],
+      "y": 0.514312
+    },
+    {
+      "label": "Via Truglio",
+      "x": 0.301154,
+      "tags": ["Via Truglio","Truglio"],
+      "y": 0.591925
+    },
+    {
+      "label": "Via Strozzi",
+      "x": 0.721607,
+      "tags": ["Via Strozzi","STROZZI"],
+      "y": 0.429198
+    },
+    {
+      "label": "Via Ingroia",
+      "x": 0.687958,
+      "tags": ["Via Ingroia","INGROIA"],
+      "y": 0.510808
+    },
+    {
+      "label": "Via Zanardelli",
+      "x": 0.72648,
+      "tags": ["Via Zanardelli","ZANARDELLI"],
+      "y": 0.315976
+    },
+    {
+      "label": "Via Donatello",
+      "x": 0.70998,
+      "tags": ["Via Donatello","DONATELLO"],
+      "y": 0.499466
+    },
+    {
+      "label": "Via Gaetano Cangemi",
+      "x": 0.722298,
+      "tags": ["Via Gaetano Cangemi","GAETANO CANGEMI","GAETANO","CANGEMI"],
+      "y": 0.446731
+    },
+    {
+      "label": "Via Caradonna",
+      "x": 0.694682,
+      "tags": ["Via Caradonna","CARADONNA"],
+      "y": 0.472076
+    },
+    {
+      "label": "Viale Europa",
+      "x": 0.262081,
+      "tags": ["Viale Europa","EUROPA"],
+      "y": 0.611289
+    },
+    {
+      "label": "Corso Vittorio Emanuele",
+      "x": 0.709342,
+      "tags": ["Corso Vittorio Emanuele","VITTORIO EMANUELE","VITTORIO","EMANUELE"],
+      "y": 0.560083
+    },
+    {
+      "label": "Corso Vittorio Emanuele",
+      "x": 0.796574,
+      "tags": ["Corso Vittorio Emanuele","VITTORIO EMANUELE","VITTORIO","EMANUELE"],
+      "y": 0.565192
+    },
+    {
+      "label": "Corso Vittorio Emanuele",
+      "x": 0.613326,
+      "tags": ["Corso Vittorio Emanuele","VITTORIO EMANUELE","VITTORIO","EMANUELE"],
+      "y": 0.491996
     }
   ]
 }
