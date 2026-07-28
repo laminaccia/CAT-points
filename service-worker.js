@@ -1,4 +1,4 @@
-const CACHE = 'mappa-squadra-v18';
+const CACHE = 'mappa-squadra-v20';
 const MAP_PATH = '/assets/map-placeholder.jpg';
 const ASSETS = [
   './',
@@ -40,5 +40,36 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  event.respondWith(caches.match(event.request).then((cached) => cached || fetch(event.request)));
+  event.respondWith(
+    caches.match(event.request).then((trovata) => {
+      if (trovata) return trovata;
+
+      return fetch(event.request)
+        .then((response) => {
+          // Quello che si scarica finisce in cache con la sua URL esatta, così
+          // un file appena versionato è disponibile offline dalla volta dopo
+          // senza aspettare la prossima installazione del service worker.
+          if (response.ok && event.request.method === 'GET' && requestUrl.origin === self.location.origin) {
+            const copia = response.clone();
+            event.waitUntil(caches.open(CACHE).then((cache) => cache.put(event.request, copia)));
+          }
+          return response;
+        })
+        .catch(() => {
+          // Rete assente. La lista ASSETS è precaricata SENZA query
+          // ('./styles.css'), ma index.html chiede 'styles.css?v=13' e per la
+          // Cache API la query fa parte dell'identità della risorsa: la
+          // corrispondenza esatta qui sopra fallisce sempre. Senza questa
+          // seconda ricerca che ignora la query, offline non arrivavano né il
+          // CSS né il JS e restava un guscio HTML nudo.
+          //
+          // Sta in fondo, e non al posto della ricerca esatta, di proposito:
+          // online il ?v=N continua a funzionare da cache-buster com'è sempre
+          // stato — versione nuova, corrispondenza mancata, file preso dalla
+          // rete. Qui si ripiega su una versione vecchia soltanto quando
+          // l'alternativa è non mostrare niente.
+          return caches.match(event.request, { ignoreSearch: true });
+        });
+    })
+  );
 });

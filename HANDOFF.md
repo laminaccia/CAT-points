@@ -5,6 +5,71 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-29 — L'offline funziona davvero; procedura di pubblicazione
+
+*Agente: Claude. Toccati `service-worker.js`, `app.js`, `index.html`.*
+
+L'utente vuole pubblicare l'app e ha chiesto di correggere prima l'offline,
+lasciando a lui i passi della pubblicazione.
+
+### La correzione dell'offline
+
+In `AGENTS.md` §9 avevo annotato due rimedi possibili; **nessuno dei due era
+buono**. Elencare in `ASSETS` gli URL versionati costringe ad aggiornare la
+lista a ogni bump (tre numeri da tenere allineati a mano, destinati a
+divergere); usare `ignoreSearch: true` al posto della ricerca esatta avrebbe
+tolto al `?v=N` la sua unica funzione, servendo il CSS vecchio a chi ha appena
+pubblicato il nuovo.
+
+La soluzione adottata è una terza: il gestore `fetch` prova **in ordine**
+corrispondenza esatta → rete (mettendo in cache la URL esatta scaricata) →
+corrispondenza ignorando la query. L'ultimo passo scatta solo quando la rete è
+fallita, quindi il `?v=N` conserva intatto il suo valore di cache-buster e
+offline si ripiega su una versione vecchia soltanto quando l'alternativa è non
+mostrare niente. Nessun numero in più da tenere allineato.
+
+### Un secondo bug, preesistente, che l'offline ha fatto emergere
+
+Corretto l'aggancio della cache, offline arrivavano CSS e JS ma **la mappa
+restava bianca**. Non era la cache: l'immagine era caricata (`naturalWidth`
+7559). `app.js` è deferred, quindi parte a parsing finito, e quando la mappa
+arriva dalla cache è già completa a quel punto: l'evento `load` a cui era
+appeso `fitImage()` non scatta più e la mappa non veniva mai inquadrata — si
+vedeva l'angolo dell'immagine a grandezza naturale, che è campagna vuota.
+
+Una riga: `if (image.complete && image.naturalWidth) fitImage();`. Il bug
+c'era da sempre e colpiva **anche online dalla seconda visita in poi**; è
+emerso solo ora perché prima, offline, non si arrivava nemmeno a caricare il JS.
+
+### Verificato col server spento
+
+Non simulato: `preview_stop`, conferma che la rete rifiuta le richieste, poi
+ricarica. Mappa inquadrata, coordinate del mirino attive, ricerca funzionante
+(`chianipodda` → Piazza dottor Nicolò Mazzara, dall'indice in cache), nessun
+errore in console. Screenshot agli atti.
+
+Versioni: `app.js?v=18` in `index.html`, `CACHE` a `mappa-squadra-v20`.
+
+### Pubblicazione
+
+Scritto `PUBBLICARE.md` su richiesta dell'utente, che preferisce eseguire i
+passi da sé. In sintesi: **serve HTTPS obbligatoriamente** (senza, niente
+service worker, niente PWA, niente offline); l'app gira già da qualunque
+sottocartella senza modifiche perché manifest e percorsi sono relativi;
+consigliato Cloudflare Pages per via dei 5,6 MB del primo caricamento.
+
+Sui domini: `.xyz` non è gratuito, è solo economico — i sottodomini `.pages.dev`
+o `.github.io` sì, e per un link che gira su WhatsApp bastano.
+
+### Da valutare
+
+- **Peso del primo caricamento: 5,6 MB.** Il PDF da 1,35 MB è precaricato e
+  non serve all'app: toglierlo da `ASSETS` è guadagno netto.
+- **Diritti sulla mappa**: pubblicare la distribuisce. Da verificare prima.
+- `gh` non è installato: il repository remoto va creato dal sito.
+
+---
+
 ## 2026-07-29 — Primo lotto di punti curati fuso nell'indice delle vie
 
 *Agente: Claude. Toccati `assets/streets.json` (rigenerato) e `CACHE` nel

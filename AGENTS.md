@@ -97,32 +97,34 @@ Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
 resta attivo e continua a servire i file vecchi.
 
-### Perché il `?v=N` funziona (e cosa rompe)
+### Come stanno insieme il `?v=N` e la cache
 
-Verificato in browser il 2026-07-28. `ASSETS` elenca i file **senza** query
-(`'./styles.css'`), ma la pagina li chiede **con** query (`styles.css?v=13`), e
-`caches.match()` di default considera la query parte dell'identità:
+`ASSETS` elenca i file **senza** query (`'./styles.css'`), ma la pagina li
+chiede **con** query (`styles.css?v=13`), e `caches.match()` di default
+considera la query parte dell'identità della risorsa:
 
-| Richiesta | Trova la voce in cache? |
-|-----------|-------------------------|
+| Richiesta | Trova la voce precaricata? |
+|-----------|----------------------------|
 | `/styles.css` | sì |
 | `/styles.css?v=13` | **no** |
 | `/styles.css?v=13` con `{ ignoreSearch: true }` | sì |
 
-Online questo è un caso fortunato: la richiesta versionata manca la cache,
-cade su `fetch()` e prende il file nuovo dalla rete — ecco perché bumpare il
-`?v=N` sembra funzionare bene.
+È questa asimmetria a far funzionare il cache-busting: online la richiesta
+versionata manca la cache, cade su `fetch()` e prende il file nuovo.
 
-**Offline no.** Il gestore `fetch` è `caches.match(req) || fetch(req)`
-(`service-worker.js:43`): senza rete, `styles.css?v=13` manca la cache, il
-`fetch` fallisce e **CSS e JS non si caricano**. `index.html` e
-`assets/streets.json` sì, perché vengono chiesti senza query. Il risultato è
-un guscio HTML nudo e inerte. Questo **viola il criterio di accettazione
-«la PWA si apre anche offline»** (§7).
+Fino al 2026-07-29 la stessa asimmetria **rompeva l'offline** — senza rete il
+`fetch` falliva e CSS e JS non arrivavano, lasciando un guscio HTML nudo.
+Il gestore `fetch` ora fa tre tentativi in quest'ordine:
 
-Vedi §9: è un problema noto e ancora aperto, non correggerlo di nascosto —
-ma soprattutto **non aggiungere nuovi file versionati** finché non è risolto,
-perché ognuno peggiora l'offline.
+1. **corrispondenza esatta** in cache — il `?v=N` conserva tutto il suo valore
+   di cache-buster, una versione nuova non la trova e va in rete;
+2. **rete**, e quello che scarica lo mette in cache *con la sua URL esatta*,
+   così dalla volta dopo è disponibile anche senza rete;
+3. **corrispondenza ignorando la query**, solo se la rete è fallita: si ripiega
+   su una versione vecchia soltanto quando l'alternativa è non mostrare niente.
+
+Il punto 3 sta in fondo, e non al posto del punto 1, di proposito: invertirli
+significherebbe servire il vecchio CSS a chi ha appena bumpato la versione.
 
 ---
 
@@ -203,8 +205,8 @@ esiste l'export JSON — chi raccoglie punti deve poterli portare via.
   PNG.
 - Il marker permette di scegliere colore e testo breve.
 - Il pulsante di copia usa Clipboard API quando disponibile.
-- La PWA si apre anche offline dopo il primo caricamento. *(oggi non è vero:
-  vedi §5 e §9)*
+- La PWA si apre anche offline dopo il primo caricamento. *(verificato il
+  2026-07-29 col server spento: mappa, ricerca e mirino funzionano)*
 
 ---
 
@@ -244,21 +246,17 @@ sovrascriverle e non committarle a nome proprio. Chiedere all'utente.
 
 ## 9. Problemi noti, aperti
 
-Trovati il 2026-07-28, **nessuno ancora corretto** — vanno discussi con
-l'utente prima di intervenire, perché toccano la cache e quindi il
-comportamento sui telefoni già installati.
+Restano aperti dal 2026-07-28 — **nessuno dei due corretto**. Vanno discussi
+con l'utente prima di intervenire, perché toccano la cache e quindi il
+comportamento sui telefoni su cui l'app è già installata.
 
-1. **L'offline non funziona davvero** (§5). Due rimedi possibili, da scegliere
-   insieme: elencare in `ASSETS` gli URL già versionati (`'./styles.css?v=13'`,
-   e allora la lista va aggiornata a ogni bump), oppure usare
-   `caches.match(event.request, { ignoreSearch: true })` nel gestore `fetch`
-   (una riga, ma la cache smette di distinguere le versioni: va abbinata al
-   bump del nome `CACHE`, che comunque è già obbligatorio).
-2. **La mappa pesa 4,4 MB** e il service worker la precarica all'installazione:
+*(L'offline, che era il terzo, è stato corretto il 2026-07-29: vedi §5.)*
+
+1. **La mappa pesa 4,4 MB** e il service worker la precarica all'installazione:
    il primo caricamento su rete mobile è lento proprio nel momento peggiore,
    cioè quando il giocatore è per strada. Su questa macchina è disponibile solo
    `sips` per le immagini — niente ImageMagick, niente `cwebp`.
-3. **Il PDF è precaricato ma non serve all'app.** `assets/map-placeholder.pdf`
+2. **Il PDF è precaricato ma non serve all'app.** `assets/map-placeholder.pdf`
    (1,35 MB) è in `ASSETS`, ma nessuno lo carica a runtime: è il sorgente della
    mappa, utile alle persone, non all'app. Toglierlo da `ASSETS` libera un
    quarto del peso dell'installazione senza perdere nulla — il file resta nel

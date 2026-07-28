@@ -902,6 +902,13 @@
   });
 
   image.addEventListener('load', fitImage);
+  // Questo script è deferred, quindi parte a parsing finito: quando la mappa
+  // arriva dalla cache — cioè sempre, dalla seconda visita in poi e in tutta
+  // l'esperienza offline — è già completa prima di adesso e il suo evento
+  // 'load' non scatterà mai. Senza questa chiamata la mappa resterebbe non
+  // inquadrata: si vedrebbe l'angolo dell'immagine a grandezza naturale, che
+  // è campagna vuota, e il mirino non avrebbe coordinate.
+  if (image.complete && image.naturalWidth) fitImage();
   window.addEventListener('resize', fitImage);
   setMarkerVisual();
   loadPlayerName();
