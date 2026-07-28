@@ -1,0 +1,230 @@
+# Mappa Squadra — regole condivise
+
+**Questa è la fonte unica di verità del progetto.** `CLAUDE.md` e `CODEX.md`
+non contengono regole: puntano qui. Chi impara qualcosa di nuovo sul progetto
+lo scrive **in questo file**, così l'altro agente lo trova al prossimo avvio.
+
+Lingua di testi, commenti e messaggi di commit: **italiano**.
+
+---
+
+## 1. Obiettivo
+
+Web app mobile-first per una caccia al tesoro. Il giocatore deve:
+
+1. visualizzare una mappa fornita come immagine JPG;
+2. spostarla e ingrandirla;
+3. posizionare un punto tramite mirino centrale;
+4. generare un PNG della vista con il marker;
+5. condividerlo tramite il menu nativo del telefono, soprattutto WhatsApp.
+
+L'app ha anche una **seconda funzione, per chi prepara il gioco**: il pannello
+coordinate e la lista manuale servono a costruire `assets/streets.json`
+segnando i punti direttamente sulla mappa, invece di calcolarli a mano. Sono
+strumenti da cartografo, non da giocatore: vanno tenuti presenti quando si
+ragiona sull'interfaccia, perché oggi convivono nella stessa schermata.
+
+---
+
+## 2. Vincoli
+
+- Progetto statico: HTML, CSS e JavaScript puro.
+- Nessun backend, login, database o geolocalizzazione.
+- Deve funzionare su iPhone e Android.
+- Deve poter essere installato come PWA e funzionare offline dopo il primo
+  caricamento.
+- Interfaccia scura, minimale, immersiva, ottimizzata per uso verticale.
+- Non introdurre dipendenze npm o build step senza necessità esplicita.
+
+---
+
+## 3. Struttura
+
+```
+index.html              Struttura dell'app: mappa, mirino, marker, 4 dialog
+styles.css              Interfaccia e stile (tema scuro/oro)
+app.js                  Pan, zoom, marker, ricerca, esportazione, condivisione
+service-worker.js       Cache offline
+manifest.webmanifest    Installazione PWA
+assets/map-placeholder.jpg   La mappa servita (4,4 MB)
+assets/map-placeholder.pdf   Sorgente con livello testuale ricercabile
+assets/streets.json          Indice dei punti: label, tags, coordinate x/y
+assets/icons/                icon-192.png, icon-512.png
+```
+
+Per sostituire la mappa: cambiare `assets/map-placeholder.jpg` mantenendo lo
+stesso nome, oppure aggiornare il riferimento in `index.html` **e** in
+`service-worker.js` (compare in due punti: `MAP_PATH` e `ASSETS`).
+
+`assets/streets.json` è la sola fonte dei punti ricercabili. Ogni voce ha
+`label` (il testo mostrato nei risultati), `tags` (le parole e gli alias su cui
+si cerca) e coordinate **normalizzate** `x`/`y` da 0 a 1 — `x` cresce da
+sinistra a destra, `y` dall'alto verso il basso. Se una via compare più volte
+sulla mappa, la ricerca mostra tutte le occorrenze numerate e non ne sceglie
+una automaticamente: è voluto.
+
+---
+
+## 4. Come si avvia
+
+Server statico Python. Il service worker richiede HTTP/HTTPS: **non aprire
+`index.html` con `file://`**, l'app non si registra come PWA.
+
+```bash
+python3 -m http.server 8000
+```
+
+Da un altro dispositivo sulla stessa rete si usa l'IP del computer
+(`http://192.168.1.20:8000`) — è così che si prova davvero, perché pan, zoom e
+condivisione nativa hanno senso solo su telefono.
+
+> Per Claude Code la porta è la **8010**, non la 8000: vedi `CLAUDE.md`.
+
+---
+
+## 5. Versionamento e cache — REGOLA CRITICA
+
+Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
+
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=13` e
+   `app.js?v=17`.
+2. `service-worker.js` ha un nome di cache versionato, oggi
+   `mappa-squadra-v17`, e precarica la lista `ASSETS` all'installazione.
+
+**Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
+`index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
+resta attivo e continua a servire i file vecchi.
+
+### Perché il `?v=N` funziona (e cosa rompe)
+
+Verificato in browser il 2026-07-28. `ASSETS` elenca i file **senza** query
+(`'./styles.css'`), ma la pagina li chiede **con** query (`styles.css?v=13`), e
+`caches.match()` di default considera la query parte dell'identità:
+
+| Richiesta | Trova la voce in cache? |
+|-----------|-------------------------|
+| `/styles.css` | sì |
+| `/styles.css?v=13` | **no** |
+| `/styles.css?v=13` con `{ ignoreSearch: true }` | sì |
+
+Online questo è un caso fortunato: la richiesta versionata manca la cache,
+cade su `fetch()` e prende il file nuovo dalla rete — ecco perché bumpare il
+`?v=N` sembra funzionare bene.
+
+**Offline no.** Il gestore `fetch` è `caches.match(req) || fetch(req)`
+(`service-worker.js:43`): senza rete, `styles.css?v=13` manca la cache, il
+`fetch` fallisce e **CSS e JS non si caricano**. `index.html` e
+`assets/streets.json` sì, perché vengono chiesti senza query. Il risultato è
+un guscio HTML nudo e inerte. Questo **viola il criterio di accettazione
+«la PWA si apre anche offline»** (§7).
+
+Vedi §9: è un problema noto e ancora aperto, non correggerlo di nascosto —
+ma soprattutto **non aggiungere nuovi file versionati** finché non è risolto,
+perché ognuno peggiora l'offline.
+
+---
+
+## 6. Identità partecipante
+
+Il partecipante inserisce un nome al primo accesso. Il valore è salvato in
+`localStorage` (`mappa-player-name`) e si modifica toccando il nome in alto a
+sinistra. Anche la lista manuale dei punti vive in `localStorage`: è **legata
+al browser di quel dispositivo**, non viaggia con il progetto. Per questo
+esiste l'export JSON — chi raccoglie punti deve poterli portare via.
+
+---
+
+## 7. Criteri di accettazione
+
+- La mappa copre sempre lo schermo senza lasciare spazi vuoti.
+- Pan e zoom sono fluidi.
+- Il marker appare al centro esatto del mirino.
+- Dopo la conferma la mappa non si muove accidentalmente.
+- Il PNG include mappa, partecipante, marker, data e ora, ma non i pulsanti.
+- Su browser compatibili il pulsante usa Web Share API; altrimenti scarica il
+  PNG.
+- Il marker permette di scegliere colore e testo breve.
+- Il pulsante di copia usa Clipboard API quando disponibile.
+- La PWA si apre anche offline dopo il primo caricamento. *(oggi non è vero:
+  vedi §5 e §9)*
+
+---
+
+## 8. Come lavoriamo in due
+
+Il progetto è passato sotto git il 2026-07-28 proprio per questo: due agenti
+sugli stessi file, senza storico, non possono lavorare in sicurezza.
+
+**Prima di toccare qualsiasi cosa:**
+
+```bash
+git status
+```
+
+Se ci sono modifiche non committate, **sono di qualcun altro**: non
+sovrascriverle e non committarle a nome proprio. Chiedere all'utente.
+
+**Alla fine di ogni intervento:**
+
+1. Un commit con messaggio in italiano che spiega **il perché**, non l'elenco
+   delle righe cambiate (il diff quello lo dice già).
+2. Una voce in `HANDOFF.md`, in testa, con la data: cosa è cambiato, cosa si è
+   scoperto, cosa resta aperto. È il file che l'altro agente legge per capire
+   dove eravamo rimasti.
+
+**Regole di convivenza:**
+
+- Non riscrivere il lavoro dell'altro perché «si farebbe meglio così». Se una
+  scelta sembra sbagliata, scriverlo in `HANDOFF.md` sotto *Da valutare* e
+  lasciare decidere all'utente.
+- Le decisioni prese con l'utente si scrivono qui o in `HANDOFF.md`: se restano
+  nella chat, per l'altro agente non esistono.
+- Le proposte non confermate stanno in §10 e **non si implementano** finché
+  l'utente non le approva.
+
+---
+
+## 9. Problemi noti, aperti
+
+Trovati il 2026-07-28, **nessuno ancora corretto** — vanno discussi con
+l'utente prima di intervenire, perché toccano la cache e quindi il
+comportamento sui telefoni già installati.
+
+1. **L'offline non funziona davvero** (§5). Due rimedi possibili, da scegliere
+   insieme: elencare in `ASSETS` gli URL già versionati (`'./styles.css?v=13'`,
+   e allora la lista va aggiornata a ogni bump), oppure usare
+   `caches.match(event.request, { ignoreSearch: true })` nel gestore `fetch`
+   (una riga, ma la cache smette di distinguere le versioni: va abbinata al
+   bump del nome `CACHE`, che comunque è già obbligatorio).
+2. **La mappa pesa 4,4 MB** e il service worker la precarica all'installazione:
+   il primo caricamento su rete mobile è lento proprio nel momento peggiore,
+   cioè quando il giocatore è per strada. Su questa macchina è disponibile solo
+   `sips` per le immagini — niente ImageMagick, niente `cwebp`.
+3. **Il PDF è precaricato ma non serve all'app.** `assets/map-placeholder.pdf`
+   (1,35 MB) è in `ASSETS`, ma nessuno lo carica a runtime: è il sorgente della
+   mappa, utile alle persone, non all'app. Toglierlo da `ASSETS` libera un
+   quarto del peso dell'installazione senza perdere nulla — il file resta nel
+   repository.
+
+---
+
+## 10. Sviluppi possibili (proposte, non approvate)
+
+- Colori distinti per squadra.
+- Selettore missione o giorno.
+- Marker personalizzato SVG.
+- Cornice grafica dedicata all'evento.
+- Memorizzazione locale dell'ultima posizione.
+- Più mappe selezionabili.
+
+---
+
+## 11. Convenzioni di codice
+
+- Nessun framework, nessun bundler, nessuna dipendenza a runtime.
+- JS in IIFE, niente moduli ES.
+- Commenti in italiano, discorsivi, che spiegano **il perché** di una scelta:
+  il *cosa* si legge già nel codice.
+- HTML accessibile: `role="dialog"` e `aria-modal` sui dialog, `aria-label`
+  sui pulsanti-icona, `aria-live` sui messaggi di stato, `.sr-only` sulle
+  etichette visivamente nascoste. Non regredire su questo.
