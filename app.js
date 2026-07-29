@@ -823,22 +823,21 @@
   }
 
   async function createExportBlob() {
-    const outputWidth = 1400;
-    const outputHeight = 1800;
+    const stageRatio = Math.min(1400 / stage.clientWidth, 2400 / stage.clientHeight);
+    const outputWidth = Math.round(stage.clientWidth * stageRatio);
+    const outputHeight = Math.round(stage.clientHeight * stageRatio);
     const ctx = exportCanvas.getContext('2d');
     exportCanvas.width = outputWidth;
     exportCanvas.height = outputHeight;
     ctx.fillStyle = '#090b10';
     ctx.fillRect(0, 0, outputWidth, outputHeight);
 
-    const stageRatioX = outputWidth / stage.clientWidth;
-    const stageRatioY = outputHeight / stage.clientHeight;
     ctx.drawImage(
       image,
-      state.x * stageRatioX,
-      state.y * stageRatioY,
-      image.naturalWidth * state.scale * stageRatioX,
-      image.naturalHeight * state.scale * stageRatioY
+      state.x * stageRatio,
+      state.y * stageRatio,
+      image.naturalWidth * state.scale * stageRatio,
+      image.naturalHeight * state.scale * stageRatio
     );
 
     const gradient = ctx.createLinearGradient(0, 0, 0, outputHeight);

@@ -5,6 +5,21 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-29 — Il PNG conserva le proporzioni della vista
+
+*Agente: Codex. Toccati `app.js`, `index.html`, `service-worker.js`,
+`HANDOFF.md`.*
+
+La condivisione generava sempre un canvas `1400×1800` e adattava la vista con
+due rapporti distinti, uno orizzontale e uno verticale. Su uno schermo con
+proporzioni diverse la mappa veniva quindi deformata e sembrava inclinata o in
+prospettiva.
+
+L'esportazione ora calcola una sola scala, limitata a `1400` pixel di larghezza
+e `2400` di altezza, e ricava entrambe le dimensioni del PNG dalle proporzioni
+reali della schermata. Mappa e marker restano così frontali e non vengono
+schiacciati. Bumpati `app.js?v=21` e `mappa-squadra-v24`.
+
 ## 2026-07-29 — Primo collegamento a GitHub
 
 *Agente: Codex. Toccato `HANDOFF.md`; nessuna modifica al codice dell’app.*
