@@ -5,6 +5,63 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-29 — L'elenco dei risultati si scorre; e il precaricamento era bugiardo
+
+*Agente: Claude. Toccati `styles.css`, `app.js`, `service-worker.js`,
+`index.html`.*
+
+Segnalazione dell'utente: cercando «seg» il messaggio dice sei corrispondenze
+ma se ne vedono quattro.
+
+### Il bug segnalato
+
+Tutte e sei erano nel DOM: altezza visibile 218px, contenuto 328px. La lista
+aveva già `max-height` e `overflow-y: auto`, ma **non si scorreva in nessun
+modo**, per due cause indipendenti che si sommavano:
+
+* `.map-stage` ha `touch-action: none` per gestire pan e pinch a mano, e
+  `.search-results` ci sta dentro: il dito non riusciva a scorrerla;
+* il gestore `wheel` su `.map-stage` faceva `preventDefault()` senza guardare
+  il bersaglio, quindi la rotella sopra l'elenco zoomava la mappa.
+
+Corretti entrambi (`touch-action: pan-y`, `overscroll-behavior: contain`, una
+guardia sul `wheel` gemella di quella che già esisteva su `pointerdown`) e
+alzato il tetto da `220px` a `min(52vh, 360px)`: le sei voci di «seg» ora ci
+stanno **tutte senza scorrere**, e quando la lista sfora comunque — «cortile»
+dà 19 corrispondenze, 12 mostrate — si arriva in fondo davvero. Regola scritta
+in `AGENTS.md` §5-ter.
+
+### Il bug che è saltato fuori verificando, più grave
+
+La correzione non si vedeva. Motivo: la cache `v22`… conteneva un `index.html`
+che chiedeva ancora `styles.css?v=13`. **`cache.addAll()` passa dalla cache HTTP
+del browser**, quindi il precaricamento del nuovo service worker aveva
+riportato dentro proprio i file vecchi che il bump di `CACHE` doveva sostituire.
+
+Tradotto in produzione: si pubblica un aggiornamento, si bumpano
+diligentemente tutte le versioni, e agli utenti non arriva niente — senza un
+errore da nessuna parte. L'install ora costruisce le richieste con
+`new Request(url, { cache: 'reload' })`. Scritto in `AGENTS.md` §5.
+
+### Verificato
+
+Da cache e service worker azzerati, come un telefono che non ha mai visto
+l'app: cache `v22`, l'`index.html` precaricato chiede `?v=14`/`?v=19`, sei voci
+su sei visibili a 375×812, rotella non più rubata dalla mappa, `touch-action:
+pan-y` e `overscroll-behavior: contain` attivi, console pulita.
+
+Versioni: `styles.css?v=14`, `app.js?v=19`, `CACHE` a `mappa-squadra-v22`.
+
+### Da valutare
+
+- `showSearchResults()` taglia a 12 risultati con la nota «restringi la
+  ricerca». Ora che la lista scorre davvero, quel tetto si può alzare — ma è
+  una scelta di prodotto, non l'ho toccata.
+- Restano aperti il peso del primo caricamento e i diritti sulla mappa
+  (vedi la voce precedente e `PUBBLICARE.md`).
+
+---
+
 ## 2026-07-29 — L'offline funziona davvero; procedura di pubblicazione
 
 *Agente: Claude. Toccati `service-worker.js`, `app.js`, `index.html`.*

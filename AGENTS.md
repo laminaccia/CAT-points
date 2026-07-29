@@ -126,6 +126,23 @@ Il gestore `fetch` ora fa tre tentativi in quest'ordine:
 Il punto 3 sta in fondo, e non al posto del punto 1, di proposito: invertirli
 significherebbe servire il vecchio CSS a chi ha appena bumpato la versione.
 
+### Il precaricamento deve scavalcare la cache HTTP
+
+`cache.addAll()` fa richieste normali, che **passano dalla cache HTTP del
+browser**. Il 2026-07-29 è successo questo: bumpati regolarmente `?v=N` e
+`CACHE`, il nuovo service worker si è installato e ha precaricato… l'`index.html`
+vecchio, che chiedeva ancora `styles.css?v=13`. Aggiornamento pubblicato,
+nessuno che lo riceve, e nessun errore da nessuna parte.
+
+Per questo l'install costruisce le richieste con `new Request(url, { cache:
+'reload' })`, che obbliga a passare dalla rete. **Non togliere quell'opzione**:
+senza, il bump di `CACHE` smette di garantire alcunché.
+
+In verifica, ricordarsi che questo vale anche per te: se una modifica sembra
+non avere effetto, azzerare service worker e cache (`getRegistrations()` →
+`unregister()`, `caches.keys()` → `delete()`) e ricaricare, invece di cercare
+il problema nel codice.
+
 ---
 
 ## 5-bis. L'indice delle vie — `assets/streets.json` è generato
@@ -181,6 +198,29 @@ Il rapporto separa quello che ha deciso da solo — **scartate**, **riqualificat
 lontano), **tipo diverso**, **possibili varianti di grafia**, **solo PDF**
 (etichette grezze ancora da curare). Quelle voci restano nell'indice com'erano:
 meglio un nome brutto che un posto sparito.
+
+---
+
+## 5-ter. I pannelli che scorrono dentro la mappa
+
+`.map-stage` ha `touch-action: none` perché pan e pinch della mappa sono gestiti
+a mano in JS, e il gestore `wheel` annulla l'evento per zoomare. Sono decisioni
+giuste per la mappa, e **sbagliate per qualunque pannello sovrapposto che debba
+scorrere per conto suo** — che sta comunque dentro `.map-stage`.
+
+È già costato un bug: l'elenco dei risultati aveva `max-height` e
+`overflow-y: auto`, ma non si scorreva né col dito né con la rotella. Il
+messaggio annunciava «Trovate 6 corrispondenze» e se ne raggiungevano quattro.
+
+Chi aggiunge un pannello scorrevole dentro `.map-stage` deve fare **tre** cose:
+
+1. `touch-action: pan-y` sul pannello, altrimenti il dito non lo scorre;
+2. `overscroll-behavior: contain`, perché arrivati in fondo lo scorrimento non
+   prosegua sulla pagina sotto;
+3. aggiungerne il selettore alla guardia del gestore `wheel` in `app.js`, così
+   la rotella non viene rubata dallo zoom della mappa. Esiste già una guardia
+   gemella su `pointerdown` per non trascinare la mappa quando si tocca un
+   controllo: **le due liste di selettori vanno tenute allineate.**
 
 ---
 

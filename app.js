@@ -620,6 +620,12 @@
   stage.addEventListener('pointercancel', () => { state.dragging = false; });
 
   stage.addEventListener('wheel', (event) => {
+    // I pannelli che scorrono per conto loro tengono la rotella: senza questo
+    // controllo l'evento risaliva fino a qui, veniva annullato, e girare la
+    // rotella sopra l'elenco dei risultati zoomava la mappa invece di scorrere
+    // la lista — le voci oltre le prime restavano irraggiungibili. È lo stesso
+    // riguardo che il gestore pointerdown ha già per i controlli sovrapposti.
+    if (event.target.closest?.('.search-results, .street-list-items, .dialog-card')) return;
     event.preventDefault();
     if (state.markerPlaced) return;
     zoomAt(event.deltaY < 0 ? 1.12 : 0.89, event.clientX, event.clientY);

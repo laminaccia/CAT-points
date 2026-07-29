@@ -1,4 +1,4 @@
-const CACHE = 'mappa-squadra-v20';
+const CACHE = 'mappa-squadra-v22';
 const MAP_PATH = '/assets/map-placeholder.jpg';
 const ASSETS = [
   './',
@@ -14,7 +14,17 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)));
+  // `cache: 'reload'` obbliga ogni richiesta a passare dalla rete, scavalcando
+  // la cache HTTP del browser. Senza, il precaricamento può rimettere in cache
+  // proprio i file vecchi che il bump di CACHE doveva sostituire: è già
+  // successo: la cache v21 conteneva un index.html che chiedeva ancora
+  // styles.css?v=13. Il risultato è un aggiornamento pubblicato che non arriva
+  // a nessuno, pur avendo bumpato correttamente tutte le versioni.
+  event.waitUntil(
+    caches.open(CACHE).then((cache) =>
+      cache.addAll(ASSETS.map((url) => new Request(url, { cache: 'reload' })))
+    )
+  );
   self.skipWaiting();
 });
 
