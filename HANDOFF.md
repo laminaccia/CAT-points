@@ -5,6 +5,18 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-29 — Primo collegamento a GitHub
+
+*Agente: Codex. Toccato `HANDOFF.md`; nessuna modifica al codice dell’app.*
+
+Il repository locale è stato collegato come `origin` a
+`https://github.com/laminaccia/CAT-points.git`. Il remoto era vuoto al momento
+della verifica, quindi il ramo locale `main` resta la fonte completa dello
+storico e può essere inviato senza fusioni o sovrascritture.
+
+Dopo il primo push resta da attivare GitHub Pages da **Settings → Pages**,
+scegliendo **Deploy from a branch**, ramo `main` e cartella `/(root)`.
+
 ## 2026-07-29 — Interruttore per gli strumenti da cartografo
 
 *Agente: Claude. Toccati `index.html`, `styles.css`, `app.js`.*
