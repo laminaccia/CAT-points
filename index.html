@@ -10,7 +10,7 @@
   <title>Mappa Squadra</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=28">
+  <link rel="stylesheet" href="styles.css?v=29">
 </head>
 <body>
   <main class="app-shell">
@@ -26,7 +26,13 @@
         </div>
         <div class="topbar-actions">
           <button id="toggleCoordinatesButton" class="icon-button icon-button--label" type="button" aria-pressed="false" aria-controls="coordinatePanel" aria-label="Mostra gli strumenti coordinate">x/y</button>
-          <button id="resetButton" class="icon-button" type="button" aria-label="Reimposta la mappa">↺</button>
+          <button id="resetButton" class="icon-button" type="button" aria-label="Torna alla vista iniziale" title="Home">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 10.5 12 4l8 6.5"></path>
+              <path d="M6.5 9.5V20h11V9.5"></path>
+              <path d="M10 20v-6h4v6"></path>
+            </svg>
+          </button>
         </div>
       </div>
 
@@ -107,19 +113,42 @@
           </div>
           <fieldset class="color-fieldset">
             <legend>Colore</legend>
-            <div class="color-options" id="colorOptions" aria-describedby="colorHelp">
-              <button class="color-option" type="button" data-color="#ffffff" aria-label="Bianco" title="Bianco" aria-pressed="false"></button>
-              <button class="color-option" type="button" data-color="#17191f" aria-label="Nero" title="Nero" aria-pressed="false"></button>
-              <button class="color-option" type="button" data-color="#e53935" aria-label="Rosso" title="Rosso" aria-pressed="false"></button>
-              <button class="color-option" type="button" data-color="#fdd835" aria-label="Giallo" title="Giallo" aria-pressed="false"></button>
-              <button class="color-option" type="button" data-color="#43a047" aria-label="Verde" title="Verde" aria-pressed="false"></button>
-              <button class="color-option" type="button" data-color="#1e88e5" aria-label="Blu" title="Blu" aria-pressed="false"></button>
-              <button class="color-option" type="button" data-color="#8e44ad" aria-label="Viola" title="Viola" aria-pressed="false"></button>
-              <button class="color-option" type="button" data-color="#fb8c00" aria-label="Arancione" title="Arancione" aria-pressed="false"></button>
-              <button class="color-option no-color" type="button" data-color="none" aria-label="Senza colore" title="Senza colore" aria-pressed="false"></button>
+            <div class="color-select-grid" aria-describedby="colorHelp">
+              <label class="color-select-field" for="primaryColorSelect">
+                <span>Colore principale</span>
+                <select id="primaryColorSelect">
+                  <option value="#d9b45b">Oro</option>
+                  <option value="#ffffff">Bianco</option>
+                  <option value="#17191f">Nero</option>
+                  <option value="#e53935">Rosso</option>
+                  <option value="#fdd835">Giallo</option>
+                  <option value="#43a047">Verde</option>
+                  <option value="#1e88e5">Blu</option>
+                  <option value="#8e44ad">Viola</option>
+                  <option value="#fb8c00">Arancione</option>
+                  <option value="none">Senza colore</option>
+                  <option value="custom">Personalizzato…</option>
+                </select>
+              </label>
+              <label class="color-select-field" for="secondaryColorSelect">
+                <span>Secondo colore</span>
+                <select id="secondaryColorSelect">
+                  <option value="">Nessuno</option>
+                  <option value="#d9b45b">Oro</option>
+                  <option value="#ffffff">Bianco</option>
+                  <option value="#17191f">Nero</option>
+                  <option value="#e53935">Rosso</option>
+                  <option value="#fdd835">Giallo</option>
+                  <option value="#43a047">Verde</option>
+                  <option value="#1e88e5">Blu</option>
+                  <option value="#8e44ad">Viola</option>
+                  <option value="#fb8c00">Arancione</option>
+                  <option value="custom">Personalizzato…</option>
+                </select>
+              </label>
             </div>
-            <div class="color-name-box">
-              <label for="markerColorInput">Scrivi un colore</label>
+            <div class="color-name-box hidden" id="colorNameBox">
+              <label for="markerColorInput" id="colorNameLabel">Colore personalizzato</label>
               <form class="color-name-form" id="colorNameForm" novalidate>
                 <span class="color-name-preview" id="colorNamePreview" aria-hidden="true"></span>
                 <input id="markerColorInput" type="text" maxlength="40" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Es. rosa antico" aria-describedby="colorFormatExamples colorNameFeedback">
@@ -132,10 +161,12 @@
               </p>
               <p class="color-name-feedback" id="colorNameFeedback" role="status" aria-live="polite">Scrivi un nome o usa uno degli esempi.</p>
             </div>
-            <p class="color-help" id="colorHelp">Tocca un colore pronto o scrivine uno. Puoi combinare fino a due colori.</p>
+            <p class="color-help" id="colorHelp">Scegli un colore oppure aggiungine un secondo per creare un marker bicolore.</p>
           </fieldset>
           <label class="marker-text-field" for="markerText">Lettere o numeri (facoltativo)</label>
           <input id="markerText" type="text" inputmode="text" maxlength="12" placeholder="Es. A12 o B">
+          <label class="marker-history-label-field" for="markerHistoryLabelInput">Etichetta cronologia (facoltativa)</label>
+          <input id="markerHistoryLabelInput" type="text" maxlength="40" autocomplete="off" placeholder="Es. Tappa 3 o Piazza">
           <div class="dialog-actions">
             <button id="cancelMarkerButtonSecondary" class="secondary-wide" type="button">Annulla</button>
             <button id="confirmMarkerButton" class="primary-button" type="button">Conferma punto</button>
@@ -210,6 +241,6 @@
     <canvas id="exportCanvas" hidden></canvas>
   </main>
 
-  <script src="app.js?v=30" defer></script>
+  <script src="app.js?v=31" defer></script>
 </body>
 </html>

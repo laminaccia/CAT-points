@@ -40,8 +40,13 @@
   const confirmRow = document.getElementById('confirmRow');
   const markerDialog = document.getElementById('markerDialog');
   const markerTextInput = document.getElementById('markerText');
+  const markerHistoryLabelInput = document.getElementById('markerHistoryLabelInput');
   const cancelMarkerButton = document.getElementById('cancelMarkerButton');
   const editMarkerButton = document.getElementById('editMarkerButton');
+  const primaryColorSelect = document.getElementById('primaryColorSelect');
+  const secondaryColorSelect = document.getElementById('secondaryColorSelect');
+  const colorNameBox = document.getElementById('colorNameBox');
+  const colorNameLabel = document.getElementById('colorNameLabel');
   const colorNameForm = document.getElementById('colorNameForm');
   const markerColorInput = document.getElementById('markerColorInput');
   const colorNamePreview = document.getElementById('colorNamePreview');
@@ -52,7 +57,6 @@
   const playerNameInput = document.getElementById('playerNameInput');
   const identityFeedback = document.getElementById('identityFeedback');
   const cancelIdentityButton = document.getElementById('cancelIdentityButton');
-  const colorOptions = [...document.querySelectorAll('.color-option')];
   const exportCanvas = document.getElementById('exportCanvas');
   const defaultMarkerColor = '#d9b45b';
   const manualStreetStorageKey = 'mappa-manual-streets';
@@ -112,7 +116,7 @@
   let activeHistoryEntryId = null;
   let activeHistoryLabel = '';
   let activeHistoryCreatedAt = null;
-  let markerColorTouched = false;
+  let customColorTarget = 'primary';
 
   document.body.append(streetPointDialog, streetListDialog, markerHistoryDialog);
 
@@ -795,6 +799,27 @@
     statusPill.textContent = message;
   }
 
+  function setColorSelectValue(select, value, customLabel) {
+    [...select.options].filter((option) => option.dataset.dynamic === 'true').forEach((option) => option.remove());
+    const hasPreset = [...select.options].some((option) => option.value === value);
+    if (value && !hasPreset) {
+      const customOption = document.createElement('option');
+      customOption.value = value;
+      customOption.dataset.dynamic = 'true';
+      customOption.textContent = `${customLabel} (${value.toUpperCase()})`;
+      select.insertBefore(customOption, select.options[select.options.length - 1]);
+    }
+    select.value = value;
+  }
+
+  function syncMarkerColorSelects() {
+    const primaryColor = state.markerColors[0] || 'none';
+    const secondaryColor = state.markerColors[1] || '';
+    setColorSelectValue(primaryColorSelect, primaryColor, 'Personalizzato');
+    setColorSelectValue(secondaryColorSelect, secondaryColor, 'Personalizzato');
+    secondaryColorSelect.disabled = state.markerColors.length === 0;
+  }
+
   function setMarkerVisual() {
     const markerBackground = state.markerColors.length === 2
       ? `linear-gradient(90deg, ${state.markerColors[0]} 0 50%, ${state.markerColors[1]} 50% 100%)`
@@ -805,13 +830,7 @@
     marker.style.setProperty('--marker-outline', state.markerColors.includes('#ffffff') ? '#17191f' : 'transparent');
     markerLabel.textContent = state.markerText;
     markerLabel.classList.toggle('hidden', !state.markerText);
-    colorOptions.forEach((button) => {
-      const selected = button.dataset.color === 'none'
-        ? state.markerColors.length === 0
-        : state.markerColors.includes(button.dataset.color);
-      button.classList.toggle('selected', selected);
-      button.setAttribute('aria-pressed', String(selected));
-    });
+    syncMarkerColorSelects();
   }
 
   function openMarkerDialog() {
@@ -820,8 +839,10 @@
       text: state.markerText
     };
     markerTextInput.value = state.markerText;
-    markerColorTouched = false;
+    markerHistoryLabelInput.value = activeHistoryLabel;
+    customColorTarget = 'primary';
     markerColorInput.value = '';
+    colorNameBox.classList.add('hidden');
     updateColorNamePreview();
     setMarkerVisual();
     markerDialog.classList.remove('hidden');
@@ -845,6 +866,7 @@
   function placeMarker() {
     const markerWasPlaced = state.markerPlaced;
     state.markerText = markerTextInput.value.trim().slice(0, 12);
+    activeHistoryLabel = normalizeHistoryLabel(markerHistoryLabelInput.value);
     state.markerPlaced = true;
     setMarkerVisual();
     marker.classList.remove('hidden');
@@ -858,11 +880,9 @@
       setStatus('Marker salvato solo per questa sessione');
       return;
     }
-    if (markerWasPlaced) {
-      setStatus(state.markerText ? `Marker aggiornato • ${state.markerText}` : 'Marker aggiornato');
-    } else {
-      setStatus(state.markerText ? `Punto selezionato • ${state.markerText}` : 'Punto selezionato');
-    }
+    const markerName = activeHistoryLabel || state.markerText;
+    if (markerWasPlaced) setStatus(markerName ? `Marker aggiornato • ${markerName}` : 'Marker aggiornato');
+    else setStatus(markerName ? `Punto selezionato • ${markerName}` : 'Punto selezionato');
   }
 
   function enableMarkerMove() {
@@ -883,6 +903,7 @@
     activeHistoryLabel = '';
     activeHistoryCreatedAt = null;
     markerTextInput.value = '';
+    markerHistoryLabelInput.value = '';
     marker.classList.add('hidden');
     crosshair.classList.remove('hidden');
     mainControlsRow.classList.remove('hidden');
@@ -1091,22 +1112,31 @@
     setPlayerName(value);
     closeIdentityDialog();
   });
-  function selectMarkerColor(color, toggleSelected = true) {
-    if (color === 'none') {
-      state.markerColors = [];
-    } else if (state.markerColors.includes(color)) {
-      if (toggleSelected) {
-        state.markerColors = state.markerColors.filter((selectedColor) => selectedColor !== color);
+  function applyMarkerColor(target, color) {
+    if (target === 'primary') {
+      if (color === 'none') {
+        state.markerColors = [];
+      } else {
+        const secondaryColor = state.markerColors[1];
+        state.markerColors = secondaryColor ? [color, secondaryColor] : [color];
       }
-    } else if (!markerColorTouched) {
-      state.markerColors = [color];
-    } else if (state.markerColors.length >= 2) {
-      state.markerColors = [state.markerColors[1], color];
+    } else if (!color || color === 'none') {
+      state.markerColors = state.markerColors[0] ? [state.markerColors[0]] : [];
     } else {
-      state.markerColors = [...state.markerColors, color];
+      state.markerColors = [state.markerColors[0] || defaultMarkerColor, color];
     }
-    markerColorTouched = true;
     setMarkerVisual();
+  }
+
+  function openCustomColorInput(target) {
+    customColorTarget = target;
+    colorNameLabel.textContent = target === 'primary'
+      ? 'Colore principale personalizzato'
+      : 'Secondo colore personalizzato';
+    markerColorInput.value = '';
+    colorNameBox.classList.remove('hidden');
+    updateColorNamePreview();
+    markerColorInput.focus({ preventScroll: true });
   }
 
   function resolveMarkerColor(value) {
@@ -1133,7 +1163,9 @@
     colorNamePreview.classList.remove('invalid', 'no-color');
     colorNameFeedback.classList.remove('error');
     if (!value) {
-      const currentColor = state.markerColors[state.markerColors.length - 1] || defaultMarkerColor;
+      const currentColor = customColorTarget === 'secondary'
+        ? state.markerColors[1] || state.markerColors[0] || defaultMarkerColor
+        : state.markerColors[0] || defaultMarkerColor;
       colorNamePreview.style.setProperty('--typed-color', currentColor);
       colorNameFeedback.textContent = 'Scrivi un nome o usa uno degli esempi.';
       return null;
@@ -1155,11 +1187,22 @@
     return resolvedColor;
   }
 
-  colorOptions.forEach((button) => button.addEventListener('click', () => {
-    selectMarkerColor(button.dataset.color);
-    markerColorInput.value = '';
-    updateColorNamePreview();
-  }));
+  primaryColorSelect.addEventListener('change', () => {
+    if (primaryColorSelect.value === 'custom') {
+      openCustomColorInput('primary');
+      return;
+    }
+    colorNameBox.classList.add('hidden');
+    applyMarkerColor('primary', primaryColorSelect.value);
+  });
+  secondaryColorSelect.addEventListener('change', () => {
+    if (secondaryColorSelect.value === 'custom') {
+      openCustomColorInput('secondary');
+      return;
+    }
+    colorNameBox.classList.add('hidden');
+    applyMarkerColor('secondary', secondaryColorSelect.value);
+  });
   markerColorInput.addEventListener('input', updateColorNamePreview);
   colorNameForm.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -1168,11 +1211,12 @@
       markerColorInput.focus();
       return;
     }
-    selectMarkerColor(resolvedColor);
+    applyMarkerColor(customColorTarget, resolvedColor);
     colorNameFeedback.textContent = resolvedColor === 'none'
       ? 'Applicato: senza colore.'
       : `Applicato: ${resolvedColor.toUpperCase()}.`;
     markerColorInput.blur();
+    colorNameBox.classList.add('hidden');
   });
   searchForm.addEventListener('submit', (event) => {
     event.preventDefault();

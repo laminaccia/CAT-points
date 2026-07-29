@@ -38,6 +38,7 @@ button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; 
 h1 { margin: 0; font-size: 22px; letter-spacing: .08em; }
 .player-name-button { min-height: 0; padding: 0; border: 0; border-radius: 0; color: var(--text); background: transparent; font-size: 22px; letter-spacing: .025em; text-align: left; text-shadow: 0 2px 8px rgba(0,0,0,.72); }
 .icon-button { display: grid; place-items: center; flex: 0 0 48px; width: 48px; height: 48px; min-height: 48px; aspect-ratio: 1; padding: 0; border: 1px solid var(--line); border-radius: 50%; color: var(--text); background: rgba(12,16,23,.88); box-shadow: var(--shadow-control); backdrop-filter: blur(12px); font-size: 23px; line-height: 1; }
+.icon-button svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .topbar-actions { display: flex; gap: 8px; }
 /* «x/y» nello stesso monospaziato della lettura delle coordinate: il pulsante
    si legge come l'interruttore di quel pannello, non come un'icona qualsiasi. */
@@ -111,19 +112,13 @@ button:active { transform: translateY(1px) scale(.97); }
 #closeMarkerHistoryButton::before { transform: translate(-50%, -50%) rotate(45deg); }
 #closeMarkerHistoryButton::after { transform: translate(-50%, -50%) rotate(-45deg); }
 .color-fieldset { margin: 24px 0 18px; padding: 0; border: 0; }
-.color-fieldset legend, .marker-text-field { display: block; margin-bottom: 10px; color: var(--muted); font-size: 13px; }
-.color-options { display: grid; grid-template-columns: repeat(5, 44px); justify-content: space-between; gap: 10px 6px; }
-.color-option { width: 44px; height: 44px; min-height: 44px; aspect-ratio: 1; padding: 0; border: 2px solid rgba(255,255,255,.14); border-radius: 50%; background: var(--option-color, var(--accent)); box-shadow: 0 5px 12px rgba(0,0,0,.24); }
-.color-option:nth-child(1) { --option-color: #ffffff; }
-.color-option:nth-child(2) { --option-color: #17191f; }
-.color-option:nth-child(3) { --option-color: #e53935; }
-.color-option:nth-child(4) { --option-color: #fdd835; }
-.color-option:nth-child(5) { --option-color: #43a047; }
-.color-option:nth-child(6) { --option-color: #1e88e5; }
-.color-option:nth-child(7) { --option-color: #8e44ad; }
-.color-option:nth-child(8) { --option-color: #fb8c00; }
-.color-option.no-color { border: 1px dashed rgba(255,255,255,.55); background: linear-gradient(135deg, transparent 44%, rgba(255,255,255,.65) 45%, rgba(255,255,255,.65) 55%, transparent 56%), rgba(255,255,255,.06); }
-.color-option.selected { border-color: #fff; box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent), 0 6px 15px rgba(0,0,0,.3); }
+.color-fieldset legend, .marker-text-field, .marker-history-label-field { display: block; margin-bottom: 9px; color: var(--muted); font-size: 13px; }
+.color-select-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.color-select-field { min-width: 0; }
+.color-select-field span { display: block; margin-bottom: 7px; color: var(--muted); font-size: 11px; }
+.color-select-field select { width: 100%; min-height: 50px; padding: 0 10px; border: 1px solid rgba(255,255,255,.18); border-radius: 13px; outline: 0; color: var(--text); background: rgba(255,255,255,.06); font: 600 13px/1 system-ui, sans-serif; color-scheme: dark; }
+.color-select-field select:focus { border-color: rgba(217,180,91,.72); box-shadow: 0 0 0 3px rgba(217,180,91,.12); }
+.color-select-field select:disabled { opacity: .45; }
 .color-name-box { margin-top: 15px; }
 .color-name-box > label { display: block; margin-bottom: 7px; color: var(--muted); font-size: 12px; }
 .color-name-form { display: grid; grid-template-columns: 44px minmax(0, 1fr) 62px; align-items: center; gap: 8px; }
@@ -140,7 +135,9 @@ button:active { transform: translateY(1px) scale(.97); }
 .color-name-feedback { min-height: 16px; margin: 6px 0 0 52px; color: var(--muted); font-size: 11px; line-height: 1.4; }
 .color-name-feedback.error { color: #ff9aa1; }
 .color-help { margin: 10px 0 0; color: var(--muted); font-size: 11px; line-height: 1.4; }
-.marker-text-field + input { width: 100%; min-height: 50px; padding: 0 14px; border: 1px solid rgba(255,255,255,.18); border-radius: 14px; outline: 0; color: var(--text); background: rgba(255,255,255,.06); font: inherit; }
+.marker-text-field + input, .marker-history-label-field + input { width: 100%; min-height: 50px; padding: 0 14px; border: 1px solid rgba(255,255,255,.18); border-radius: 14px; outline: 0; color: var(--text); background: rgba(255,255,255,.06); font: inherit; font-size: 16px; }
+.marker-text-field + input:focus, .marker-history-label-field + input:focus { border-color: rgba(217,180,91,.72); box-shadow: 0 0 0 3px rgba(217,180,91,.12); }
+.marker-history-label-field { margin-top: 14px; }
 .dialog-actions { display: grid; grid-template-columns: .85fr 1.45fr; gap: 10px; margin-top: 20px; }
 .dialog-actions button { font-size: 14px; white-space: nowrap; }
 
@@ -190,8 +187,7 @@ button:active { transform: translateY(1px) scale(.97); }
 .identity-actions #cancelIdentityButton.hidden + .primary-button { grid-column: 1 / -1; }
 
 @media (max-width: 350px) {
-  .color-options { grid-template-columns: repeat(5, 42px); gap: 9px 4px; }
-  .color-option { width: 42px; height: 42px; min-height: 42px; }
+  .color-select-grid { grid-template-columns: 1fr; }
   .color-name-form { grid-template-columns: 42px minmax(0, 1fr) 56px; gap: 6px; }
   .color-name-preview { width: 42px; height: 42px; }
   .color-name-form button { padding: 0 7px; }

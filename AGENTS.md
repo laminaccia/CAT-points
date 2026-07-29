@@ -98,10 +98,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=28` e
-   `app.js?v=30`.
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=29` e
+   `app.js?v=31`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v38`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v39`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
@@ -262,9 +262,10 @@ data originali e apre il normale flusso di condivisione.
 - Il PNG include mappa, partecipante, marker, data e ora, ma non i pulsanti.
 - Su browser compatibili il pulsante usa Web Share API; altrimenti scarica il
   PNG.
-- Il marker permette di scegliere colore e testo breve; i colori principali
-  restano subito visibili e il campo libero riconosce nomi italiani, codici
-  HEX e i formati CSS RGB/HSL.
+- Il marker permette di scegliere colore e testo breve; due menu a tendina
+  gestiscono colore principale e secondo colore, mentre il campo libero
+  riconosce nomi italiani, codici HEX e i formati CSS RGB/HSL. Nello stesso
+  dialog si può assegnare subito l'etichetta della cronologia.
 - Dopo la conferma il marker può essere modificato senza riposizionarlo oppure
   riportato al mirino per scegliere un nuovo punto; annullare una modifica
   ripristina colore e testo precedenti.

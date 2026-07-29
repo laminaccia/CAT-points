@@ -5,6 +5,25 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-29 — Etichetta immediata, colori a tendina e Home
+
+*Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,
+`app.js`, `service-worker.js`, `README.md`, `AGENTS.md`, `HANDOFF.md`.*
+
+«Personalizza il marker» espone ora il campo «Etichetta cronologia» insieme al
+testo breve: l'etichetta viene salvata alla conferma senza dover riaprire la
+cronologia. La selezione a pallini è stata sostituita da due menu nativi,
+«Colore principale» e «Secondo colore», così il bicolore resta disponibile ma
+occupa meno spazio su telefono.
+
+L'opzione «Personalizzato…» apre soltanto quando richiesta il campo che
+riconosce nomi, HEX, RGB e HSL; i colori personalizzati già salvati vengono
+mostrati come opzioni dinamiche. Il pulsante `↺` in alto è stato sostituito da
+un'icona Home SVG, mantenendo la stessa funzione di ritorno alla vista
+iniziale.
+
+Bumpati `styles.css?v=29`, `app.js?v=31` e `mappa-squadra-v39`.
+
 ## 2026-07-29 — Chiusura cronologia centrata geometricamente
 
 *Agente: Codex con skill Impeccable. Toccati `styles.css`, `index.html`,
