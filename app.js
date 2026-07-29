@@ -820,13 +820,13 @@
     if (!value) {
       const currentColor = state.markerColors[state.markerColors.length - 1] || defaultMarkerColor;
       colorNamePreview.style.setProperty('--typed-color', currentColor);
-      colorNameFeedback.textContent = 'Accetta nomi, codici HEX, RGB e HSL.';
+      colorNameFeedback.textContent = 'Scrivi un nome o usa uno degli esempi.';
       return null;
     }
     if (!resolvedColor) {
       colorNamePreview.classList.add('invalid');
       colorNameFeedback.classList.add('error');
-      colorNameFeedback.textContent = 'Colore non riconosciuto. Prova “rosa”, “blu notte” o #C2185B.';
+      colorNameFeedback.textContent = 'Colore non riconosciuto. Prova “rosa”, “blu notte” o #FF0000.';
       return null;
     }
     if (resolvedColor === 'none') {

@@ -126,7 +126,11 @@ button:active { transform: translateY(1px) scale(.97); }
 .color-name-form input { min-width: 0; min-height: 44px; padding: 0 11px; border: 1px solid rgba(255,255,255,.18); border-radius: 12px; outline: 0; color: var(--text); background: rgba(255,255,255,.06); font: inherit; font-size: 16px; }
 .color-name-form input:focus { border-color: rgba(217,180,91,.72); box-shadow: 0 0 0 3px rgba(217,180,91,.12); }
 .color-name-form button { min-height: 44px; padding: 0 10px; border-radius: 12px; border-color: rgba(217,180,91,.55); color: #12151c; background: var(--accent-2); box-shadow: 0 5px 14px rgba(0,0,0,.22); font-size: 12px; }
-.color-name-feedback { min-height: 16px; margin: 7px 0 0 52px; color: var(--muted); font-size: 11px; line-height: 1.4; }
+.color-format-examples { display: grid; gap: 3px; margin: 9px 0 0 52px; color: var(--muted); font-size: 10px; line-height: 1.4; }
+.color-format-examples span { display: flex; gap: 6px; align-items: baseline; }
+.color-format-examples strong { flex: 0 0 28px; color: var(--accent-2); font-size: 9px; letter-spacing: .05em; }
+.color-format-examples code { overflow-wrap: anywhere; color: #d8deea; font: 600 10px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.color-name-feedback { min-height: 16px; margin: 6px 0 0 52px; color: var(--muted); font-size: 11px; line-height: 1.4; }
 .color-name-feedback.error { color: #ff9aa1; }
 .color-help { margin: 10px 0 0; color: var(--muted); font-size: 11px; line-height: 1.4; }
 .marker-text-field + input { width: 100%; min-height: 50px; padding: 0 14px; border: 1px solid rgba(255,255,255,.18); border-radius: 14px; outline: 0; color: var(--text); background: rgba(255,255,255,.06); font: inherit; }
@@ -170,6 +174,7 @@ button:active { transform: translateY(1px) scale(.97); }
   .color-name-form { grid-template-columns: 42px minmax(0, 1fr) 56px; gap: 6px; }
   .color-name-preview { width: 42px; height: 42px; }
   .color-name-form button { padding: 0 7px; }
+  .color-format-examples { margin-left: 48px; }
   .color-name-feedback { margin-left: 48px; }
 }
 

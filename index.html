@@ -10,7 +10,7 @@
   <title>Mappa Squadra</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=21">
+  <link rel="stylesheet" href="styles.css?v=23">
 </head>
 <body>
   <main class="app-shell">
@@ -117,10 +117,15 @@
               <label for="markerColorInput">Scrivi un colore</label>
               <form class="color-name-form" id="colorNameForm" novalidate>
                 <span class="color-name-preview" id="colorNamePreview" aria-hidden="true"></span>
-                <input id="markerColorInput" type="text" maxlength="40" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Es. rosa antico">
+                <input id="markerColorInput" type="text" maxlength="40" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Es. rosa antico" aria-describedby="colorFormatExamples colorNameFeedback">
                 <button type="submit">Usa</button>
               </form>
-              <p class="color-name-feedback" id="colorNameFeedback" role="status" aria-live="polite">Accetta nomi, codici HEX, RGB e HSL.</p>
+              <p class="color-format-examples" id="colorFormatExamples">
+                <span><strong>HEX</strong> <code>#FF0000</code></span>
+                <span><strong>RGB</strong> <code>rgb(255, 0, 0)</code></span>
+                <span><strong>HSL</strong> <code>hsl(0, 100%, 50%)</code></span>
+              </p>
+              <p class="color-name-feedback" id="colorNameFeedback" role="status" aria-live="polite">Scrivi un nome o usa uno degli esempi.</p>
             </div>
             <p class="color-help" id="colorHelp">Tocca un colore pronto o scrivine uno. Puoi combinare fino a due colori.</p>
           </fieldset>
@@ -186,6 +191,6 @@
     <canvas id="exportCanvas" hidden></canvas>
   </main>
 
-  <script src="app.js?v=24" defer></script>
+  <script src="app.js?v=26" defer></script>
 </body>
 </html>

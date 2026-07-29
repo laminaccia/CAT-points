@@ -5,6 +5,19 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-29 — Esempi per HEX, RGB e HSL
+
+*Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,
+`app.js`, `service-worker.js`, `README.md`, `AGENTS.md`, `HANDOFF.md`.*
+
+Il campo colore indicava i formati accettati senza mostrare come scriverli.
+Ora sotto il campo restano sempre visibili tre esempi completi ed equivalenti:
+`#FF0000`, `rgb(255, 0, 0)` e `hsl(0, 100%, 50%)`. Sono separati dal
+messaggio dinamico di riconoscimento o errore, quindi non spariscono mentre
+l'utente digita. Il campo li annuncia anche come descrizione accessibile.
+
+Bumpati `styles.css?v=23`, `app.js?v=26` e `mappa-squadra-v32`.
+
 ## 2026-07-29 — Controlli circolari e gerarchia più pulita
 
 *Agente: Codex con skill Impeccable. Toccati `styles.css`, `index.html`,
