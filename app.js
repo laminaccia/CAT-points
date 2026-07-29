@@ -35,6 +35,7 @@
   const markerDialog = document.getElementById('markerDialog');
   const markerTextInput = document.getElementById('markerText');
   const cancelMarkerButton = document.getElementById('cancelMarkerButton');
+  const editMarkerButton = document.getElementById('editMarkerButton');
   const colorNameForm = document.getElementById('colorNameForm');
   const markerColorInput = document.getElementById('markerColorInput');
   const colorNamePreview = document.getElementById('colorNamePreview');
@@ -98,6 +99,7 @@
   const genericSearchWords = new Set(['VIA', 'VIALE', 'CONTRADA', 'CORSO', 'PIAZZA', 'STRADA', 'C', 'CDA', 'DA', 'LE', 'AVV', 'DOTTOR', 'SS', 'SP']);
   let incrementalSearchTimer = 0;
   let pendingStreetPoint = null;
+  let markerDialogSnapshot = null;
   let markerColorTouched = false;
 
   document.body.append(streetPointDialog, streetListDialog);
@@ -530,6 +532,10 @@
   }
 
   function openMarkerDialog() {
+    markerDialogSnapshot = {
+      colors: [...state.markerColors],
+      text: state.markerText
+    };
     markerTextInput.value = state.markerText;
     markerColorTouched = false;
     markerColorInput.value = '';
@@ -540,10 +546,21 @@
   }
 
   function closeMarkerDialog() {
+    markerDialogSnapshot = null;
     markerDialog.classList.add('hidden');
   }
 
+  function cancelMarkerDialog() {
+    if (markerDialogSnapshot) {
+      state.markerColors = [...markerDialogSnapshot.colors];
+      state.markerText = markerDialogSnapshot.text;
+      setMarkerVisual();
+    }
+    closeMarkerDialog();
+  }
+
   function placeMarker() {
+    const markerWasPlaced = state.markerPlaced;
     state.markerText = markerTextInput.value.trim().slice(0, 12);
     state.markerPlaced = true;
     setMarkerVisual();
@@ -553,7 +570,11 @@
     confirmRow.classList.remove('hidden');
     closeMarkerDialog();
     updateCrosshairCoordinates();
-    setStatus(state.markerText ? `Punto selezionato • ${state.markerText}` : 'Punto selezionato');
+    if (markerWasPlaced) {
+      setStatus(state.markerText ? `Marker aggiornato • ${state.markerText}` : 'Marker aggiornato');
+    } else {
+      setStatus(state.markerText ? `Punto selezionato • ${state.markerText}` : 'Punto selezionato');
+    }
   }
 
   function enableMarkerMove() {
@@ -743,6 +764,7 @@
   document.getElementById('zoomOutButton').addEventListener('click', () => zoomAt(0.8));
   document.getElementById('placeButton').addEventListener('click', openMarkerDialog);
   document.getElementById('moveButton').addEventListener('click', enableMarkerMove);
+  editMarkerButton.addEventListener('click', openMarkerDialog);
   document.getElementById('resetButton').addEventListener('click', resetMap);
   toggleCoordinatesButton.addEventListener('click', () => {
     setCoordinateToolsVisible(!state.coordinateToolsVisible);
@@ -750,8 +772,8 @@
       ? 'Strumenti coordinate mostrati'
       : 'Strumenti coordinate nascosti');
   });
-  cancelMarkerButton.addEventListener('click', closeMarkerDialog);
-  document.getElementById('cancelMarkerButtonSecondary').addEventListener('click', closeMarkerDialog);
+  cancelMarkerButton.addEventListener('click', cancelMarkerDialog);
+  document.getElementById('cancelMarkerButtonSecondary').addEventListener('click', cancelMarkerDialog);
   document.getElementById('confirmMarkerButton').addEventListener('click', placeMarker);
   copyCoordinatesButton.addEventListener('click', copyCoordinateJson);
   addStreetPointButton.addEventListener('click', openStreetPointDialog);
@@ -887,7 +909,7 @@
     searchStreet(streetSearch.value);
   });
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && !markerDialog.classList.contains('hidden')) closeMarkerDialog();
+    if (event.key === 'Escape' && !markerDialog.classList.contains('hidden')) cancelMarkerDialog();
     if (event.key === 'Escape' && !identityDialog.classList.contains('hidden')) closeIdentityDialog();
     if (event.key === 'Escape' && !streetPointDialog.classList.contains('hidden')) closeStreetPointDialog();
     if (event.key === 'Escape' && !streetListDialog.classList.contains('hidden')) closeManualStreetPointList();

@@ -5,6 +5,23 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-29 — Modifica marker e ritorno al mirino
+
+*Agente: Codex. Toccati `index.html`, `styles.css`, `app.js`,
+`service-worker.js`, `README.md`, `AGENTS.md`, `HANDOFF.md`.*
+
+Dopo la prima conferma compaiono quattro azioni in una griglia 2×2:
+«Cambia posizione», «Modifica marker», «Copia immagine» e «Condividi PNG».
+«Cambia posizione» torna al mirino e riattiva pan e zoom della mappa;
+«Modifica marker» riapre colore e testo lasciando il punto dov'è.
+
+All'apertura del dialog viene salvata una copia del marker corrente. Se
+l'utente cambia colori e poi preme «Annulla», chiude con la `×` o usa Escape,
+colore e testo precedenti vengono ripristinati. Solo «Conferma punto» rende
+effettive le modifiche e mostra lo stato «Marker aggiornato».
+
+Bumpati `styles.css?v=25`, `app.js?v=27` e `mappa-squadra-v34`.
+
 ## 2026-07-29 — Esempi per HEX, RGB e HSL
 
 *Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,

@@ -85,7 +85,8 @@ h1 { margin: 0; font-size: 22px; letter-spacing: .08em; }
 .status-pill { position: absolute; z-index: 5; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 132px); transform: translateX(-50%); max-width: calc(100% - 32px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 9px 13px; border: 1px solid rgba(255,255,255,.15); border-radius: 999px; background: var(--panel); color: #e8ebf2; backdrop-filter: blur(12px); font-size: 13px; }
 .controls-panel { position: absolute; z-index: 6; left: 16px; right: 16px; bottom: calc(env(safe-area-inset-bottom) + 18px); }
 .control-row { display: grid; grid-template-columns: 52px 1fr 52px; align-items: center; gap: 10px; margin-top: 10px; }
-#confirmRow { grid-template-columns: 1fr 1fr 1fr; }
+#confirmRow { grid-template-columns: 1fr 1fr; }
+#confirmRow button { font-size: 14px; white-space: nowrap; }
 button { min-height: 52px; border-radius: 14px; border: 1px solid var(--line); color: var(--text); background: var(--surface-raised); backdrop-filter: blur(14px); font-weight: 700; transition: transform .14s ease-out, border-color .14s ease-out, background-color .14s ease-out, box-shadow .14s ease-out; }
 .primary-button { border-color: rgba(245,219,139,.72); color: #15171b; background: var(--accent-2); box-shadow: 0 8px 22px rgba(0,0,0,.28), 0 3px 0 rgba(151,117,34,.42); }
 .secondary-button { display: grid; place-items: center; width: 52px; height: 52px; min-height: 52px; aspect-ratio: 1; padding: 0; border-radius: 50%; background: rgba(12,16,23,.9); box-shadow: var(--shadow-control); font-size: 24px; line-height: 1; }
@@ -162,11 +163,6 @@ button:active { transform: translateY(1px) scale(.97); }
 .identity-feedback { min-height: 18px; margin: 8px 0 0; color: var(--accent-2); font-size: 12px; }
 .identity-actions { display: grid; grid-template-columns: 1fr 1.35fr; gap: 10px; margin-top: 14px; }
 .identity-actions #cancelIdentityButton.hidden + .primary-button { grid-column: 1 / -1; }
-
-@media (max-width: 520px) {
-  #confirmRow { grid-template-columns: 1fr 1fr; }
-  #copyButton { grid-column: 1 / -1; min-height: 44px; }
-}
 
 @media (max-width: 350px) {
   .color-options { grid-template-columns: repeat(5, 42px); gap: 9px 4px; }

@@ -54,6 +54,7 @@ La lista manuale è separata da `assets/streets.json` e viene salvata nel browse
 ## Marker e condivisione
 
 - **Segna questo punto** offre i colori principali, un campo che riconosce nomi e codici colore (`#FF0000`, `rgb(255, 0, 0)`, `hsl(0, 100%, 50%)`) e un testo facoltativo, per esempio `A12`.
+- Dopo la conferma, **Modifica marker** cambia colore o testo senza spostare il punto; **Cambia posizione** torna al mirino per scegliere nuovamente il punto.
 - **Condividi PNG** usa il menu nativo quando il dispositivo supporta la condivisione di file.
 - **Copia immagine** copia il PNG negli appunti; su iPhone, se gli appunti immagine sono bloccati da HTTP, salva il PNG per poterlo condividere dal menu dell’iPhone.
 
