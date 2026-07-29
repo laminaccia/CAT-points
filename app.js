@@ -612,10 +612,15 @@
   function constrain() {
     const width = image.naturalWidth * state.scale;
     const height = image.naturalHeight * state.scale;
-    const minX = Math.min(0, stage.clientWidth - width);
-    const minY = Math.min(0, stage.clientHeight - height);
-    state.x = clamp(state.x, minX, 0);
-    state.y = clamp(state.y, minY, 0);
+    const centerX = stage.clientWidth / 2;
+    const centerY = stage.clientHeight / 2;
+    // Il mirino è fisso al centro: se fermassimo la mappa sul bordo dello
+    // schermo, come faceva il vecchio vincolo, una fascia lungo tutti e
+    // quattro i lati non potrebbe mai raggiungerlo. I nuovi estremi portano
+    // invece ogni bordo esattamente sotto il mirino, quindi l'intervallo
+    // normalizzato completo 0–1 resta realmente utilizzabile.
+    state.x = clamp(state.x, centerX - width, centerX);
+    state.y = clamp(state.y, centerY - height, centerY);
   }
 
   function render() {
@@ -1431,13 +1436,40 @@
     ctx.fillStyle = '#090b10';
     ctx.fillRect(0, 0, outputWidth, outputHeight);
 
+    // Quando si segna un punto sul bordo, metà vista può trovarsi oltre la
+    // carta vera. Lo stesso fondale sfocato dell'interfaccia evita un vuoto
+    // nero nel PNG, mentre il contorno successivo rende inequivocabile dove
+    // termina la mappa utilizzabile.
+    const backdropScale = Math.max(outputWidth / image.naturalWidth, outputHeight / image.naturalHeight) * 1.08;
+    const backdropWidth = image.naturalWidth * backdropScale;
+    const backdropHeight = image.naturalHeight * backdropScale;
+    ctx.save();
+    ctx.filter = 'blur(28px) brightness(.58)';
     ctx.drawImage(
       image,
-      state.x * stageRatio,
-      state.y * stageRatio,
-      image.naturalWidth * state.scale * stageRatio,
-      image.naturalHeight * state.scale * stageRatio
+      (outputWidth - backdropWidth) / 2,
+      (outputHeight - backdropHeight) / 2,
+      backdropWidth,
+      backdropHeight
     );
+    ctx.restore();
+    ctx.fillStyle = 'rgba(9,11,16,.28)';
+    ctx.fillRect(0, 0, outputWidth, outputHeight);
+
+    const mapX = state.x * stageRatio;
+    const mapY = state.y * stageRatio;
+    const mapWidth = image.naturalWidth * state.scale * stageRatio;
+    const mapHeight = image.naturalHeight * state.scale * stageRatio;
+    ctx.drawImage(
+      image,
+      mapX,
+      mapY,
+      mapWidth,
+      mapHeight
+    );
+    ctx.strokeStyle = 'rgba(255,255,255,.34)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(mapX, mapY, mapWidth, mapHeight);
 
     const gradient = ctx.createLinearGradient(0, 0, 0, outputHeight);
     gradient.addColorStop(0, 'rgba(4,7,12,.70)');

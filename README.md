@@ -54,6 +54,7 @@ La lista manuale è separata da `assets/streets.json` e viene salvata nel browse
 ## Marker e condivisione
 
 - **Segna questo punto** offre due menu a tendina per scegliere uno o due colori, mantiene la scelta personalizzata tramite nomi e codici (`#FF0000`, `rgb(255, 0, 0)`, `hsl(0, 100%, 50%)`) e permette di inserire subito testo marker ed etichetta cronologia.
+- La mappa può essere trascinata finché ciascuno dei quattro bordi raggiunge il centro del mirino: sono quindi selezionabili anche gli angoli estremi. Oltre il bordo vero compare un fondale sfocato che non viene confuso con la carta utilizzabile.
 - Dopo la conferma, **Modifica marker** cambia colore o testo senza spostare il punto; **Cambia posizione** torna al mirino per scegliere nuovamente il punto.
 - L’icona **Home** in alto a destra conclude il marker corrente e riporta mappa e controlli alla vista iniziale.
 - Il pulsante con l’orologio nella barra di ricerca apre la cronologia locale del partecipante: ogni marker può essere riordinato, etichettato, rivisto sulla mappa, inviato nuovamente come foto o eliminato. **Esporta / invia cronologia** condivide un JSON, ripiega su un riepilogo testuale oppure scarica il file. I dati restano soltanto in quel browser/dispositivo.

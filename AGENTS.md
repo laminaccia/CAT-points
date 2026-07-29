@@ -98,10 +98,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=31` e
-   `app.js?v=32`.
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=32` e
+   `app.js?v=33`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v41`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v42`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
@@ -234,6 +234,22 @@ Chi aggiunge un pannello scorrevole dentro `.map-stage` deve fare **tre** cose:
 
 ---
 
+## 5-quater. Tutta la mappa deve raggiungere il mirino
+
+Il mirino è fisso al centro. Per poter selezionare davvero coordinate da
+`0,0` a `1,1`, `constrain()` consente alla mappa di scorrere finché il suo
+bordo arriva al centro dello stage: i limiti sono `center - size` e `center`,
+non `viewport - size` e `0`. Ripristinare il vecchio vincolo renderebbe di
+nuovo irraggiungibile una fascia lungo tutti e quattro i bordi.
+
+Quando il bordo raggiunge il mirino è inevitabile mostrare spazio oltre la
+carta. Non è un errore: `.map-stage::before` usa una copia sfocata e scura
+della mappa come fondale, mentre la carta vera ha un contorno visibile. Anche
+il PNG riproduce questa distinzione. La vista iniziale continua invece a
+coprire tutto lo schermo.
+
+---
+
 ## 6. Identità partecipante
 
 Il partecipante inserisce un nome al primo accesso. Il valore è salvato in
@@ -258,7 +274,8 @@ condivisione nativa, poi il testo condiviso, infine il download.
 
 ## 7. Criteri di accettazione
 
-- La mappa copre sempre lo schermo senza lasciare spazi vuoti.
+- La vista iniziale copre lo schermo; durante il pan ciascun bordo e angolo
+  della mappa può raggiungere il mirino, con il fondale sfocato oltre la carta.
 - Pan e zoom sono fluidi.
 - Le icone circolari sono geometricamente centrate e i controlli interattivi
   compatti mantengono un'area tattile minima di 44×44 px.

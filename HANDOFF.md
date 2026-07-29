@@ -5,6 +5,24 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-30 — Intera area della mappa raggiungibile
+
+*Agente: Codex con skill Impeccable. Toccati `app.js`, `styles.css`,
+`index.html`, `service-worker.js`, `README.md`, `AGENTS.md`, `HANDOFF.md`.*
+
+Il vecchio `constrain()` obbligava l'immagine a coprire sempre lo stage:
+poiché il mirino è fisso al centro, i bordi si fermavano sul bordo dello
+schermo e una fascia della carta non poteva mai arrivare sotto il punto.
+
+I limiti di pan sono ora `center - imageSize` e `center`, quindi il mirino può
+raggiungere coordinate normalizzate esatte da 0 a 1 su entrambi gli assi. Lo
+spazio inevitabilmente esposto oltre la carta usa un fondale sfocato e scuro;
+un contorno sottile distingue sempre la mappa vera. L'export PNG applica lo
+stesso fondale e lo stesso contorno, evitando grandi zone nere quando si
+condivide un marker vicino a un bordo.
+
+Bumpati `styles.css?v=32`, `app.js?v=33` e `mappa-squadra-v42`.
+
 ## 2026-07-30 — Menu desktop leggibili, ordine ed export cronologia
 
 *Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,
