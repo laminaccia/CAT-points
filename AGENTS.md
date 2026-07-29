@@ -98,10 +98,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=30` e
-   `app.js?v=31`.
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=31` e
+   `app.js?v=32`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v40`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v41`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
@@ -249,7 +249,10 @@ aggiorna la voce attiva invece di duplicarla. Reimpostare la mappa conclude
 quel marker, quindi la conferma successiva crea una nuova voce. Ogni voce può
 avere un'etichetta facoltativa distinta dal testo visibile sul marker:
 «Rivedi» la riporta sulla mappa, «Invia foto» rigenera il PNG con etichetta e
-data originali e apre il normale flusso di condivisione.
+data originali e apre il normale flusso di condivisione. L'ordine si modifica
+con «Su»/«Giù» e resta salvato; modificare un marker esistente non lo riporta
+in testa. L'esportazione produce un JSON ordinato e prova prima la
+condivisione nativa, poi il testo condiviso, infine il download.
 
 ---
 
@@ -274,6 +277,8 @@ data originali e apre il normale flusso di condivisione.
 - Ogni conferma salva automaticamente il marker nella cronologia locale del
   partecipante; una voce può essere etichettata, rivista, condivisa nuovamente
   o eliminata.
+- Le voci della cronologia possono essere riordinate e l'ordine viene
+  mantenuto nell'esportazione condivisibile.
 - Il pulsante di copia usa Clipboard API quando disponibile.
 - La PWA si apre anche offline dopo il primo caricamento. *(verificato il
   2026-07-29 col server spento: mappa, ricerca e mirino funzionano)*

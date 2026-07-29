@@ -34,6 +34,7 @@
   const markerHistoryList = document.getElementById('markerHistoryList');
   const markerHistoryDescription = document.getElementById('markerHistoryDescription');
   const closeMarkerHistoryButton = document.getElementById('closeMarkerHistoryButton');
+  const exportMarkerHistoryButton = document.getElementById('exportMarkerHistoryButton');
   const searchFeedback = document.getElementById('searchFeedback');
   const searchResults = document.getElementById('searchResults');
   const mainControlsRow = document.getElementById('mainControlsRow');
@@ -273,6 +274,19 @@
     setStatus(persisted ? action : `${action} solo per questa sessione`);
   }
 
+  function moveMarkerHistoryEntry(entryId, offset) {
+    const playerKey = markerHistoryPlayerKey();
+    const entries = [...getCurrentMarkerHistory()];
+    const currentIndex = entries.findIndex((entry) => entry.id === entryId);
+    const targetIndex = currentIndex + offset;
+    if (currentIndex < 0 || targetIndex < 0 || targetIndex >= entries.length) return;
+    [entries[currentIndex], entries[targetIndex]] = [entries[targetIndex], entries[currentIndex]];
+    markerHistoryStore[playerKey] = entries;
+    const persisted = persistMarkerHistoryStore();
+    renderMarkerHistory();
+    setStatus(persisted ? 'Ordine cronologia aggiornato' : 'Ordine valido solo per questa sessione');
+  }
+
   function openMarkerHistoryLabelEditor(item, actions, entry, triggerButton) {
     actions.classList.add('hidden');
     const form = document.createElement('form');
@@ -318,9 +332,10 @@
   function renderMarkerHistory() {
     markerHistoryList.replaceChildren();
     markerHistoryDescription.textContent = state.playerName
-      ? `Cronologia di ${state.playerName}: rivedi, etichetta o invia nuovamente una foto.`
-      : 'Rivedi, etichetta o invia nuovamente un marker salvato in questo browser.';
+      ? `Cronologia di ${state.playerName}: riordina, rivedi o invia nuovamente i marker.`
+      : 'Riordina, rivedi o invia nuovamente i marker salvati in questo browser.';
     const entries = getCurrentMarkerHistory();
+    exportMarkerHistoryButton.disabled = entries.length === 0;
     if (!entries.length) {
       const empty = document.createElement('p');
       empty.className = 'marker-history-empty';
@@ -328,7 +343,7 @@
       markerHistoryList.append(empty);
       return;
     }
-    entries.forEach((entry) => {
+    entries.forEach((entry, index) => {
       const item = document.createElement('article');
       item.className = 'marker-history-item';
       item.append(createHistoryMarkerSwatch(Array.isArray(entry.colors) ? entry.colors : []));
@@ -348,6 +363,27 @@
       copy.prepend(title);
       copy.append(meta);
       item.append(copy);
+
+      const order = document.createElement('div');
+      order.className = 'marker-history-order';
+      const orderLabel = document.createElement('span');
+      orderLabel.textContent = `Posizione ${index + 1} di ${entries.length}`;
+      const moveUpButton = document.createElement('button');
+      moveUpButton.className = 'secondary-wide';
+      moveUpButton.type = 'button';
+      moveUpButton.textContent = 'Su';
+      moveUpButton.disabled = index === 0;
+      moveUpButton.setAttribute('aria-label', `Sposta ${historyLabel || entry.text || 'marker'} verso l'alto`);
+      moveUpButton.addEventListener('click', () => moveMarkerHistoryEntry(entry.id, -1));
+      const moveDownButton = document.createElement('button');
+      moveDownButton.className = 'secondary-wide';
+      moveDownButton.type = 'button';
+      moveDownButton.textContent = 'Giù';
+      moveDownButton.disabled = index === entries.length - 1;
+      moveDownButton.setAttribute('aria-label', `Sposta ${historyLabel || entry.text || 'marker'} verso il basso`);
+      moveDownButton.addEventListener('click', () => moveMarkerHistoryEntry(entry.id, 1));
+      order.append(orderLabel, moveUpButton, moveDownButton);
+      item.append(order);
 
       const actions = document.createElement('div');
       actions.className = 'marker-history-item-actions';
@@ -380,6 +416,77 @@
     });
   }
 
+  function buildMarkerHistoryExport() {
+    return {
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      participant: state.playerName,
+      markers: getCurrentMarkerHistory().map((entry, index) => ({
+        order: index + 1,
+        label: normalizeHistoryLabel(entry.label),
+        markerText: typeof entry.text === 'string' ? entry.text : '',
+        colors: Array.isArray(entry.colors) ? entry.colors : [],
+        x: Number(entry.x),
+        y: Number(entry.y),
+        createdAt: entry.createdAt || null,
+        updatedAt: entry.updatedAt || null
+      }))
+    };
+  }
+
+  function buildMarkerHistoryShareText(payload) {
+    const lines = [`Cronologia marker di ${payload.participant || 'partecipante'}`];
+    payload.markers.forEach((entry) => {
+      const name = entry.label || entry.markerText || `Marker ${entry.order}`;
+      const colors = entry.colors.length ? entry.colors.join(' + ') : 'trasparente';
+      lines.push(
+        '',
+        `${entry.order}. ${name}`,
+        `Coordinate: x ${entry.x.toFixed(6)}, y ${entry.y.toFixed(6)}`,
+        `Colori: ${colors}`,
+        `Data: ${formatMarkerHistoryTime(entry.createdAt)}`
+      );
+    });
+    return lines.join('\n');
+  }
+
+  async function exportAndShareMarkerHistory() {
+    const payload = buildMarkerHistoryExport();
+    if (!payload.markers.length) {
+      setStatus('Nessun marker da esportare');
+      return;
+    }
+    const json = JSON.stringify(payload, null, 2);
+    const safeName = normalizeText(state.playerName || 'partecipante').toLowerCase().replace(/\s+/g, '-');
+    const fileName = `cronologia-${safeName}-${Date.now()}.json`;
+    const blob = new Blob([json], { type: 'application/json' });
+    const file = typeof File === 'function' ? new File([blob], fileName, { type: blob.type }) : null;
+    const title = `Cronologia marker - ${state.playerName || 'Caccia al Tesoro'}`;
+    setStatus('Preparazione cronologia…');
+    exportMarkerHistoryButton.disabled = true;
+    try {
+      if (file && canShareFile(file)) {
+        await navigator.share({ files: [file], title });
+        setStatus('Cronologia condivisa');
+      } else if (typeof navigator.share === 'function') {
+        await navigator.share({ title, text: buildMarkerHistoryShareText(payload) });
+        setStatus('Cronologia condivisa come testo');
+      } else {
+        downloadBlob(blob, fileName);
+        setStatus('Cronologia JSON scaricata');
+      }
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        setStatus('Esportazione annullata');
+      } else {
+        downloadBlob(blob, fileName);
+        setStatus('Condivisione non disponibile: JSON scaricato');
+      }
+    } finally {
+      exportMarkerHistoryButton.disabled = false;
+    }
+  }
+
   function openMarkerHistory() {
     renderMarkerHistory();
     markerHistoryDialog.classList.remove('hidden');
@@ -399,15 +506,16 @@
       y: Number(coordinates.y.toFixed(6)),
       colors: [...state.markerColors],
       text: state.markerText,
-      label: normalizeHistoryLabel(existing?.label ?? activeHistoryLabel),
+      label: normalizeHistoryLabel(activeHistoryLabel),
       createdAt: existing?.createdAt || activeHistoryCreatedAt || now,
       updatedAt: now
     };
     activeHistoryEntryId = entry.id;
     activeHistoryLabel = entry.label;
     activeHistoryCreatedAt = entry.createdAt;
-    markerHistoryStore[playerKey] = [entry, ...entries.filter((historyEntry) => historyEntry.id !== entry.id)]
-      .slice(0, markerHistoryLimit);
+    markerHistoryStore[playerKey] = existing
+      ? entries.map((historyEntry) => historyEntry.id === entry.id ? entry : historyEntry)
+      : [entry, ...entries].slice(0, markerHistoryLimit);
     const persisted = persistMarkerHistoryStore();
     updateMarkerHistoryCount();
     return persisted;
@@ -1079,6 +1187,7 @@
   editMarkerButton.addEventListener('click', openMarkerDialog);
   historyButton.addEventListener('click', openMarkerHistory);
   closeMarkerHistoryButton.addEventListener('click', closeMarkerHistory);
+  exportMarkerHistoryButton.addEventListener('click', exportAndShareMarkerHistory);
   document.getElementById('resetButton').addEventListener('click', resetMap);
   toggleCoordinatesButton.addEventListener('click', () => {
     setCoordinateToolsVisible(!state.coordinateToolsVisible);

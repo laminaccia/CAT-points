@@ -5,6 +5,27 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-30 — Menu desktop leggibili, ordine ed export cronologia
+
+*Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,
+`app.js`, `service-worker.js`, `README.md`, `AGENTS.md`, `HANDOFF.md`.*
+
+Le `<option>` dei due selettori colore dichiarano ora esplicitamente testo
+chiaro e sfondo scuro: su desktop non dipendono più dal popup bianco imposto
+dal browser.
+
+Ogni scheda della cronologia mostra «Posizione N di M» e i pulsanti «Su» e
+«Giù». Lo scambio modifica direttamente l'array del partecipante in
+`mappa-marker-history-v1`; anche la modifica successiva di un marker conserva
+la posizione scelta invece di riportarlo in testa.
+
+«Esporta / invia cronologia» costruisce un JSON ordinato con partecipante,
+etichette, testo marker, colori, coordinate e date. Se Web Share accetta il
+file lo invia direttamente; altrimenti prova un riepilogo testuale condiviso,
+oppure scarica il JSON su browser senza condivisione.
+
+Bumpati `styles.css?v=31`, `app.js?v=32` e `mappa-squadra-v41`.
+
 ## 2026-07-29 — Audit definitivo di icone e aree tattili
 
 *Agente: Codex con skill Impeccable (`audit`). Toccati `index.html`,
