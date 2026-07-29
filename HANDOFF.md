@@ -5,6 +5,24 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-29 — Etichette, revisione e reinvio dalla cronologia
+
+*Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,
+`app.js`, `service-worker.js`, `README.md`, `AGENTS.md`, `HANDOFF.md`.*
+
+Ogni voce della cronologia offre ora quattro azioni: «Rivedi» ripristina il
+marker sulla mappa, «Invia foto» lo ripristina e apre direttamente il flusso
+di condivisione, «Etichetta» apre un editor inline, «Elimina» mantiene il
+comportamento precedente. L'etichetta è facoltativa, lunga al massimo 40
+caratteri e separata dal testo breve disegnato accanto al marker.
+
+Quando una voce viene rivista, la foto rigenerata usa l'etichetta nel riquadro
+inferiore e conserva la data di prima creazione del marker invece di fingere
+che sia stato segnato adesso. I record già presenti restano compatibili:
+l'assenza del nuovo campo `label` equivale a nessuna etichetta.
+
+Bumpati `styles.css?v=27`, `app.js?v=29` e `mappa-squadra-v36`.
+
 ## 2026-07-29 — Cronologia marker locale per partecipante
 
 *Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,

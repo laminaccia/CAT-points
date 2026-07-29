@@ -110,6 +110,8 @@
   let markerDialogSnapshot = null;
   let markerHistoryStore = {};
   let activeHistoryEntryId = null;
+  let activeHistoryLabel = '';
+  let activeHistoryCreatedAt = null;
   let markerColorTouched = false;
 
   document.body.append(streetPointDialog, streetListDialog, markerHistoryDialog);
@@ -145,6 +147,10 @@
 
   function markerHistoryPlayerKey(value = state.playerName) {
     return value.normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('it-IT');
+  }
+
+  function normalizeHistoryLabel(value) {
+    return String(value || '').normalize('NFKC').trim().replace(/\s+/g, ' ').slice(0, 40);
   }
 
   function loadMarkerHistoryStore() {
@@ -212,11 +218,15 @@
   }
 
   function restoreMarkerHistoryEntry(entry) {
-    if (!Number.isFinite(entry.x) || !Number.isFinite(entry.y)) return;
+    const x = Number(entry.x);
+    const y = Number(entry.y);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return;
     state.markerColors = Array.isArray(entry.colors) ? [...entry.colors].slice(0, 2) : [defaultMarkerColor];
     state.markerText = typeof entry.text === 'string' ? entry.text.slice(0, 12) : '';
     activeHistoryEntryId = entry.id;
-    zoomToMapPoint(entry.x, entry.y);
+    activeHistoryLabel = normalizeHistoryLabel(entry.label);
+    activeHistoryCreatedAt = entry.createdAt || entry.updatedAt || null;
+    zoomToMapPoint(x, y);
     state.markerPlaced = true;
     setMarkerVisual();
     marker.classList.remove('hidden');
@@ -225,24 +235,86 @@
     confirmRow.classList.remove('hidden');
     closeMarkerHistory();
     updateCrosshairCoordinates();
-    setStatus(state.markerText ? `Marker ripristinato • ${state.markerText}` : 'Marker ripristinato');
+    const restoredName = activeHistoryLabel || state.markerText;
+    setStatus(restoredName ? `Marker ripristinato • ${restoredName}` : 'Marker ripristinato');
   }
 
   function deleteMarkerHistoryEntry(entryId) {
     const playerKey = markerHistoryPlayerKey();
     markerHistoryStore[playerKey] = getCurrentMarkerHistory().filter((entry) => entry.id !== entryId);
-    if (activeHistoryEntryId === entryId) activeHistoryEntryId = null;
-    persistMarkerHistoryStore();
+    if (activeHistoryEntryId === entryId) {
+      activeHistoryEntryId = null;
+      activeHistoryLabel = '';
+      activeHistoryCreatedAt = null;
+    }
+    const persisted = persistMarkerHistoryStore();
     updateMarkerHistoryCount();
     renderMarkerHistory();
-    setStatus('Marker eliminato dalla cronologia');
+    setStatus(persisted ? 'Marker eliminato dalla cronologia' : 'Eliminato solo per questa sessione');
+  }
+
+  function updateMarkerHistoryLabel(entryId, value) {
+    const playerKey = markerHistoryPlayerKey();
+    const entries = getCurrentMarkerHistory();
+    const entry = entries.find((historyEntry) => historyEntry.id === entryId);
+    if (!entry) return;
+    entry.label = normalizeHistoryLabel(value);
+    entry.labelUpdatedAt = new Date().toISOString();
+    markerHistoryStore[playerKey] = entries;
+    if (activeHistoryEntryId === entryId) activeHistoryLabel = entry.label;
+    const persisted = persistMarkerHistoryStore();
+    renderMarkerHistory();
+    closeMarkerHistoryButton.focus({ preventScroll: true });
+    const action = entry.label ? 'Etichetta salvata' : 'Etichetta rimossa';
+    setStatus(persisted ? action : `${action} solo per questa sessione`);
+  }
+
+  function openMarkerHistoryLabelEditor(item, actions, entry, triggerButton) {
+    actions.classList.add('hidden');
+    const form = document.createElement('form');
+    form.className = 'marker-history-label-form';
+    const label = document.createElement('label');
+    label.className = 'sr-only';
+    label.textContent = 'Etichetta del marker';
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.maxLength = 40;
+    input.autocomplete = 'off';
+    input.placeholder = 'Es. Tappa 3 o Piazza';
+    input.value = normalizeHistoryLabel(entry.label);
+    label.append(input);
+    const controls = document.createElement('div');
+    controls.className = 'marker-history-label-actions';
+    const cancelButton = document.createElement('button');
+    cancelButton.className = 'secondary-wide';
+    cancelButton.type = 'button';
+    cancelButton.textContent = 'Annulla';
+    const saveButton = document.createElement('button');
+    saveButton.className = 'primary-button';
+    saveButton.type = 'submit';
+    saveButton.textContent = 'Salva etichetta';
+    controls.append(cancelButton, saveButton);
+    form.append(label, controls);
+    item.append(form);
+
+    cancelButton.addEventListener('click', () => {
+      form.remove();
+      actions.classList.remove('hidden');
+      triggerButton.focus({ preventScroll: true });
+    });
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      updateMarkerHistoryLabel(entry.id, input.value);
+    });
+    input.focus({ preventScroll: true });
+    input.select();
   }
 
   function renderMarkerHistory() {
     markerHistoryList.replaceChildren();
     markerHistoryDescription.textContent = state.playerName
-      ? `Cronologia di ${state.playerName}, salvata solo in questo browser.`
-      : 'I marker restano solo in questo browser.';
+      ? `Cronologia di ${state.playerName}: rivedi, etichetta o invia nuovamente una foto.`
+      : 'Rivedi, etichetta o invia nuovamente un marker salvato in questo browser.';
     const entries = getCurrentMarkerHistory();
     if (!entries.length) {
       const empty = document.createElement('p');
@@ -259,25 +331,45 @@
       const copy = document.createElement('div');
       copy.className = 'marker-history-copy';
       const title = document.createElement('strong');
-      title.textContent = entry.text || 'Marker senza testo';
+      const historyLabel = normalizeHistoryLabel(entry.label);
+      title.textContent = historyLabel || entry.text || 'Marker senza etichetta';
+      if (historyLabel && entry.text) {
+        const markerText = document.createElement('span');
+        markerText.textContent = `Testo marker: ${entry.text}`;
+        copy.append(markerText);
+      }
       const meta = document.createElement('small');
       meta.textContent = `${formatMarkerHistoryTime(entry.updatedAt || entry.createdAt)} · x ${Number(entry.x).toFixed(4)} · y ${Number(entry.y).toFixed(4)}`;
-      copy.append(title, meta);
+      copy.prepend(title);
+      copy.append(meta);
       item.append(copy);
 
       const actions = document.createElement('div');
       actions.className = 'marker-history-item-actions';
       const restoreButton = document.createElement('button');
-      restoreButton.className = 'primary-button';
+      restoreButton.className = 'secondary-wide';
       restoreButton.type = 'button';
-      restoreButton.textContent = 'Ripristina';
+      restoreButton.textContent = 'Rivedi';
       restoreButton.addEventListener('click', () => restoreMarkerHistoryEntry(entry));
+      const shareButton = document.createElement('button');
+      shareButton.className = 'primary-button';
+      shareButton.type = 'button';
+      shareButton.textContent = 'Invia foto';
+      shareButton.addEventListener('click', async () => {
+        restoreMarkerHistoryEntry(entry);
+        await shareCurrentMarker();
+      });
+      const labelButton = document.createElement('button');
+      labelButton.className = 'secondary-wide';
+      labelButton.type = 'button';
+      labelButton.textContent = historyLabel ? 'Modifica etichetta' : 'Etichetta';
+      labelButton.addEventListener('click', () => openMarkerHistoryLabelEditor(item, actions, entry, labelButton));
       const deleteButton = document.createElement('button');
       deleteButton.className = 'marker-history-delete';
       deleteButton.type = 'button';
       deleteButton.textContent = 'Elimina';
       deleteButton.addEventListener('click', () => deleteMarkerHistoryEntry(entry.id));
-      actions.append(restoreButton, deleteButton);
+      actions.append(restoreButton, shareButton, labelButton, deleteButton);
       item.append(actions);
       markerHistoryList.append(item);
     });
@@ -302,10 +394,13 @@
       y: Number(coordinates.y.toFixed(6)),
       colors: [...state.markerColors],
       text: state.markerText,
-      createdAt: existing?.createdAt || now,
+      label: normalizeHistoryLabel(existing?.label ?? activeHistoryLabel),
+      createdAt: existing?.createdAt || activeHistoryCreatedAt || now,
       updatedAt: now
     };
     activeHistoryEntryId = entry.id;
+    activeHistoryLabel = entry.label;
+    activeHistoryCreatedAt = entry.createdAt;
     markerHistoryStore[playerKey] = [entry, ...entries.filter((historyEntry) => historyEntry.id !== entry.id)]
       .slice(0, markerHistoryLimit);
     const persisted = persistMarkerHistoryStore();
@@ -316,7 +411,11 @@
   function setPlayerName(value, persist = true) {
     const previousHistoryKey = markerHistoryPlayerKey(state.playerName);
     state.playerName = value.trim().replace(/\s+/g, ' ').slice(0, 50);
-    if (previousHistoryKey && previousHistoryKey !== markerHistoryPlayerKey()) activeHistoryEntryId = null;
+    if (previousHistoryKey && previousHistoryKey !== markerHistoryPlayerKey()) {
+      activeHistoryEntryId = null;
+      activeHistoryLabel = '';
+      activeHistoryCreatedAt = null;
+    }
     playerNameButton.textContent = state.playerName || 'Inserisci nome';
     if (persist && state.playerName) {
       try {
@@ -780,6 +879,8 @@
     state.markerColors = [defaultMarkerColor];
     state.markerText = '';
     activeHistoryEntryId = null;
+    activeHistoryLabel = '';
+    activeHistoryCreatedAt = null;
     markerTextInput.value = '';
     marker.classList.add('hidden');
     crosshair.classList.remove('hidden');
@@ -1200,14 +1301,16 @@
     ctx.fillText(state.playerName || 'CACCIA AL TESORO', 54, 124);
     drawExportMarker(ctx, outputWidth / 2, outputHeight / 2);
 
-    const now = new Date();
+    const historicalDate = activeHistoryCreatedAt ? new Date(activeHistoryCreatedAt) : null;
+    const now = historicalDate && !Number.isNaN(historicalDate.getTime()) ? historicalDate : new Date();
+    const footerLabel = normalizeHistoryLabel(activeHistoryLabel) || 'Punto indicato';
     ctx.fillStyle = 'rgba(8,11,16,.76)';
     ctx.beginPath();
     roundedRectPath(ctx, 48, outputHeight - 118, outputWidth - 96, 70, 24);
     ctx.fill();
     ctx.fillStyle = '#ffffff';
     ctx.font = '500 25px sans-serif';
-    ctx.fillText(`Punto indicato • ${now.toLocaleDateString('it-IT')} ${now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}`, 78, outputHeight - 74);
+    ctx.fillText(`${footerLabel} • ${now.toLocaleDateString('it-IT')} ${now.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}`, 78, outputHeight - 74);
 
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => reject(new Error('export-timeout')), 5000);
@@ -1248,22 +1351,38 @@
     return { blob, file: new File([blob], `mappa-${safeName}-${Date.now()}.png`, { type: 'image/png' }) };
   }
 
-  document.getElementById('shareButton').addEventListener('click', async () => {
+  async function shareCurrentMarker() {
     setStatus('Preparazione immagine…');
     try {
       const { blob, file } = await exportFile();
       if (canShareFile(file)) {
-        await navigator.share({ files: [file], title: `Punto sulla mappa - ${state.playerName}` });
+        const shareLabel = normalizeHistoryLabel(activeHistoryLabel);
+        const title = shareLabel
+          ? `${shareLabel} - ${state.playerName}`
+          : `Punto sulla mappa - ${state.playerName}`;
+        await navigator.share({ files: [file], title });
         setStatus('Immagine condivisa');
-      } else if (await copyBlobToClipboard(blob)) {
-        setStatus('Immagine copiata: incollala nell’app desiderata');
       } else {
+        let copied = false;
+        try {
+          copied = await copyBlobToClipboard(blob);
+        } catch (error) {
+          copied = false;
+        }
+        if (copied) {
+          setStatus('Immagine copiata: incollala nell’app desiderata');
+          return;
+        }
         downloadBlob(blob, file.name);
         setStatus('PNG scaricato');
       }
     } catch (error) {
       setStatus(error.name === 'AbortError' ? 'Punto selezionato' : 'Condivisione non riuscita');
     }
+  }
+
+  document.getElementById('shareButton').addEventListener('click', async () => {
+    await shareCurrentMarker();
   });
 
   document.getElementById('copyButton').addEventListener('click', async () => {
