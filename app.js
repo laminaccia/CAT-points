@@ -34,8 +34,15 @@
   const confirmRow = document.getElementById('confirmRow');
   const markerDialog = document.getElementById('markerDialog');
   const markerTextInput = document.getElementById('markerText');
-  const markerColorPicker = document.getElementById('markerColorPicker');
   const cancelMarkerButton = document.getElementById('cancelMarkerButton');
+  const colorWheelToggle = document.getElementById('colorWheelToggle');
+  const colorWheelPanel = document.getElementById('colorWheelPanel');
+  const colorWheel = document.getElementById('colorWheel');
+  const colorWheelThumb = document.getElementById('colorWheelThumb');
+  const colorWheelToggleSwatch = document.getElementById('colorWheelToggleSwatch');
+  const colorWheelPreview = document.getElementById('colorWheelPreview');
+  const colorWheelValue = document.getElementById('colorWheelValue');
+  const colorLightness = document.getElementById('colorLightness');
   const playerNameButton = document.getElementById('playerNameButton');
   const identityDialog = document.getElementById('identityDialog');
   const identityForm = document.getElementById('identityForm');
@@ -49,6 +56,11 @@
   const genericSearchWords = new Set(['VIA', 'VIALE', 'CONTRADA', 'CORSO', 'PIAZZA', 'STRADA', 'C', 'CDA', 'DA', 'LE', 'AVV', 'DOTTOR', 'SS', 'SP']);
   let incrementalSearchTimer = 0;
   let pendingStreetPoint = null;
+  let wheelHue = 42;
+  let wheelSaturation = 62;
+  let wheelLightness = 60;
+  let wheelColorIndex = 0;
+  let markerColorTouched = false;
 
   document.body.append(streetPointDialog, streetListDialog);
 
@@ -477,6 +489,9 @@
 
   function openMarkerDialog() {
     markerTextInput.value = state.markerText;
+    markerColorTouched = false;
+    setColorWheelExpanded(false);
+    setColorWheelFromHex(state.markerColors[state.markerColors.length - 1] || defaultMarkerColor);
     setMarkerVisual();
     markerDialog.classList.remove('hidden');
     cancelMarkerButton.focus({ preventScroll: true });
@@ -726,18 +741,144 @@
       if (toggleSelected) {
         state.markerColors = state.markerColors.filter((selectedColor) => selectedColor !== color);
       }
+    } else if (!markerColorTouched) {
+      state.markerColors = [color];
     } else if (state.markerColors.length >= 2) {
       state.markerColors = [state.markerColors[1], color];
     } else {
       state.markerColors = [...state.markerColors, color];
     }
+    markerColorTouched = true;
     setMarkerVisual();
   }
+
+  function hslToHex(hue, saturation, lightness) {
+    const normalizedSaturation = saturation / 100;
+    const normalizedLightness = lightness / 100;
+    const chroma = (1 - Math.abs(2 * normalizedLightness - 1)) * normalizedSaturation;
+    const hueSection = hue / 60;
+    const intermediate = chroma * (1 - Math.abs((hueSection % 2) - 1));
+    let red = 0;
+    let green = 0;
+    let blue = 0;
+    if (hueSection < 1) [red, green, blue] = [chroma, intermediate, 0];
+    else if (hueSection < 2) [red, green, blue] = [intermediate, chroma, 0];
+    else if (hueSection < 3) [red, green, blue] = [0, chroma, intermediate];
+    else if (hueSection < 4) [red, green, blue] = [0, intermediate, chroma];
+    else if (hueSection < 5) [red, green, blue] = [intermediate, 0, chroma];
+    else [red, green, blue] = [chroma, 0, intermediate];
+    const offset = normalizedLightness - chroma / 2;
+    return `#${[red, green, blue].map((channel) => Math.round((channel + offset) * 255).toString(16).padStart(2, '0')).join('')}`;
+  }
+
+  function hexToHsl(hex) {
+    const red = parseInt(hex.slice(1, 3), 16) / 255;
+    const green = parseInt(hex.slice(3, 5), 16) / 255;
+    const blue = parseInt(hex.slice(5, 7), 16) / 255;
+    const maximum = Math.max(red, green, blue);
+    const minimum = Math.min(red, green, blue);
+    const difference = maximum - minimum;
+    let hue = 0;
+    if (difference) {
+      if (maximum === red) hue = ((green - blue) / difference) % 6;
+      else if (maximum === green) hue = (blue - red) / difference + 2;
+      else hue = (red - green) / difference + 4;
+      hue = Math.round(hue * 60);
+      if (hue < 0) hue += 360;
+    }
+    const lightness = (maximum + minimum) / 2;
+    const saturation = difference === 0 ? 0 : difference / (1 - Math.abs(2 * lightness - 1));
+    return {
+      hue,
+      saturation: Math.round(saturation * 100),
+      lightness: Math.round(lightness * 100)
+    };
+  }
+
+  function renderColorWheel(applyColor = false) {
+    const selectedColor = hslToHex(wheelHue, wheelSaturation, wheelLightness);
+    const angle = wheelHue * Math.PI / 180;
+    const radius = wheelSaturation * 0.44;
+    colorWheelThumb.style.left = `${50 + Math.cos(angle) * radius}%`;
+    colorWheelThumb.style.top = `${50 + Math.sin(angle) * radius}%`;
+    markerDialog.style.setProperty('--wheel-selected-color', selectedColor);
+    colorWheelToggleSwatch.style.setProperty('--wheel-selected-color', selectedColor);
+    colorWheelPreview.style.setProperty('--wheel-selected-color', selectedColor);
+    colorWheelValue.textContent = selectedColor.toUpperCase();
+    colorWheel.setAttribute('aria-valuenow', String(wheelHue));
+    colorWheel.setAttribute('aria-valuetext', `Tonalità ${wheelHue}°, saturazione ${wheelSaturation}%, luminosità ${wheelLightness}%`);
+    colorLightness.value = String(wheelLightness);
+    if (applyColor) {
+      if (wheelColorIndex === 0) {
+        state.markerColors = [selectedColor];
+      } else {
+        state.markerColors = [state.markerColors[0] || defaultMarkerColor, selectedColor];
+      }
+      markerColorTouched = true;
+      setMarkerVisual();
+    }
+  }
+
+  function setColorWheelFromHex(color) {
+    const wheelColor = hexToHsl(color);
+    wheelHue = wheelColor.hue;
+    wheelSaturation = wheelColor.saturation;
+    wheelLightness = clamp(wheelColor.lightness, 15, 85);
+    renderColorWheel();
+  }
+
+  function setColorWheelExpanded(expanded) {
+    colorWheelToggle.setAttribute('aria-expanded', String(expanded));
+    colorWheelPanel.classList.toggle('hidden', !expanded);
+    if (!expanded) return;
+    wheelColorIndex = markerColorTouched && state.markerColors.length ? Math.min(state.markerColors.length, 1) : 0;
+    setColorWheelFromHex(state.markerColors[state.markerColors.length - 1] || defaultMarkerColor);
+    requestAnimationFrame(() => colorWheel.focus({ preventScroll: true }));
+  }
+
+  function updateColorWheelFromPointer(event) {
+    const rect = colorWheel.getBoundingClientRect();
+    const deltaX = event.clientX - rect.left - rect.width / 2;
+    const deltaY = event.clientY - rect.top - rect.height / 2;
+    wheelHue = Math.round((Math.atan2(deltaY, deltaX) * 180 / Math.PI + 360) % 360);
+    wheelSaturation = Math.round(clamp(Math.hypot(deltaX, deltaY) / (Math.min(rect.width, rect.height) / 2), 0, 1) * 100);
+    renderColorWheel(true);
+  }
+
   colorOptions.forEach((button) => button.addEventListener('click', () => {
+    setColorWheelExpanded(false);
     selectMarkerColor(button.dataset.color);
   }));
-  markerColorPicker.addEventListener('change', () => {
-    selectMarkerColor(markerColorPicker.value.toLowerCase(), false);
+  colorWheelToggle.addEventListener('click', () => {
+    setColorWheelExpanded(colorWheelToggle.getAttribute('aria-expanded') !== 'true');
+  });
+  colorWheel.addEventListener('pointerdown', (event) => {
+    event.preventDefault();
+    colorWheel.setPointerCapture(event.pointerId);
+    updateColorWheelFromPointer(event);
+  });
+  colorWheel.addEventListener('pointermove', (event) => {
+    if (colorWheel.hasPointerCapture(event.pointerId)) updateColorWheelFromPointer(event);
+  });
+  colorWheel.addEventListener('pointerup', (event) => {
+    if (colorWheel.hasPointerCapture(event.pointerId)) colorWheel.releasePointerCapture(event.pointerId);
+  });
+  colorWheel.addEventListener('pointercancel', (event) => {
+    if (colorWheel.hasPointerCapture(event.pointerId)) colorWheel.releasePointerCapture(event.pointerId);
+  });
+  colorWheel.addEventListener('keydown', (event) => {
+    const step = event.shiftKey ? 10 : 2;
+    if (event.key === 'ArrowLeft') wheelHue = (wheelHue - step + 360) % 360;
+    else if (event.key === 'ArrowRight') wheelHue = (wheelHue + step) % 360;
+    else if (event.key === 'ArrowUp') wheelSaturation = clamp(wheelSaturation + step, 0, 100);
+    else if (event.key === 'ArrowDown') wheelSaturation = clamp(wheelSaturation - step, 0, 100);
+    else return;
+    event.preventDefault();
+    renderColorWheel(true);
+  });
+  colorLightness.addEventListener('input', () => {
+    wheelLightness = Number(colorLightness.value);
+    renderColorWheel(true);
   });
   searchForm.addEventListener('submit', (event) => {
     event.preventDefault();

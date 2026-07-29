@@ -98,10 +98,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=16` e
-   `app.js?v=22`.
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=17` e
+   `app.js?v=23`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v25`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v26`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
@@ -253,7 +253,8 @@ esiste l'export JSON — chi raccoglie punti deve poterli portare via.
 - Il PNG include mappa, partecipante, marker, data e ora, ma non i pulsanti.
 - Su browser compatibili il pulsante usa Web Share API; altrimenti scarica il
   PNG.
-- Il marker permette di scegliere colore e testo breve.
+- Il marker permette di scegliere colore e testo breve; i colori principali
+  restano subito visibili, mentre la rotella libera si apre solo su richiesta.
 - Il pulsante di copia usa Clipboard API quando disponibile.
 - La PWA si apre anche offline dopo il primo caricamento. *(verificato il
   2026-07-29 col server spento: mappa, ricerca e mirino funzionano)*

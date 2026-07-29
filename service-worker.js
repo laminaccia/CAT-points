@@ -1,4 +1,4 @@
-const CACHE = 'mappa-squadra-v25';
+const CACHE = 'mappa-squadra-v26';
 const MAP_PATH = '/assets/map-placeholder.jpg';
 const ASSETS = [
   './',

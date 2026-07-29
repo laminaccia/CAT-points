@@ -5,6 +5,24 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-29 — Colori essenziali e rotella mobile
+
+*Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,
+`app.js`, `service-worker.js`, `README.md`, `AGENTS.md`, `HANDOFF.md`.*
+
+I sedici campioni occupavano troppo spazio nel dialog su telefono. Restano
+nove scelte immediate, disposte su due righe anche negli schermi più stretti:
+bianco, nero, rosso, giallo, verde, blu, viola, arancione e trasparente.
+
+La palette nativa è stata sostituita da una rotella espandibile: trascinando
+si scelgono tonalità e saturazione, mentre un cursore regola la luminosità.
+Il controllo è utilizzabile anche da tastiera, resta chiuso finché non serve e
+non apre la tastiera virtuale. La prima scelta sostituisce il colore corrente;
+le successive mantengono la possibilità del marker bicolore. Il dialog può
+scorrere sui telefoni bassi senza trascinare o zoomare la mappa.
+
+Bumpati `styles.css?v=17`, `app.js?v=23` e `mappa-squadra-v26`.
+
 ## 2026-07-29 — Palette libera e avvio pulito per il partecipante
 
 *Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,

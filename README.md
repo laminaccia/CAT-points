@@ -53,7 +53,7 @@ La lista manuale è separata da `assets/streets.json` e viene salvata nel browse
 
 ## Marker e condivisione
 
-- **Segna questo punto** apre la scelta del colore e un testo facoltativo, per esempio `A12`.
+- **Segna questo punto** offre i colori principali, una rotella per le tonalità libere e un testo facoltativo, per esempio `A12`.
 - **Condividi PNG** usa il menu nativo quando il dispositivo supporta la condivisione di file.
 - **Copia immagine** copia il PNG negli appunti; su iPhone, se gli appunti immagine sono bloccati da HTTP, salva il PNG per poterlo condividere dal menu dell’iPhone.
 
