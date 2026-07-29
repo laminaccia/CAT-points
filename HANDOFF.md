@@ -14,8 +14,10 @@ Il repository locale è stato collegato come `origin` a
 della verifica, quindi il ramo locale `main` resta la fonte completa dello
 storico e può essere inviato senza fusioni o sovrascritture.
 
-Dopo il primo push resta da attivare GitHub Pages da **Settings → Pages**,
-scegliendo **Deploy from a branch**, ramo `main` e cartella `/(root)`.
+Il primo push è riuscito e GitHub Pages è stato attivato sul ramo `main`, dalla
+cartella `/(root)`. Il sito pubblico è
+`https://laminaccia.github.io/CAT-points/`; verificati via HTTPS con risposta
+`200` anche `app.js?v=20` e `assets/streets.json`.
 
 ## 2026-07-29 — Interruttore per gli strumenti da cartografo
 
