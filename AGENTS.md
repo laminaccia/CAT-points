@@ -98,10 +98,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=18` e
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=21` e
    `app.js?v=24`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v27`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v30`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker

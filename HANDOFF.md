@@ -5,6 +5,26 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-29 — Controlli circolari e gerarchia più pulita
+
+*Agente: Codex con skill Impeccable. Toccati `styles.css`, `index.html`,
+`service-worker.js`, `AGENTS.md`, `HANDOFF.md`.*
+
+Safari conservava parte dell'aspetto nativo dei pulsanti e la regola globale
+`min-height: 52px` deformava i controlli che dichiaravano solo larghezza e
+altezza. Inoltre, sotto i 350 px, i campioni colore passavano a 42 px di
+larghezza ma restavano alti 44 px: erano davvero ovali.
+
+I controlli iconici ora dichiarano sempre larghezza, altezza, `aspect-ratio`,
+padding e raggio circolare: `x/y`, reset, ricerca, zoom, chiusura dialog e
+campioni colore rimangono quindi tondi anche su Safari e sugli schermi più
+stretti. Il resto dell'interfaccia è stato rifinito con superfici più coerenti,
+ombre con profondità, focus visibile singolo, azioni primarie più nette e
+raggi meno gonfi. Il campione del colore scritto è ora circolare come i preset.
+
+Bumpati `styles.css?v=21` e `mappa-squadra-v30`; il JavaScript resta
+`app.js?v=24`.
+
 ## 2026-07-29 — Il colore si può scrivere
 
 *Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,
