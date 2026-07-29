@@ -10,7 +10,7 @@
   <title>Mappa Squadra</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=15">
+  <link rel="stylesheet" href="styles.css?v=16">
 </head>
 <body>
   <main class="app-shell">
@@ -25,7 +25,7 @@
           <button id="playerNameButton" class="player-name-button" type="button">Inserisci nome</button>
         </div>
         <div class="topbar-actions">
-          <button id="toggleCoordinatesButton" class="icon-button icon-button--label" type="button" aria-pressed="true" aria-controls="coordinatePanel" aria-label="Nascondi gli strumenti coordinate">x/y</button>
+          <button id="toggleCoordinatesButton" class="icon-button icon-button--label" type="button" aria-pressed="false" aria-controls="coordinatePanel" aria-label="Mostra gli strumenti coordinate">x/y</button>
           <button id="resetButton" class="icon-button" type="button" aria-label="Reimposta la mappa">↺</button>
         </div>
       </div>
@@ -49,7 +49,7 @@
         <span class="marker-tail"></span>
       </div>
 
-      <div class="coordinate-panel" id="coordinatePanel">
+      <div class="coordinate-panel hidden" id="coordinatePanel">
         <span class="coordinate-label" id="coordinateLabel">Coordinate mirino</span>
         <output id="crosshairCoordinates" aria-label="Coordinate normalizzate del mirino">x — · y —</output>
         <button id="copyCoordinatesButton" type="button">Copia x/y</button>
@@ -120,7 +120,14 @@
               <button class="color-option" type="button" data-color="#ec4899" aria-label="Rosa" title="Rosa" aria-pressed="false"></button>
               <button class="color-option no-color" type="button" data-color="none" aria-label="Senza colore" title="Senza colore" aria-pressed="false"></button>
             </div>
-            <p class="color-help" id="colorHelp">Scegli un colore oppure due colori per un puntino bicolore.</p>
+            <label class="custom-color-picker" for="markerColorPicker">
+              <input id="markerColorPicker" type="color" value="#d9b45b" aria-describedby="colorHelp">
+              <span>
+                <strong>Palette libera</strong>
+                <small>Scegli qualsiasi colore</small>
+              </span>
+            </label>
+            <p class="color-help" id="colorHelp">Tocca un colore pronto oppure apri la palette. Puoi selezionare fino a due colori per un puntino bicolore.</p>
           </fieldset>
           <label class="marker-text-field" for="markerText">Lettere o numeri (facoltativo)</label>
           <input id="markerText" type="text" inputmode="text" maxlength="12" placeholder="Es. A12 o B">
@@ -184,6 +191,6 @@
     <canvas id="exportCanvas" hidden></canvas>
   </main>
 
-  <script src="app.js?v=21" defer></script>
+  <script src="app.js?v=22" defer></script>
 </body>
 </html>

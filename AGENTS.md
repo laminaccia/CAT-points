@@ -27,7 +27,8 @@ Convivono nella stessa schermata, ma **si spengono**: il pulsante `x/y` in alto
 a destra nasconde il pannello coordinate — e con esso «Copia x/y», «Aggiungi
 punto» e «Lista» — lasciando l'app come la vede un partecipante. La scelta è
 salvata in `localStorage` (`mappa-strumenti-coordinate`), quindi chi li ha
-spenti non se li ritrova al ricaricamento. Senza preferenza restano visibili.
+spenti non se li ritrova al ricaricamento. Senza preferenza restano nascosti:
+al primo accesso prevale la schermata pulita del partecipante.
 
 Chi aggiunge altri strumenti di preparazione li metta **dentro
 `#coordinatePanel`**, così seguono l'interruttore invece di richiederne un
@@ -97,10 +98,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=13` e
-   `app.js?v=17`.
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=16` e
+   `app.js?v=22`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v17`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v25`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker

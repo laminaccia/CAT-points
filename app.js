@@ -34,6 +34,8 @@
   const confirmRow = document.getElementById('confirmRow');
   const markerDialog = document.getElementById('markerDialog');
   const markerTextInput = document.getElementById('markerText');
+  const markerColorPicker = document.getElementById('markerColorPicker');
+  const cancelMarkerButton = document.getElementById('cancelMarkerButton');
   const playerNameButton = document.getElementById('playerNameButton');
   const identityDialog = document.getElementById('identityDialog');
   const identityForm = document.getElementById('identityForm');
@@ -66,7 +68,7 @@
     streetIndex: [],
     manualStreetPoints: [],
     playerName: '',
-    coordinateToolsVisible: true
+    coordinateToolsVisible: false
   };
 
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
@@ -139,8 +141,9 @@
     } catch (error) {
       salvata = null;
     }
-    // Senza preferenza restano visibili: è lo stato in cui l'app è sempre stata.
-    setCoordinateToolsVisible(salvata !== '0', false);
+    // Al primo accesso prevale la vista del partecipante; chi prepara la mappa
+    // può riattivare gli strumenti e ritrovarli visibili ai caricamenti seguenti.
+    setCoordinateToolsVisible(salvata === '1', false);
   }
 
   function fitImage() {
@@ -458,8 +461,8 @@
       ? `linear-gradient(90deg, ${state.markerColors[0]} 0 50%, ${state.markerColors[1]} 50% 100%)`
       : state.markerColors[0] || 'transparent';
     marker.style.setProperty('--marker-background', markerBackground);
-    marker.style.setProperty('--marker-border-width', state.markerColors.length === 0 ? '2px' : '0px');
-    marker.style.setProperty('--marker-border-color', state.markerColors.length === 0 ? '#ffffff' : 'transparent');
+    marker.style.setProperty('--marker-border-width', state.markerColors.length === 0 ? '1px' : '0px');
+    marker.style.setProperty('--marker-border-color', state.markerColors.length === 0 ? '#17191f' : 'transparent');
     marker.style.setProperty('--marker-outline', state.markerColors.includes('#ffffff') ? '#17191f' : 'transparent');
     markerLabel.textContent = state.markerText;
     markerLabel.classList.toggle('hidden', !state.markerText);
@@ -476,7 +479,7 @@
     markerTextInput.value = state.markerText;
     setMarkerVisual();
     markerDialog.classList.remove('hidden');
-    markerTextInput.focus();
+    cancelMarkerButton.focus({ preventScroll: true });
   }
 
   function closeMarkerDialog() {
@@ -690,7 +693,7 @@
       ? 'Strumenti coordinate mostrati'
       : 'Strumenti coordinate nascosti');
   });
-  document.getElementById('cancelMarkerButton').addEventListener('click', closeMarkerDialog);
+  cancelMarkerButton.addEventListener('click', closeMarkerDialog);
   document.getElementById('cancelMarkerButtonSecondary').addEventListener('click', closeMarkerDialog);
   document.getElementById('confirmMarkerButton').addEventListener('click', placeMarker);
   copyCoordinatesButton.addEventListener('click', copyCoordinateJson);
@@ -716,19 +719,26 @@
     setPlayerName(value);
     closeIdentityDialog();
   });
-  colorOptions.forEach((button) => button.addEventListener('click', () => {
-    const color = button.dataset.color;
+  function selectMarkerColor(color, toggleSelected = true) {
     if (color === 'none') {
       state.markerColors = [];
     } else if (state.markerColors.includes(color)) {
-      state.markerColors = state.markerColors.filter((selectedColor) => selectedColor !== color);
+      if (toggleSelected) {
+        state.markerColors = state.markerColors.filter((selectedColor) => selectedColor !== color);
+      }
     } else if (state.markerColors.length >= 2) {
       state.markerColors = [state.markerColors[1], color];
     } else {
       state.markerColors = [...state.markerColors, color];
     }
     setMarkerVisual();
+  }
+  colorOptions.forEach((button) => button.addEventListener('click', () => {
+    selectMarkerColor(button.dataset.color);
   }));
+  markerColorPicker.addEventListener('change', () => {
+    selectMarkerColor(markerColorPicker.value.toLowerCase(), false);
+  });
   searchForm.addEventListener('submit', (event) => {
     event.preventDefault();
     clearTimeout(incrementalSearchTimer);
@@ -799,8 +809,8 @@
       ctx.fill();
       ctx.stroke();
     } else {
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#17191f';
+      ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.arc(centerX, centerY, 10, 0, Math.PI * 2);
       ctx.stroke();

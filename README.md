@@ -35,6 +35,7 @@ http://192.168.1.20:8000
 
 ## Coordinate delle vie
 
+- Gli strumenti coordinate sono nascosti al primo accesso; premere **x/y** in alto a destra per mostrarli.
 - Il pannello sotto il mirino mostra in tempo reale le coordinate normalizzate `x` e `y` usate da `assets/streets.json`.
 - Dopo aver centrato e fissato il punto, premere **Copia x/y** per copiare le due proprietà già formattate per il JSON.
 - I valori vanno da `0` a `1`: `x` cresce da sinistra a destra e `y` dall’alto verso il basso.

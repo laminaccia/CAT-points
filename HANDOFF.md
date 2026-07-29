@@ -5,6 +5,24 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-29 — Palette libera e avvio pulito per il partecipante
+
+*Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,
+`app.js`, `service-worker.js`, `README.md`, `AGENTS.md`, `HANDOFF.md`.*
+
+Il marker mantiene i colori rapidi e aggiunge un controllo nativo
+`input[type=color]`, così l'utente può scegliere qualsiasi colore senza
+perdere il bicolore. Aprendo «Segna questo punto» il focus va al pulsante di
+chiusura invece che al campo testo: su telefono non compare più subito la
+tastiera che copriva mappa e palette.
+
+Il marker senza riempimento usa ora un bordo nero sottile sia nell'app sia nel
+PNG esportato. Gli strumenti `x/y` partono nascosti quando non esiste ancora
+una preferenza; l'HTML nasce già nello stato spento per evitare un lampo del
+pannello prima del caricamento JavaScript. Una scelta salvata continua a
+prevalere. Bumpati `styles.css?v=16`, `app.js?v=22` e
+`mappa-squadra-v25`.
+
 ## 2026-07-29 — Il PNG conserva le proporzioni della vista
 
 *Agente: Codex. Toccati `app.js`, `index.html`, `service-worker.js`,
