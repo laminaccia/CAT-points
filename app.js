@@ -277,12 +277,13 @@
     label.className = 'sr-only';
     label.textContent = 'Etichetta del marker';
     const input = document.createElement('input');
+    input.id = `marker-history-label-${entry.id}`;
     input.type = 'text';
     input.maxLength = 40;
     input.autocomplete = 'off';
     input.placeholder = 'Es. Tappa 3 o Piazza';
     input.value = normalizeHistoryLabel(entry.label);
-    label.append(input);
+    label.htmlFor = input.id;
     const controls = document.createElement('div');
     controls.className = 'marker-history-label-actions';
     const cancelButton = document.createElement('button');
@@ -294,7 +295,7 @@
     saveButton.type = 'submit';
     saveButton.textContent = 'Salva etichetta';
     controls.append(cancelButton, saveButton);
-    form.append(label, controls);
+    form.append(label, input, controls);
     item.append(form);
 
     cancelButton.addEventListener('click', () => {

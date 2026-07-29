@@ -5,6 +5,19 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-29 — Campo etichetta nuovamente visibile
+
+*Agente: Codex con skill Impeccable. Toccati `app.js`, `index.html`,
+`service-worker.js`, `AGENTS.md`, `HANDOFF.md`.*
+
+Il campo dell'editor etichetta era stato inserito dentro un `<label>` con
+classe `.sr-only`: la classe nascondeva correttamente il testo accessibile, ma
+anche tutto il campo annidato. Ora label e input sono elementi fratelli,
+collegati tramite `for`/`id`, quindi il campo è visibile senza perdere
+l'associazione per i lettori di schermo.
+
+Bumpati `app.js?v=30` e `mappa-squadra-v37`; il CSS resta `styles.css?v=27`.
+
 ## 2026-07-29 — Etichette, revisione e reinvio dalla cronologia
 
 *Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,
