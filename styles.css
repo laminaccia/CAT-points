@@ -32,6 +32,13 @@ button { font: inherit; }
 h1 { margin: 0; font-size: 22px; letter-spacing: .08em; }
 .player-name-button { min-height: 0; padding: 0; border: 0; border-radius: 0; color: var(--text); background: transparent; font-size: 22px; letter-spacing: .04em; text-align: left; }
 .icon-button { width: 46px; height: 46px; border: 1px solid rgba(255,255,255,.17); border-radius: 50%; color: var(--text); background: var(--panel); backdrop-filter: blur(12px); font-size: 24px; }
+.topbar-actions { display: flex; gap: 10px; }
+/* «x/y» nello stesso monospaziato della lettura delle coordinate: il pulsante
+   si legge come l'interruttore di quel pannello, non come un'icona qualsiasi. */
+.icon-button--label { font: 700 13px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+/* Spento: resta leggibile e raggiungibile, ma smette di chiedere attenzione —
+   per chi gioca gli strumenti da cartografo sono rumore. */
+.icon-button[aria-pressed="false"] { color: var(--muted); border-color: rgba(255,255,255,.09); background: rgba(9,11,16,.55); }
 
 .searchbar { position: absolute; z-index: 6; top: calc(env(safe-area-inset-top) + 84px); left: 16px; right: 16px; display: flex; gap: 8px; padding: 6px; border: 1px solid rgba(255,255,255,.16); border-radius: 17px; background: var(--panel); backdrop-filter: blur(14px); }
 .searchbar input { min-width: 0; flex: 1; border: 0; outline: 0; color: var(--text); background: transparent; font: inherit; font-size: 15px; }

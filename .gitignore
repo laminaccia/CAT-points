@@ -3,4 +3,8 @@
 
 # Stato locale degli agenti (sessioni, preferenze per-macchina)
 .claude/settings.local.json
-.impeccable/
+.impeccable/*
+# …tranne le decisioni condivise: le esenzioni ai controlli di design sono
+# scelte prese con l'utente e devono valere per chiunque lavori sul progetto,
+# Codex compreso. Il resto (cache, consenso locale) resta fuori.
+!.impeccable/config.json

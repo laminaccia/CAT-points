@@ -5,6 +5,8 @@
   const marker = document.getElementById('marker');
   const markerLabel = document.getElementById('markerLabel');
   const crosshair = document.getElementById('crosshair');
+  const coordinatePanel = document.getElementById('coordinatePanel');
+  const toggleCoordinatesButton = document.getElementById('toggleCoordinatesButton');
   const coordinateLabel = document.getElementById('coordinateLabel');
   const crosshairCoordinates = document.getElementById('crosshairCoordinates');
   const copyCoordinatesButton = document.getElementById('copyCoordinatesButton');
@@ -63,7 +65,8 @@
     markerText: '',
     streetIndex: [],
     manualStreetPoints: [],
-    playerName: ''
+    playerName: '',
+    coordinateToolsVisible: true
   };
 
   const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
@@ -106,6 +109,38 @@
     }
     if (savedName) setPlayerName(savedName, false);
     else openIdentityDialog();
+  }
+
+  // Il pannello coordinate, «Aggiungi punto» e «Lista» servono a chi *prepara*
+  // il gioco, non a chi ci gioca: mentre si costruisce l'indice delle vie
+  // devono poter sparire, per provare l'app come la vedrà un partecipante.
+  // La scelta resta sul dispositivo, come il nome: chi ha spento gli strumenti
+  // non se li ritrova addosso al ricaricamento.
+  function setCoordinateToolsVisible(visible, persist = true) {
+    state.coordinateToolsVisible = visible;
+    coordinatePanel.classList.toggle('hidden', !visible);
+    toggleCoordinatesButton.setAttribute('aria-pressed', String(visible));
+    toggleCoordinatesButton.setAttribute(
+      'aria-label',
+      visible ? 'Nascondi gli strumenti coordinate' : 'Mostra gli strumenti coordinate'
+    );
+    if (!persist) return;
+    try {
+      localStorage.setItem('mappa-strumenti-coordinate', visible ? '1' : '0');
+    } catch (error) {
+      /* Spazio esaurito o navigazione privata: la scelta vale per questa sessione. */
+    }
+  }
+
+  function loadCoordinateToolsPreference() {
+    let salvata = null;
+    try {
+      salvata = localStorage.getItem('mappa-strumenti-coordinate');
+    } catch (error) {
+      salvata = null;
+    }
+    // Senza preferenza restano visibili: è lo stato in cui l'app è sempre stata.
+    setCoordinateToolsVisible(salvata !== '0', false);
   }
 
   function fitImage() {
@@ -649,6 +684,12 @@
   document.getElementById('placeButton').addEventListener('click', openMarkerDialog);
   document.getElementById('moveButton').addEventListener('click', enableMarkerMove);
   document.getElementById('resetButton').addEventListener('click', resetMap);
+  toggleCoordinatesButton.addEventListener('click', () => {
+    setCoordinateToolsVisible(!state.coordinateToolsVisible);
+    setStatus(state.coordinateToolsVisible
+      ? 'Strumenti coordinate mostrati'
+      : 'Strumenti coordinate nascosti');
+  });
   document.getElementById('cancelMarkerButton').addEventListener('click', closeMarkerDialog);
   document.getElementById('cancelMarkerButtonSecondary').addEventListener('click', closeMarkerDialog);
   document.getElementById('confirmMarkerButton').addEventListener('click', placeMarker);
@@ -917,6 +958,7 @@
   if (image.complete && image.naturalWidth) fitImage();
   window.addEventListener('resize', fitImage);
   setMarkerVisual();
+  loadCoordinateToolsPreference();
   loadPlayerName();
   loadStreetIndex();
   loadManualStreetPoints();

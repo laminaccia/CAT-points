@@ -21,8 +21,17 @@ Web app mobile-first per una caccia al tesoro. Il giocatore deve:
 L'app ha anche una **seconda funzione, per chi prepara il gioco**: il pannello
 coordinate e la lista manuale servono a costruire `assets/streets.json`
 segnando i punti direttamente sulla mappa, invece di calcolarli a mano. Sono
-strumenti da cartografo, non da giocatore: vanno tenuti presenti quando si
-ragiona sull'interfaccia, perché oggi convivono nella stessa schermata.
+strumenti da cartografo, non da giocatore.
+
+Convivono nella stessa schermata, ma **si spengono**: il pulsante `x/y` in alto
+a destra nasconde il pannello coordinate — e con esso «Copia x/y», «Aggiungi
+punto» e «Lista» — lasciando l'app come la vede un partecipante. La scelta è
+salvata in `localStorage` (`mappa-strumenti-coordinate`), quindi chi li ha
+spenti non se li ritrova al ricaricamento. Senza preferenza restano visibili.
+
+Chi aggiunge altri strumenti di preparazione li metta **dentro
+`#coordinatePanel`**, così seguono l'interruttore invece di richiederne un
+altro.
 
 ---
 

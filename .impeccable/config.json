@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "createdAt": "2026-07-29T16:09:53.245Z",
+        "reason": "Font mai caricato: nessun @font-face, sul telefono cade sul font di sistema. Utente: basta che sia comprensibile."
+      }
+    ]
+  }
+}

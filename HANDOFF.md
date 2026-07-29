@@ -5,6 +5,53 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-29 — Interruttore per gli strumenti da cartografo
+
+*Agente: Claude. Toccati `index.html`, `styles.css`, `app.js`.*
+
+L'utente sta completando l'indice delle vie (oggi la parte destra della mappa)
+e ha chiesto di poter nascondere il pannello coordinate «così nel frattempo
+posso anche utilizzare il resto»: cioè provare l'app come la vedrà un
+partecipante, senza gli strumenti di preparazione addosso.
+
+Aggiunto il pulsante `x/y` nella barra in alto, accanto a quello di
+reimpostazione — **fuori** dal pannello che nasconde, altrimenti non si
+potrebbe riaccendere. Nasconde `#coordinatePanel` per intero, quindi anche
+«Copia x/y», «Aggiungi punto» e «Lista». La scelta vive in `localStorage`
+(`mappa-strumenti-coordinate`) come il nome del giocatore; senza preferenza
+gli strumenti restano visibili, che è lo stato in cui l'app è sempre stata.
+
+Dettagli: `aria-pressed` e `aria-controls` sul pulsante, `aria-label` che si
+inverte fra «Nascondi» e «Mostra», e il pulsante spento che si smorza invece
+di sparire. Usa la classe `.hidden` già esistente (`display: none`), quindi i
+controlli escono anche dall'albero di accessibilità e non restano raggiungibili
+da tastiera — verificato.
+
+Il `?v=N` del CSS e del JS e `CACHE` sono stati bumpati: `styles.css?v=15`,
+`app.js?v=20`, `mappa-squadra-v23`.
+
+### Sul font
+
+L'utente ha confermato che il carattere non è una priorità («l'importante è che
+sia comprensibile»), quindi la segnalazione `overused-font` su `Inter` è
+registrata come esenzione in `.impeccable/config.json`. Vale la pena sapere
+*perché* è innocua: `Inter` è dichiarata ma **non viene mai caricata** — nessun
+`@font-face`, nessun link a Google Fonts — quindi sui telefoni cade sempre su
+`-apple-system`/`ui-sans-serif`, cioè il font di sistema. Se un giorno si
+volesse un carattere con personalità servirebbe caricarlo davvero, con il costo
+di rete che comporta.
+
+Corretto anche il `.gitignore`: escludeva tutta `.impeccable/`, e quindi anche
+il `config.json` condiviso. Ora l'esenzione viaggia col repository — è una
+decisione presa con l'utente, deve valere anche per Codex.
+
+### Da valutare
+
+- Il pannello si nasconde tutto o niente. Se in futuro «Lista» servisse anche a
+  gioco iniziato, andrà separata dagli strumenti di misura.
+
+---
+
 ## 2026-07-29 — L'elenco dei risultati si scorre; e il precaricamento era bugiardo
 
 *Agente: Claude. Toccati `styles.css`, `app.js`, `service-worker.js`,
