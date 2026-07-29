@@ -10,7 +10,7 @@
   <title>Mappa Squadra</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=29">
+  <link rel="stylesheet" href="styles.css?v=30">
 </head>
 <body>
   <main class="app-shell">
@@ -40,10 +40,18 @@
         <label class="sr-only" for="streetSearch">Cerca una via</label>
         <input id="streetSearch" name="street" type="search" autocomplete="off" placeholder="Cerca una via…" enterkeyhint="search" aria-autocomplete="list" aria-controls="searchResults" aria-expanded="false">
         <button id="historyButton" class="history-button" type="button" aria-label="Apri cronologia marker">
-          <span aria-hidden="true">◷</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="8"></circle>
+            <path d="M12 8v4l3 2"></path>
+          </svg>
           <span class="history-count" id="historyCount">0</span>
         </button>
-        <button id="searchButton" type="button" aria-label="Cerca la via">⌕</button>
+        <button id="searchButton" type="button" aria-label="Cerca la via">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="10.5" cy="10.5" r="6"></circle>
+            <path d="m15 15 4.5 4.5"></path>
+          </svg>
+        </button>
       </form>
       <p class="search-feedback" id="searchFeedback" role="status" aria-live="polite"></p>
       <div class="search-results hidden" id="searchResults" aria-label="Risultati della ricerca"></div>
@@ -73,9 +81,13 @@
 
       <div class="controls-panel">
         <div class="control-row" id="mainControlsRow">
-          <button id="zoomOutButton" class="secondary-button" type="button" aria-label="Riduci zoom">−</button>
+          <button id="zoomOutButton" class="secondary-button" type="button" aria-label="Riduci zoom">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12"></path></svg>
+          </button>
           <button id="placeButton" class="primary-button" type="button">Segna questo punto</button>
-          <button id="zoomInButton" class="secondary-button" type="button" aria-label="Aumenta zoom">＋</button>
+          <button id="zoomInButton" class="secondary-button" type="button" aria-label="Aumenta zoom">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12h12M12 6v12"></path></svg>
+          </button>
         </div>
         <div class="control-row hidden" id="confirmRow">
           <button id="moveButton" class="secondary-wide" type="button">Cambia posizione</button>

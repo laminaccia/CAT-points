@@ -5,6 +5,25 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-29 — Audit definitivo di icone e aree tattili
+
+*Agente: Codex con skill Impeccable (`audit`). Toccati `index.html`,
+`styles.css`, `service-worker.js`, `AGENTS.md`, `HANDOFF.md`.*
+
+L'audit dei controlli circolari ha trovato lo stesso difetto della cronologia
+anche su ricerca e zoom: i simboli `◷`, `⌕`, `−`, `＋` e le `×` dipendevano
+dalle metriche del font. Cronologia, ricerca e zoom usano ora SVG con
+`viewBox` centrato; tutte le chiusure dei dialog usano la stessa croce CSS
+geometrica già collaudata sulla cronologia.
+
+Il controllo ha incluso anche le aree tattili: ricerca e chiusure sono ora
+44×44 px, e i pulsanti compatti di coordinate, lista manuale e cronologia
+hanno `min-height: 44px`. Restano testuali soltanto controlli per cui il testo
+è informazione reale (`x/y`, nomi delle azioni), non un'icona improvvisata.
+
+Bumpati `styles.css?v=30` e `mappa-squadra-v40`; il JavaScript resta
+`app.js?v=31`.
+
 ## 2026-07-29 — Etichetta immediata, colori a tendina e Home
 
 *Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,

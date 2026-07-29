@@ -98,10 +98,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=29` e
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=30` e
    `app.js?v=31`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v39`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v40`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
@@ -257,6 +257,8 @@ data originali e apre il normale flusso di condivisione.
 
 - La mappa copre sempre lo schermo senza lasciare spazi vuoti.
 - Pan e zoom sono fluidi.
+- Le icone circolari sono geometricamente centrate e i controlli interattivi
+  compatti mantengono un'area tattile minima di 44×44 px.
 - Il marker appare al centro esatto del mirino.
 - Dopo la conferma la mappa non si muove accidentalmente.
 - Il PNG include mappa, partecipante, marker, data e ora, ma non i pulsanti.

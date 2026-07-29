@@ -38,7 +38,8 @@ button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; 
 h1 { margin: 0; font-size: 22px; letter-spacing: .08em; }
 .player-name-button { min-height: 0; padding: 0; border: 0; border-radius: 0; color: var(--text); background: transparent; font-size: 22px; letter-spacing: .025em; text-align: left; text-shadow: 0 2px 8px rgba(0,0,0,.72); }
 .icon-button { display: grid; place-items: center; flex: 0 0 48px; width: 48px; height: 48px; min-height: 48px; aspect-ratio: 1; padding: 0; border: 1px solid var(--line); border-radius: 50%; color: var(--text); background: rgba(12,16,23,.88); box-shadow: var(--shadow-control); backdrop-filter: blur(12px); font-size: 23px; line-height: 1; }
-.icon-button svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.icon-button svg, .searchbar button svg, .secondary-button svg { display: block; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.icon-button svg { width: 21px; height: 21px; }
 .topbar-actions { display: flex; gap: 8px; }
 /* «x/y» nello stesso monospaziato della lettura delle coordinate: il pulsante
    si legge come l'interruttore di quel pannello, non come un'icona qualsiasi. */
@@ -50,8 +51,10 @@ h1 { margin: 0; font-size: 22px; letter-spacing: .08em; }
 .searchbar { position: absolute; z-index: 6; top: calc(env(safe-area-inset-top) + 84px); left: 16px; right: 16px; display: flex; gap: 8px; padding: 6px; border: 1px solid var(--line); border-radius: 16px; background: rgba(12,16,23,.9); box-shadow: 0 10px 28px rgba(0,0,0,.24); backdrop-filter: blur(14px); }
 .searchbar input { min-width: 0; flex: 1; border: 0; outline: 0; color: var(--text); background: transparent; font: inherit; font-size: 15px; }
 .searchbar input::placeholder { color: var(--muted); }
-.searchbar button { display: grid; place-items: center; flex: 0 0 42px; width: 42px; height: 42px; min-height: 42px; aspect-ratio: 1; padding: 0; border: 0; border-radius: 50%; color: #12151c; background: var(--accent-2); font-size: 24px; line-height: 1; }
+.searchbar button { display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px; min-height: 44px; aspect-ratio: 1; padding: 0; border: 0; border-radius: 50%; color: #12151c; background: var(--accent-2); line-height: 1; }
+.searchbar button svg { width: 20px; height: 20px; }
 .searchbar .history-button { position: relative; color: var(--text); background: var(--surface-raised); box-shadow: inset 0 0 0 1px var(--line); font-size: 20px; }
+.searchbar .history-button svg { width: 21px; height: 21px; }
 .history-count { position: absolute; top: -4px; right: -4px; display: grid; place-items: center; min-width: 18px; height: 18px; padding: 0 4px; border: 2px solid var(--surface); border-radius: 999px; color: #14171c; background: var(--accent-2); font-size: 9px; font-weight: 900; line-height: 1; }
 .search-feedback { position: absolute; z-index: 6; top: calc(env(safe-area-inset-top) + 134px); left: 22px; right: 22px; margin: 0; padding: 5px 9px; border-radius: 8px; color: #f5db8b; background: rgba(9,11,16,.78); font-size: 12px; font-weight: 700; text-shadow: 0 1px 2px #000, 0 0 8px #000; pointer-events: none; }
 /* La lista dei risultati vive dentro .map-stage, che ha touch-action: none per
@@ -80,9 +83,9 @@ h1 { margin: 0; font-size: 22px; letter-spacing: .08em; }
 .coordinate-panel { position: absolute; z-index: 6; top: calc(50% + 42px); left: 50%; display: grid; grid-template-columns: auto auto; align-items: center; gap: 2px 9px; width: max-content; max-width: calc(100% - 32px); padding: 7px 8px 7px 11px; transform: translateX(-50%); border: 1px solid rgba(255,255,255,.16); border-radius: 13px; color: var(--text); background: rgba(9,11,16,.86); box-shadow: 0 8px 24px rgba(0,0,0,.3); backdrop-filter: blur(12px); }
 .coordinate-label { color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .coordinate-panel output { grid-column: 1; font: 700 12px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: nowrap; }
-.coordinate-panel button { grid-column: 2; grid-row: 1 / 3; min-height: 34px; padding: 0 10px; border-radius: 9px; border-color: rgba(217,180,91,.5); color: #12151c; background: var(--accent-2); font-size: 11px; }
+.coordinate-panel button { grid-column: 2; grid-row: 1 / 3; min-height: 44px; padding: 0 10px; border-radius: 9px; border-color: rgba(217,180,91,.5); color: #12151c; background: var(--accent-2); font-size: 11px; }
 .coordinate-actions { grid-column: 1 / -1; display: grid; grid-template-columns: 1.35fr 1fr; gap: 6px; margin-top: 5px; }
-.coordinate-actions button { grid-column: auto; grid-row: auto; min-height: 32px; padding: 0 9px; border-color: rgba(255,255,255,.14); color: var(--text); background: rgba(255,255,255,.08); }
+.coordinate-actions button { grid-column: auto; grid-row: auto; min-height: 44px; padding: 0 9px; border-color: rgba(255,255,255,.14); color: var(--text); background: rgba(255,255,255,.08); }
 .hidden { display: none !important; }
 
 .status-pill { position: absolute; z-index: 5; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 132px); transform: translateX(-50%); max-width: calc(100% - 32px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 9px 13px; border: 1px solid rgba(255,255,255,.15); border-radius: 999px; background: var(--panel); color: #e8ebf2; backdrop-filter: blur(12px); font-size: 13px; }
@@ -93,6 +96,7 @@ h1 { margin: 0; font-size: 22px; letter-spacing: .08em; }
 button { min-height: 52px; border-radius: 14px; border: 1px solid var(--line); color: var(--text); background: var(--surface-raised); backdrop-filter: blur(14px); font-weight: 700; transition: transform .14s ease-out, border-color .14s ease-out, background-color .14s ease-out, box-shadow .14s ease-out; }
 .primary-button { border-color: rgba(245,219,139,.72); color: #15171b; background: var(--accent-2); box-shadow: 0 8px 22px rgba(0,0,0,.28), 0 3px 0 rgba(151,117,34,.42); }
 .secondary-button { display: grid; place-items: center; width: 52px; height: 52px; min-height: 52px; aspect-ratio: 1; padding: 0; border-radius: 50%; background: rgba(12,16,23,.9); box-shadow: var(--shadow-control); font-size: 24px; line-height: 1; }
+.secondary-button svg { width: 22px; height: 22px; }
 .secondary-wide { color: var(--text); background: rgba(18,24,33,.94); }
 button:active { transform: translateY(1px) scale(.97); }
 
@@ -106,11 +110,10 @@ button:active { transform: translateY(1px) scale(.97); }
 .dialog-card { width: min(100%, 480px); max-height: calc(100svh - 32px); overflow-y: auto; touch-action: pan-y; overscroll-behavior: contain; padding: 20px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); box-shadow: 0 24px 64px rgba(0,0,0,.48); }
 .dialog-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
 .dialog-heading h2 { margin: 0; font-size: 20px; }
-.dialog-close { display: grid; place-items: center; flex: 0 0 42px; width: 42px; height: 42px; min-height: 42px; aspect-ratio: 1; padding: 0; border-radius: 50%; background: rgba(255,255,255,.055); box-shadow: none; font-size: 25px; line-height: 1; }
-#closeMarkerHistoryButton { position: relative; font-size: 0; }
-#closeMarkerHistoryButton::before, #closeMarkerHistoryButton::after { position: absolute; top: 50%; left: 50%; width: 15px; height: 2px; border-radius: 999px; background: currentColor; content: ""; }
-#closeMarkerHistoryButton::before { transform: translate(-50%, -50%) rotate(45deg); }
-#closeMarkerHistoryButton::after { transform: translate(-50%, -50%) rotate(-45deg); }
+.dialog-close { position: relative; display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 44px; min-height: 44px; aspect-ratio: 1; padding: 0; border-radius: 50%; background: rgba(255,255,255,.055); box-shadow: none; font-size: 0; line-height: 1; }
+.dialog-close::before, .dialog-close::after { position: absolute; top: 50%; left: 50%; width: 15px; height: 2px; border-radius: 999px; background: currentColor; content: ""; }
+.dialog-close::before { transform: translate(-50%, -50%) rotate(45deg); }
+.dialog-close::after { transform: translate(-50%, -50%) rotate(-45deg); }
 .color-fieldset { margin: 24px 0 18px; padding: 0; border: 0; }
 .color-fieldset legend, .marker-text-field, .marker-history-label-field { display: block; margin-bottom: 9px; color: var(--muted); font-size: 13px; }
 .color-select-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
@@ -156,7 +159,7 @@ button:active { transform: translateY(1px) scale(.97); }
 .street-list-item strong { color: var(--accent-2); font-size: 13px; }
 .street-list-item code { color: var(--muted); font-size: 10px; }
 .street-list-item small { grid-column: 1; color: var(--text); font-size: 11px; line-height: 1.35; }
-.street-list-item button { grid-column: 2; grid-row: 1 / 4; align-self: center; min-height: 36px; padding: 0 10px; border-radius: 10px; color: #ff9aa1; font-size: 11px; }
+.street-list-item button { grid-column: 2; grid-row: 1 / 4; align-self: center; min-height: 44px; padding: 0 10px; border-radius: 10px; color: #ff9aa1; font-size: 11px; }
 .street-list-actions { display: grid; grid-template-columns: 1fr 1.2fr; gap: 9px; }
 .marker-history-card { display: flex; flex-direction: column; max-height: min(82svh, 720px); }
 .marker-history-description { margin-bottom: 8px; }
@@ -170,13 +173,13 @@ button:active { transform: translateY(1px) scale(.97); }
 .marker-history-copy span { display: block; margin-top: 3px; overflow: hidden; color: var(--accent-2); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 .marker-history-copy small { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; line-height: 1.35; }
 .marker-history-item-actions { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.marker-history-item-actions button { min-height: 38px; padding: 0 12px; border-radius: 11px; font-size: 12px; }
+.marker-history-item-actions button { min-height: 44px; padding: 0 12px; border-radius: 11px; font-size: 12px; }
 .marker-history-delete { color: #ff9aa1; background: rgba(255,92,101,.07); }
 .marker-history-label-form { grid-column: 1 / -1; display: grid; gap: 9px; padding-top: 2px; }
 .marker-history-label-form input { width: 100%; min-height: 44px; padding: 0 12px; border: 1px solid rgba(245,219,139,.42); border-radius: 12px; outline: 0; color: var(--text); background: rgba(255,255,255,.07); font: inherit; font-size: 16px; }
 .marker-history-label-form input:focus { border-color: var(--accent-2); box-shadow: 0 0 0 3px rgba(245,219,139,.12); }
 .marker-history-label-actions { display: grid; grid-template-columns: .8fr 1.2fr; gap: 8px; }
-.marker-history-label-actions button { min-height: 40px; padding: 0 10px; border-radius: 11px; font-size: 12px; }
+.marker-history-label-actions button { min-height: 44px; padding: 0 10px; border-radius: 11px; font-size: 12px; }
 
 .identity-dialog { position: absolute; z-index: 11; inset: 0; display: grid; place-items: center; padding: 16px; background: rgba(3,5,9,.68); backdrop-filter: blur(6px); }
 .identity-dialog h2 { margin: 0; font-size: 24px; }
