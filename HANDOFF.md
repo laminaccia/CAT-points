@@ -5,6 +5,24 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-29 — Il colore si può scrivere
+
+*Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,
+`app.js`, `service-worker.js`, `README.md`, `AGENTS.md`, `HANDOFF.md`.*
+
+La rotella non era abbastanza immediata per l'utente ed è stata rimossa. Al
+suo posto c'è un campo «Scrivi un colore» con anteprima: riconosce i nomi
+italiani più comuni e varianti come «rosa antico», «blu notte», «verde acqua»
+e «testa di moro». Accetta anche i nomi CSS in inglese, codici HEX e i formati
+RGB/HSL.
+
+Il messaggio sotto il campo distingue valore riconosciuto ed errore e suggerisce
+come correggerlo. «Usa» o Invio applicano il colore e chiudono la tastiera
+mobile; la prima scelta resta monocolore e una seconda scelta crea il bicolore.
+I nove campioni principali e il trasparente restano disponibili.
+
+Bumpati `styles.css?v=18`, `app.js?v=24` e `mappa-squadra-v27`.
+
 ## 2026-07-29 — Colori essenziali e rotella mobile
 
 *Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,

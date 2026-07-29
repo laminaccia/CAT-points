@@ -10,7 +10,7 @@
   <title>Mappa Squadra</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=17">
+  <link rel="stylesheet" href="styles.css?v=18">
 </head>
 <body>
   <main class="app-shell">
@@ -113,30 +113,16 @@
               <button class="color-option" type="button" data-color="#fb8c00" aria-label="Arancione" title="Arancione" aria-pressed="false"></button>
               <button class="color-option no-color" type="button" data-color="none" aria-label="Senza colore" title="Senza colore" aria-pressed="false"></button>
             </div>
-            <button class="color-wheel-toggle" id="colorWheelToggle" type="button" aria-expanded="false" aria-controls="colorWheelPanel">
-              <span class="color-wheel-toggle-swatch" id="colorWheelToggleSwatch" aria-hidden="true"></span>
-              <span>
-                <strong>Rotella colori</strong>
-                <small>Scegli una tonalità libera</small>
-              </span>
-              <span class="color-wheel-toggle-icon" aria-hidden="true">⌄</span>
-            </button>
-            <div class="color-wheel-panel hidden" id="colorWheelPanel">
-              <div class="color-wheel-row">
-                <div class="color-wheel" id="colorWheel" role="slider" tabindex="0" aria-label="Tonalità e saturazione" aria-valuemin="0" aria-valuemax="359" aria-valuenow="42">
-                  <span class="color-wheel-thumb" id="colorWheelThumb"></span>
-                </div>
-                <div class="color-wheel-readout">
-                  <span class="color-wheel-preview" id="colorWheelPreview"></span>
-                  <output id="colorWheelValue">#D9B45B</output>
-                </div>
-              </div>
-              <label class="color-lightness" for="colorLightness">
-                <span>Luminosità</span>
-                <input id="colorLightness" type="range" min="15" max="85" value="60">
-              </label>
+            <div class="color-name-box">
+              <label for="markerColorInput">Scrivi un colore</label>
+              <form class="color-name-form" id="colorNameForm" novalidate>
+                <span class="color-name-preview" id="colorNamePreview" aria-hidden="true"></span>
+                <input id="markerColorInput" type="text" maxlength="40" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Es. rosa antico">
+                <button type="submit">Usa</button>
+              </form>
+              <p class="color-name-feedback" id="colorNameFeedback" role="status" aria-live="polite">Accetta nomi, codici HEX, RGB e HSL.</p>
             </div>
-            <p class="color-help" id="colorHelp">Scegli un colore principale o apri la rotella. Puoi combinare fino a due colori.</p>
+            <p class="color-help" id="colorHelp">Tocca un colore pronto o scrivine uno. Puoi combinare fino a due colori.</p>
           </fieldset>
           <label class="marker-text-field" for="markerText">Lettere o numeri (facoltativo)</label>
           <input id="markerText" type="text" inputmode="text" maxlength="12" placeholder="Es. A12 o B">
@@ -200,6 +186,6 @@
     <canvas id="exportCanvas" hidden></canvas>
   </main>
 
-  <script src="app.js?v=23" defer></script>
+  <script src="app.js?v=24" defer></script>
 </body>
 </html>
