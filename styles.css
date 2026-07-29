@@ -106,6 +106,10 @@ button:active { transform: translateY(1px) scale(.97); }
 .dialog-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
 .dialog-heading h2 { margin: 0; font-size: 20px; }
 .dialog-close { display: grid; place-items: center; flex: 0 0 42px; width: 42px; height: 42px; min-height: 42px; aspect-ratio: 1; padding: 0; border-radius: 50%; background: rgba(255,255,255,.055); box-shadow: none; font-size: 25px; line-height: 1; }
+#closeMarkerHistoryButton { position: relative; font-size: 0; }
+#closeMarkerHistoryButton::before, #closeMarkerHistoryButton::after { position: absolute; top: 50%; left: 50%; width: 15px; height: 2px; border-radius: 999px; background: currentColor; content: ""; }
+#closeMarkerHistoryButton::before { transform: translate(-50%, -50%) rotate(45deg); }
+#closeMarkerHistoryButton::after { transform: translate(-50%, -50%) rotate(-45deg); }
 .color-fieldset { margin: 24px 0 18px; padding: 0; border: 0; }
 .color-fieldset legend, .marker-text-field { display: block; margin-bottom: 10px; color: var(--muted); font-size: 13px; }
 .color-options { display: grid; grid-template-columns: repeat(5, 44px); justify-content: space-between; gap: 10px 6px; }

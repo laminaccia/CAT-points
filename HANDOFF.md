@@ -5,6 +5,19 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-29 — Chiusura cronologia centrata geometricamente
+
+*Agente: Codex con skill Impeccable. Toccati `styles.css`, `index.html`,
+`service-worker.js`, `AGENTS.md`, `HANDOFF.md`.*
+
+La `×` testuale del pulsante di chiusura della cronologia risultava
+otticamente decentrata per le metriche del glifo. Solo su
+`#closeMarkerHistoryButton` viene ora disegnata con due segmenti CSS centrati
+al 50% del cerchio, senza cambiare gli altri dialog.
+
+Bumpati `styles.css?v=28` e `mappa-squadra-v38`; il JavaScript resta
+`app.js?v=30`.
+
 ## 2026-07-29 — Campo etichetta nuovamente visibile
 
 *Agente: Codex con skill Impeccable. Toccati `app.js`, `index.html`,
