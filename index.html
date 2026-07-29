@@ -10,7 +10,7 @@
   <title>Mappa Squadra</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=25">
+  <link rel="stylesheet" href="styles.css?v=26">
 </head>
 <body>
   <main class="app-shell">
@@ -33,6 +33,10 @@
       <form class="searchbar" id="searchForm" role="search">
         <label class="sr-only" for="streetSearch">Cerca una via</label>
         <input id="streetSearch" name="street" type="search" autocomplete="off" placeholder="Cerca una via…" enterkeyhint="search" aria-autocomplete="list" aria-controls="searchResults" aria-expanded="false">
+        <button id="historyButton" class="history-button" type="button" aria-label="Apri cronologia marker">
+          <span aria-hidden="true">◷</span>
+          <span class="history-count" id="historyCount">0</span>
+        </button>
         <button id="searchButton" type="button" aria-label="Cerca la via">⌕</button>
       </form>
       <p class="search-feedback" id="searchFeedback" role="status" aria-live="polite"></p>
@@ -187,11 +191,25 @@
           </div>
         </div>
       </div>
+
+      <div class="marker-history-dialog hidden" id="markerHistoryDialog" role="dialog" aria-modal="true" aria-labelledby="markerHistoryTitle" aria-describedby="markerHistoryDescription">
+        <div class="dialog-card marker-history-card">
+          <div class="dialog-heading">
+            <div>
+              <p class="eyebrow">SU QUESTO DISPOSITIVO</p>
+              <h2 id="markerHistoryTitle">Cronologia marker</h2>
+            </div>
+            <button id="closeMarkerHistoryButton" class="dialog-close" type="button" aria-label="Chiudi">×</button>
+          </div>
+          <p class="dialog-description marker-history-description" id="markerHistoryDescription">I marker restano solo in questo browser.</p>
+          <div class="marker-history-list" id="markerHistoryList"></div>
+        </div>
+      </div>
     </section>
 
     <canvas id="exportCanvas" hidden></canvas>
   </main>
 
-  <script src="app.js?v=27" defer></script>
+  <script src="app.js?v=28" defer></script>
 </body>
 </html>

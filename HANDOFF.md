@@ -5,6 +5,24 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-29 — Cronologia marker locale per partecipante
+
+*Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,
+`app.js`, `service-worker.js`, `README.md`, `AGENTS.md`, `HANDOFF.md`.*
+
+La barra di ricerca ha ora un pulsante `◷` con contatore. Apre una cronologia
+separata per nome partecipante e salvata in `localStorage`
+(`mappa-marker-history-v1`): nessun dato viene inviato o sincronizzato.
+
+Ogni prima conferma crea una voce con coordinate normalizzate, colori, testo e
+data; «Modifica marker» e «Cambia posizione» aggiornano la voce attiva, mentre
+il reset conclude quel marker e la conferma successiva ne crea uno nuovo.
+Ogni voce può essere ripristinata sulla mappa o eliminata. La lista è limitata
+agli ultimi 100 marker per partecipante; se `localStorage` non è disponibile,
+la cronologia continua a funzionare solo per la sessione corrente.
+
+Bumpati `styles.css?v=26`, `app.js?v=28` e `mappa-squadra-v35`.
+
 ## 2026-07-29 — Modifica marker e ritorno al mirino
 
 *Agente: Codex. Toccati `index.html`, `styles.css`, `app.js`,

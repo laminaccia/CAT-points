@@ -28,6 +28,12 @@
   const searchForm = document.getElementById('searchForm');
   const streetSearch = document.getElementById('streetSearch');
   const searchButton = document.getElementById('searchButton');
+  const historyButton = document.getElementById('historyButton');
+  const historyCount = document.getElementById('historyCount');
+  const markerHistoryDialog = document.getElementById('markerHistoryDialog');
+  const markerHistoryList = document.getElementById('markerHistoryList');
+  const markerHistoryDescription = document.getElementById('markerHistoryDescription');
+  const closeMarkerHistoryButton = document.getElementById('closeMarkerHistoryButton');
   const searchFeedback = document.getElementById('searchFeedback');
   const searchResults = document.getElementById('searchResults');
   const mainControlsRow = document.getElementById('mainControlsRow');
@@ -50,6 +56,8 @@
   const exportCanvas = document.getElementById('exportCanvas');
   const defaultMarkerColor = '#d9b45b';
   const manualStreetStorageKey = 'mappa-manual-streets';
+  const markerHistoryStorageKey = 'mappa-marker-history-v1';
+  const markerHistoryLimit = 100;
   const italianColorAliases = new Map(Object.entries({
     bianco: '#ffffff',
     nero: '#17191f',
@@ -100,9 +108,11 @@
   let incrementalSearchTimer = 0;
   let pendingStreetPoint = null;
   let markerDialogSnapshot = null;
+  let markerHistoryStore = {};
+  let activeHistoryEntryId = null;
   let markerColorTouched = false;
 
-  document.body.append(streetPointDialog, streetListDialog);
+  document.body.append(streetPointDialog, streetListDialog, markerHistoryDialog);
 
   const state = {
     scale: 1,
@@ -133,8 +143,180 @@
     return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
   }
 
+  function markerHistoryPlayerKey(value = state.playerName) {
+    return value.normalize('NFKC').trim().replace(/\s+/g, ' ').toLocaleLowerCase('it-IT');
+  }
+
+  function loadMarkerHistoryStore() {
+    try {
+      const savedStore = JSON.parse(localStorage.getItem(markerHistoryStorageKey) || '{}');
+      markerHistoryStore = savedStore && typeof savedStore === 'object' && !Array.isArray(savedStore)
+        ? savedStore
+        : {};
+    } catch (error) {
+      markerHistoryStore = {};
+    }
+  }
+
+  function persistMarkerHistoryStore() {
+    try {
+      localStorage.setItem(markerHistoryStorageKey, JSON.stringify(markerHistoryStore));
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function getCurrentMarkerHistory() {
+    const playerKey = markerHistoryPlayerKey();
+    return Array.isArray(markerHistoryStore[playerKey]) ? markerHistoryStore[playerKey] : [];
+  }
+
+  function updateMarkerHistoryCount() {
+    const count = state.playerName ? getCurrentMarkerHistory().length : 0;
+    historyCount.textContent = count > 99 ? '99+' : String(count);
+    historyButton.setAttribute('aria-label', `Apri cronologia marker, ${count} salvati`);
+  }
+
+  function formatMarkerHistoryTime(value) {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return 'Data non disponibile';
+    return new Intl.DateTimeFormat('it-IT', {
+      day: '2-digit',
+      month: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date);
+  }
+
+  function createHistoryMarkerSwatch(colors) {
+    const swatch = document.createElement('span');
+    swatch.className = 'history-marker-swatch';
+    if (!colors.length) {
+      swatch.classList.add('no-color');
+      return swatch;
+    }
+    const background = colors.length === 2
+      ? `linear-gradient(90deg, ${colors[0]} 0 50%, ${colors[1]} 50% 100%)`
+      : colors[0];
+    swatch.style.setProperty('--history-background', background);
+    if (colors.includes('#ffffff')) {
+      swatch.style.setProperty('--history-border-width', '2px');
+      swatch.style.setProperty('--history-border-color', '#17191f');
+    }
+    return swatch;
+  }
+
+  function closeMarkerHistory() {
+    markerHistoryDialog.classList.add('hidden');
+  }
+
+  function restoreMarkerHistoryEntry(entry) {
+    if (!Number.isFinite(entry.x) || !Number.isFinite(entry.y)) return;
+    state.markerColors = Array.isArray(entry.colors) ? [...entry.colors].slice(0, 2) : [defaultMarkerColor];
+    state.markerText = typeof entry.text === 'string' ? entry.text.slice(0, 12) : '';
+    activeHistoryEntryId = entry.id;
+    zoomToMapPoint(entry.x, entry.y);
+    state.markerPlaced = true;
+    setMarkerVisual();
+    marker.classList.remove('hidden');
+    crosshair.classList.add('hidden');
+    mainControlsRow.classList.add('hidden');
+    confirmRow.classList.remove('hidden');
+    closeMarkerHistory();
+    updateCrosshairCoordinates();
+    setStatus(state.markerText ? `Marker ripristinato • ${state.markerText}` : 'Marker ripristinato');
+  }
+
+  function deleteMarkerHistoryEntry(entryId) {
+    const playerKey = markerHistoryPlayerKey();
+    markerHistoryStore[playerKey] = getCurrentMarkerHistory().filter((entry) => entry.id !== entryId);
+    if (activeHistoryEntryId === entryId) activeHistoryEntryId = null;
+    persistMarkerHistoryStore();
+    updateMarkerHistoryCount();
+    renderMarkerHistory();
+    setStatus('Marker eliminato dalla cronologia');
+  }
+
+  function renderMarkerHistory() {
+    markerHistoryList.replaceChildren();
+    markerHistoryDescription.textContent = state.playerName
+      ? `Cronologia di ${state.playerName}, salvata solo in questo browser.`
+      : 'I marker restano solo in questo browser.';
+    const entries = getCurrentMarkerHistory();
+    if (!entries.length) {
+      const empty = document.createElement('p');
+      empty.className = 'marker-history-empty';
+      empty.textContent = 'Nessun marker salvato. Il primo verrà aggiunto automaticamente quando confermi un punto.';
+      markerHistoryList.append(empty);
+      return;
+    }
+    entries.forEach((entry) => {
+      const item = document.createElement('article');
+      item.className = 'marker-history-item';
+      item.append(createHistoryMarkerSwatch(Array.isArray(entry.colors) ? entry.colors : []));
+
+      const copy = document.createElement('div');
+      copy.className = 'marker-history-copy';
+      const title = document.createElement('strong');
+      title.textContent = entry.text || 'Marker senza testo';
+      const meta = document.createElement('small');
+      meta.textContent = `${formatMarkerHistoryTime(entry.updatedAt || entry.createdAt)} · x ${Number(entry.x).toFixed(4)} · y ${Number(entry.y).toFixed(4)}`;
+      copy.append(title, meta);
+      item.append(copy);
+
+      const actions = document.createElement('div');
+      actions.className = 'marker-history-item-actions';
+      const restoreButton = document.createElement('button');
+      restoreButton.className = 'primary-button';
+      restoreButton.type = 'button';
+      restoreButton.textContent = 'Ripristina';
+      restoreButton.addEventListener('click', () => restoreMarkerHistoryEntry(entry));
+      const deleteButton = document.createElement('button');
+      deleteButton.className = 'marker-history-delete';
+      deleteButton.type = 'button';
+      deleteButton.textContent = 'Elimina';
+      deleteButton.addEventListener('click', () => deleteMarkerHistoryEntry(entry.id));
+      actions.append(restoreButton, deleteButton);
+      item.append(actions);
+      markerHistoryList.append(item);
+    });
+  }
+
+  function openMarkerHistory() {
+    renderMarkerHistory();
+    markerHistoryDialog.classList.remove('hidden');
+    closeMarkerHistoryButton.focus({ preventScroll: true });
+  }
+
+  function saveCurrentMarkerToHistory() {
+    const coordinates = getCrosshairCoordinates();
+    const playerKey = markerHistoryPlayerKey();
+    if (!coordinates || !playerKey) return true;
+    const now = new Date().toISOString();
+    const entries = getCurrentMarkerHistory();
+    const existing = entries.find((entry) => entry.id === activeHistoryEntryId);
+    const entry = {
+      id: existing?.id || globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      x: Number(coordinates.x.toFixed(6)),
+      y: Number(coordinates.y.toFixed(6)),
+      colors: [...state.markerColors],
+      text: state.markerText,
+      createdAt: existing?.createdAt || now,
+      updatedAt: now
+    };
+    activeHistoryEntryId = entry.id;
+    markerHistoryStore[playerKey] = [entry, ...entries.filter((historyEntry) => historyEntry.id !== entry.id)]
+      .slice(0, markerHistoryLimit);
+    const persisted = persistMarkerHistoryStore();
+    updateMarkerHistoryCount();
+    return persisted;
+  }
+
   function setPlayerName(value, persist = true) {
+    const previousHistoryKey = markerHistoryPlayerKey(state.playerName);
     state.playerName = value.trim().replace(/\s+/g, ' ').slice(0, 50);
+    if (previousHistoryKey && previousHistoryKey !== markerHistoryPlayerKey()) activeHistoryEntryId = null;
     playerNameButton.textContent = state.playerName || 'Inserisci nome';
     if (persist && state.playerName) {
       try {
@@ -143,6 +325,7 @@
         identityFeedback.textContent = 'Nome valido solo per questa sessione.';
       }
     }
+    updateMarkerHistoryCount();
   }
 
   function openIdentityDialog() {
@@ -570,6 +753,11 @@
     confirmRow.classList.remove('hidden');
     closeMarkerDialog();
     updateCrosshairCoordinates();
+    const historyPersisted = saveCurrentMarkerToHistory();
+    if (!historyPersisted) {
+      setStatus('Marker salvato solo per questa sessione');
+      return;
+    }
     if (markerWasPlaced) {
       setStatus(state.markerText ? `Marker aggiornato • ${state.markerText}` : 'Marker aggiornato');
     } else {
@@ -591,6 +779,7 @@
     state.markerPlaced = false;
     state.markerColors = [defaultMarkerColor];
     state.markerText = '';
+    activeHistoryEntryId = null;
     markerTextInput.value = '';
     marker.classList.add('hidden');
     crosshair.classList.remove('hidden');
@@ -765,6 +954,8 @@
   document.getElementById('placeButton').addEventListener('click', openMarkerDialog);
   document.getElementById('moveButton').addEventListener('click', enableMarkerMove);
   editMarkerButton.addEventListener('click', openMarkerDialog);
+  historyButton.addEventListener('click', openMarkerHistory);
+  closeMarkerHistoryButton.addEventListener('click', closeMarkerHistory);
   document.getElementById('resetButton').addEventListener('click', resetMap);
   toggleCoordinatesButton.addEventListener('click', () => {
     setCoordinateToolsVisible(!state.coordinateToolsVisible);
@@ -913,6 +1104,7 @@
     if (event.key === 'Escape' && !identityDialog.classList.contains('hidden')) closeIdentityDialog();
     if (event.key === 'Escape' && !streetPointDialog.classList.contains('hidden')) closeStreetPointDialog();
     if (event.key === 'Escape' && !streetListDialog.classList.contains('hidden')) closeManualStreetPointList();
+    if (event.key === 'Escape' && !markerHistoryDialog.classList.contains('hidden')) closeMarkerHistory();
   });
 
   function roundedRectPath(ctx, x, y, width, height, radius) {
@@ -1110,6 +1302,7 @@
   window.addEventListener('resize', fitImage);
   setMarkerVisual();
   loadCoordinateToolsPreference();
+  loadMarkerHistoryStore();
   loadPlayerName();
   loadStreetIndex();
   loadManualStreetPoints();

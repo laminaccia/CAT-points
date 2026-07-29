@@ -51,7 +51,7 @@ altro.
 ## 3. Struttura
 
 ```
-index.html              Struttura dell'app: mappa, mirino, marker, 4 dialog
+index.html              Struttura dell'app: mappa, mirino, marker, 5 dialog
 styles.css              Interfaccia e stile (tema scuro/oro)
 app.js                  Pan, zoom, marker, ricerca, esportazione, condivisione
 service-worker.js       Cache offline
@@ -98,10 +98,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=25` e
-   `app.js?v=27`.
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=26` e
+   `app.js?v=28`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v34`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v35`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
@@ -242,6 +242,12 @@ sinistra. Anche la lista manuale dei punti vive in `localStorage`: è **legata
 al browser di quel dispositivo**, non viaggia con il progetto. Per questo
 esiste l'export JSON — chi raccoglie punti deve poterli portare via.
 
+La cronologia marker usa lo stesso principio (`mappa-marker-history-v1`):
+resta soltanto nel browser, è separata per nome partecipante e non si
+sincronizza. Confermare un punto crea una voce; modificarlo o riposizionarlo
+aggiorna la voce attiva invece di duplicarla. Reimpostare la mappa conclude
+quel marker, quindi la conferma successiva crea una nuova voce.
+
 ---
 
 ## 7. Criteri di accettazione
@@ -259,6 +265,8 @@ esiste l'export JSON — chi raccoglie punti deve poterli portare via.
 - Dopo la conferma il marker può essere modificato senza riposizionarlo oppure
   riportato al mirino per scegliere un nuovo punto; annullare una modifica
   ripristina colore e testo precedenti.
+- Ogni conferma salva automaticamente il marker nella cronologia locale del
+  partecipante; una voce può essere ripristinata o eliminata.
 - Il pulsante di copia usa Clipboard API quando disponibile.
 - La PWA si apre anche offline dopo il primo caricamento. *(verificato il
   2026-07-29 col server spento: mappa, ricerca e mirino funzionano)*
