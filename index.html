@@ -10,7 +10,7 @@
   <title>Mappa Squadra</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=32">
+  <link rel="stylesheet" href="styles.css?v=33">
 </head>
 <body>
   <main class="app-shell">
@@ -39,7 +39,7 @@
       <form class="searchbar" id="searchForm" role="search">
         <label class="sr-only" for="streetSearch">Cerca una via</label>
         <input id="streetSearch" name="street" type="search" autocomplete="off" placeholder="Cerca una via…" enterkeyhint="search" aria-autocomplete="list" aria-controls="searchResults" aria-expanded="false">
-        <button id="historyButton" class="history-button" type="button" aria-label="Apri cronologia marker">
+        <button id="historyButton" class="history-button" type="button" aria-label="Apri cronologia punti">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="12" cy="12" r="8"></circle>
             <path d="M12 8v4l3 2"></path>
@@ -70,6 +70,7 @@
       <div class="coordinate-panel hidden" id="coordinatePanel">
         <span class="coordinate-label" id="coordinateLabel">Coordinate mirino</span>
         <output id="crosshairCoordinates" aria-label="Coordinate normalizzate del mirino">x — · y —</output>
+        <output class="geographic-coordinates" id="geographicCoordinates" aria-label="Coordinate geografiche stimate del mirino">Lat — · Lon —</output>
         <button id="copyCoordinatesButton" type="button">Copia x/y</button>
         <div class="coordinate-actions">
           <button id="addStreetPointButton" type="button">＋ Aggiungi punto</button>
@@ -91,7 +92,7 @@
         </div>
         <div class="control-row hidden" id="confirmRow">
           <button id="moveButton" class="secondary-wide" type="button">Cambia posizione</button>
-          <button id="editMarkerButton" class="secondary-wide" type="button">Modifica marker</button>
+          <button id="editMarkerButton" class="secondary-wide" type="button">Modifica punto</button>
           <button id="copyButton" class="secondary-wide" type="button">Copia immagine</button>
           <button id="shareButton" class="primary-button" type="button">Condividi PNG</button>
         </div>
@@ -119,7 +120,7 @@
           <div class="dialog-heading">
             <div>
               <p class="eyebrow">PUNTO SULLA MAPPA</p>
-              <h2 id="markerDialogTitle">Personalizza il marker</h2>
+              <h2 id="markerDialogTitle">Personalizza il punto</h2>
             </div>
             <button id="cancelMarkerButton" class="dialog-close" type="button" aria-label="Chiudi">×</button>
           </div>
@@ -173,7 +174,7 @@
               </p>
               <p class="color-name-feedback" id="colorNameFeedback" role="status" aria-live="polite">Scrivi un nome o usa uno degli esempi.</p>
             </div>
-            <p class="color-help" id="colorHelp">Scegli un colore oppure aggiungine un secondo per creare un marker bicolore.</p>
+            <p class="color-help" id="colorHelp">Scegli un colore oppure aggiungine un secondo per creare un punto bicolore.</p>
           </fieldset>
           <label class="marker-text-field" for="markerText">Lettere o numeri (facoltativo)</label>
           <input id="markerText" type="text" inputmode="text" maxlength="12" placeholder="Es. A12 o B">
@@ -240,11 +241,11 @@
           <div class="dialog-heading">
             <div>
               <p class="eyebrow">SU QUESTO DISPOSITIVO</p>
-              <h2 id="markerHistoryTitle">Cronologia marker</h2>
+              <h2 id="markerHistoryTitle">Cronologia punti</h2>
             </div>
             <button id="closeMarkerHistoryButton" class="dialog-close" type="button" aria-label="Chiudi">×</button>
           </div>
-          <p class="dialog-description marker-history-description" id="markerHistoryDescription">Rivedi, etichetta o invia nuovamente un marker salvato su questo browser.</p>
+          <p class="dialog-description marker-history-description" id="markerHistoryDescription">Rivedi, etichetta o invia nuovamente un punto salvato su questo browser.</p>
           <div class="marker-history-list" id="markerHistoryList"></div>
           <div class="marker-history-footer">
             <button id="exportMarkerHistoryButton" class="primary-button" type="button">Esporta / invia cronologia</button>
@@ -256,6 +257,6 @@
     <canvas id="exportCanvas" hidden></canvas>
   </main>
 
-  <script src="app.js?v=33" defer></script>
+  <script src="app.js?v=34" defer></script>
 </body>
 </html>

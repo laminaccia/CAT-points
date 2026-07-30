@@ -9,6 +9,7 @@
   const toggleCoordinatesButton = document.getElementById('toggleCoordinatesButton');
   const coordinateLabel = document.getElementById('coordinateLabel');
   const crosshairCoordinates = document.getElementById('crosshairCoordinates');
+  const geographicCoordinates = document.getElementById('geographicCoordinates');
   const copyCoordinatesButton = document.getElementById('copyCoordinatesButton');
   const addStreetPointButton = document.getElementById('addStreetPointButton');
   const openStreetPointListButton = document.getElementById('openStreetPointListButton');
@@ -63,6 +64,15 @@
   const manualStreetStorageKey = 'mappa-manual-streets';
   const markerHistoryStorageKey = 'mappa-marker-history-v1';
   const markerHistoryLimit = 100;
+  // La scansione non contiene metadati geografici. Questa trasformazione
+  // affine WGS84 è stata calibrata su sei riferimenti riconoscibili sia nella
+  // carta sia in OpenStreetMap; mantiene x/y come coordinate autorevoli per
+  // la ricerca e aggiunge una posizione reale indicativa, con scarti rilevati
+  // nell'ordine di 20 metri sui punti usati per il controllo.
+  const geographicCalibration = {
+    latitude: [37.92057130985965, 0.000258450654538076, -0.014228378541362083],
+    longitude: [12.849077256251567, 0.025174821053030778, 0.00012416415904424602]
+  };
   const italianColorAliases = new Map(Object.entries({
     bianco: '#ffffff',
     nero: '#17191f',
@@ -124,7 +134,7 @@
   const state = {
     scale: 1,
     minScale: 1,
-    maxScale: 5,
+    maxScale: 6,
     x: 0,
     y: 0,
     dragging: false,
@@ -186,7 +196,7 @@
   function updateMarkerHistoryCount() {
     const count = state.playerName ? getCurrentMarkerHistory().length : 0;
     historyCount.textContent = count > 99 ? '99+' : String(count);
-    historyButton.setAttribute('aria-label', `Apri cronologia marker, ${count} salvati`);
+    historyButton.setAttribute('aria-label', `Apri cronologia punti, ${count} salvati`);
   }
 
   function formatMarkerHistoryTime(value) {
@@ -211,10 +221,6 @@
       ? `linear-gradient(90deg, ${colors[0]} 0 50%, ${colors[1]} 50% 100%)`
       : colors[0];
     swatch.style.setProperty('--history-background', background);
-    if (colors.includes('#ffffff')) {
-      swatch.style.setProperty('--history-border-width', '2px');
-      swatch.style.setProperty('--history-border-color', '#17191f');
-    }
     return swatch;
   }
 
@@ -241,7 +247,7 @@
     closeMarkerHistory();
     updateCrosshairCoordinates();
     const restoredName = activeHistoryLabel || state.markerText;
-    setStatus(restoredName ? `Marker ripristinato • ${restoredName}` : 'Marker ripristinato');
+    setStatus(restoredName ? `Punto ripristinato • ${restoredName}` : 'Punto ripristinato');
   }
 
   function deleteMarkerHistoryEntry(entryId) {
@@ -255,7 +261,7 @@
     const persisted = persistMarkerHistoryStore();
     updateMarkerHistoryCount();
     renderMarkerHistory();
-    setStatus(persisted ? 'Marker eliminato dalla cronologia' : 'Eliminato solo per questa sessione');
+    setStatus(persisted ? 'Punto eliminato dalla cronologia' : 'Eliminato solo per questa sessione');
   }
 
   function updateMarkerHistoryLabel(entryId, value) {
@@ -293,7 +299,7 @@
     form.className = 'marker-history-label-form';
     const label = document.createElement('label');
     label.className = 'sr-only';
-    label.textContent = 'Etichetta del marker';
+    label.textContent = 'Etichetta del punto';
     const input = document.createElement('input');
     input.id = `marker-history-label-${entry.id}`;
     input.type = 'text';
@@ -332,14 +338,14 @@
   function renderMarkerHistory() {
     markerHistoryList.replaceChildren();
     markerHistoryDescription.textContent = state.playerName
-      ? `Cronologia di ${state.playerName}: riordina, rivedi o invia nuovamente i marker.`
-      : 'Riordina, rivedi o invia nuovamente i marker salvati in questo browser.';
+      ? `Cronologia di ${state.playerName}: riordina, rivedi o invia nuovamente i punti.`
+      : 'Riordina, rivedi o invia nuovamente i punti salvati in questo browser.';
     const entries = getCurrentMarkerHistory();
     exportMarkerHistoryButton.disabled = entries.length === 0;
     if (!entries.length) {
       const empty = document.createElement('p');
       empty.className = 'marker-history-empty';
-      empty.textContent = 'Nessun marker salvato. Il primo verrà aggiunto automaticamente quando confermi un punto.';
+      empty.textContent = 'Nessun punto salvato. Il primo verrà aggiunto automaticamente quando confermi un punto.';
       markerHistoryList.append(empty);
       return;
     }
@@ -352,14 +358,17 @@
       copy.className = 'marker-history-copy';
       const title = document.createElement('strong');
       const historyLabel = normalizeHistoryLabel(entry.label);
-      title.textContent = historyLabel || entry.text || 'Marker senza etichetta';
+      title.textContent = historyLabel || entry.text || 'Punto senza etichetta';
       if (historyLabel && entry.text) {
         const markerText = document.createElement('span');
-        markerText.textContent = `Testo marker: ${entry.text}`;
+        markerText.textContent = `Testo punto: ${entry.text}`;
         copy.append(markerText);
       }
       const meta = document.createElement('small');
-      meta.textContent = `${formatMarkerHistoryTime(entry.updatedAt || entry.createdAt)} · x ${Number(entry.x).toFixed(4)} · y ${Number(entry.y).toFixed(4)}`;
+      const normalizedCoordinates = { x: Number(entry.x), y: Number(entry.y) };
+      const realCoordinates = getGeographicCoordinates(normalizedCoordinates);
+      meta.textContent = `${formatMarkerHistoryTime(entry.updatedAt || entry.createdAt)} · x ${normalizedCoordinates.x.toFixed(4)} · y ${normalizedCoordinates.y.toFixed(4)}`
+        + (realCoordinates ? ` · ${realCoordinates.latitude.toFixed(5)}°, ${realCoordinates.longitude.toFixed(5)}° ≈` : '');
       copy.prepend(title);
       copy.append(meta);
       item.append(copy);
@@ -373,14 +382,14 @@
       moveUpButton.type = 'button';
       moveUpButton.textContent = 'Su';
       moveUpButton.disabled = index === 0;
-      moveUpButton.setAttribute('aria-label', `Sposta ${historyLabel || entry.text || 'marker'} verso l'alto`);
+      moveUpButton.setAttribute('aria-label', `Sposta ${historyLabel || entry.text || 'punto'} verso l'alto`);
       moveUpButton.addEventListener('click', () => moveMarkerHistoryEntry(entry.id, -1));
       const moveDownButton = document.createElement('button');
       moveDownButton.className = 'secondary-wide';
       moveDownButton.type = 'button';
       moveDownButton.textContent = 'Giù';
       moveDownButton.disabled = index === entries.length - 1;
-      moveDownButton.setAttribute('aria-label', `Sposta ${historyLabel || entry.text || 'marker'} verso il basso`);
+      moveDownButton.setAttribute('aria-label', `Sposta ${historyLabel || entry.text || 'punto'} verso il basso`);
       moveDownButton.addEventListener('click', () => moveMarkerHistoryEntry(entry.id, 1));
       order.append(orderLabel, moveUpButton, moveDownButton);
       item.append(order);
@@ -418,31 +427,45 @@
 
   function buildMarkerHistoryExport() {
     return {
-      version: 1,
+      version: 2,
       exportedAt: new Date().toISOString(),
       participant: state.playerName,
-      markers: getCurrentMarkerHistory().map((entry, index) => ({
-        order: index + 1,
-        label: normalizeHistoryLabel(entry.label),
-        markerText: typeof entry.text === 'string' ? entry.text : '',
-        colors: Array.isArray(entry.colors) ? entry.colors : [],
-        x: Number(entry.x),
-        y: Number(entry.y),
-        createdAt: entry.createdAt || null,
-        updatedAt: entry.updatedAt || null
-      }))
+      coordinateSystems: {
+        normalized: 'x/y della mappa, intervallo 0–1',
+        geographic: 'WGS84 (EPSG:4326), stima cartografica'
+      },
+      markers: getCurrentMarkerHistory().map((entry, index) => {
+        const normalizedCoordinates = { x: Number(entry.x), y: Number(entry.y) };
+        const realCoordinates = getGeographicCoordinates(normalizedCoordinates);
+        return {
+          order: index + 1,
+          label: normalizeHistoryLabel(entry.label),
+          markerText: typeof entry.text === 'string' ? entry.text : '',
+          colors: Array.isArray(entry.colors) ? entry.colors : [],
+          x: normalizedCoordinates.x,
+          y: normalizedCoordinates.y,
+          latitude: realCoordinates ? Number(realCoordinates.latitude.toFixed(6)) : null,
+          longitude: realCoordinates ? Number(realCoordinates.longitude.toFixed(6)) : null,
+          createdAt: entry.createdAt || null,
+          updatedAt: entry.updatedAt || null
+        };
+      })
     };
   }
 
   function buildMarkerHistoryShareText(payload) {
-    const lines = [`Cronologia marker di ${payload.participant || 'partecipante'}`];
+    const lines = [`Cronologia punti di ${payload.participant || 'partecipante'}`];
     payload.markers.forEach((entry) => {
-      const name = entry.label || entry.markerText || `Marker ${entry.order}`;
+      const name = entry.label || entry.markerText || `Punto ${entry.order}`;
       const colors = entry.colors.length ? entry.colors.join(' + ') : 'trasparente';
+      const realCoordinates = Number.isFinite(entry.latitude) && Number.isFinite(entry.longitude)
+        ? `${entry.latitude.toFixed(6)}, ${entry.longitude.toFixed(6)}`
+        : 'non disponibili';
       lines.push(
         '',
         `${entry.order}. ${name}`,
-        `Coordinate: x ${entry.x.toFixed(6)}, y ${entry.y.toFixed(6)}`,
+        `Coordinate mappa: x ${entry.x.toFixed(6)}, y ${entry.y.toFixed(6)}`,
+        `Coordinate reali (stima): ${realCoordinates}`,
         `Colori: ${colors}`,
         `Data: ${formatMarkerHistoryTime(entry.createdAt)}`
       );
@@ -453,7 +476,7 @@
   async function exportAndShareMarkerHistory() {
     const payload = buildMarkerHistoryExport();
     if (!payload.markers.length) {
-      setStatus('Nessun marker da esportare');
+      setStatus('Nessun punto da esportare');
       return;
     }
     const json = JSON.stringify(payload, null, 2);
@@ -461,7 +484,7 @@
     const fileName = `cronologia-${safeName}-${Date.now()}.json`;
     const blob = new Blob([json], { type: 'application/json' });
     const file = typeof File === 'function' ? new File([blob], fileName, { type: blob.type }) : null;
-    const title = `Cronologia marker - ${state.playerName || 'Caccia al Tesoro'}`;
+    const title = `Cronologia punti - ${state.playerName || 'Caccia al Tesoro'}`;
     setStatus('Preparazione cronologia…');
     exportMarkerHistoryButton.disabled = true;
     try {
@@ -601,7 +624,7 @@
     if (!image.naturalWidth || !image.naturalHeight) return;
     const coverScale = Math.max(stage.clientWidth / image.naturalWidth, stage.clientHeight / image.naturalHeight);
     state.minScale = coverScale;
-    state.maxScale = coverScale * 5;
+    state.maxScale = coverScale * 6;
     state.scale = coverScale;
     state.x = (stage.clientWidth - image.naturalWidth * state.scale) / 2;
     state.y = (stage.clientHeight - image.naturalHeight * state.scale) / 2;
@@ -636,12 +659,26 @@
     };
   }
 
+  function getGeographicCoordinates(coordinates = getCrosshairCoordinates()) {
+    if (!coordinates || !Number.isFinite(coordinates.x) || !Number.isFinite(coordinates.y)) return null;
+    const [latitudeOrigin, latitudeX, latitudeY] = geographicCalibration.latitude;
+    const [longitudeOrigin, longitudeX, longitudeY] = geographicCalibration.longitude;
+    return {
+      latitude: latitudeOrigin + latitudeX * coordinates.x + latitudeY * coordinates.y,
+      longitude: longitudeOrigin + longitudeX * coordinates.x + longitudeY * coordinates.y
+    };
+  }
+
   function updateCrosshairCoordinates() {
     const coordinates = getCrosshairCoordinates();
+    const realCoordinates = getGeographicCoordinates(coordinates);
     coordinateLabel.textContent = state.markerPlaced ? 'Punto fissato' : 'Coordinate mirino';
     crosshairCoordinates.value = coordinates
       ? `x ${coordinates.x.toFixed(6)} · y ${coordinates.y.toFixed(6)}`
       : 'x — · y —';
+    geographicCoordinates.value = realCoordinates
+      ? `Lat ${realCoordinates.latitude.toFixed(5)}° · Lon ${realCoordinates.longitude.toFixed(5)}° ≈`
+      : 'Lat — · Lon —';
     copyCoordinatesButton.disabled = !coordinates;
   }
 
@@ -755,7 +792,9 @@
       x: Number(coordinates.x.toFixed(6)),
       y: Number(coordinates.y.toFixed(6))
     };
-    streetPointCoordinates.textContent = `x ${pendingStreetPoint.x.toFixed(6)} · y ${pendingStreetPoint.y.toFixed(6)}`;
+    const realCoordinates = getGeographicCoordinates(pendingStreetPoint);
+    streetPointCoordinates.textContent = `x ${pendingStreetPoint.x.toFixed(6)} · y ${pendingStreetPoint.y.toFixed(6)}`
+      + (realCoordinates ? `\nLat ${realCoordinates.latitude.toFixed(5)}° · Lon ${realCoordinates.longitude.toFixed(5)}° (stima)` : '');
     streetPointLabelInput.value = '';
     streetPointTagsInput.value = '';
     streetPointForm.classList.remove('hidden');
@@ -938,9 +977,7 @@
       ? `linear-gradient(90deg, ${state.markerColors[0]} 0 50%, ${state.markerColors[1]} 50% 100%)`
       : state.markerColors[0] || 'transparent';
     marker.style.setProperty('--marker-background', markerBackground);
-    marker.style.setProperty('--marker-border-width', state.markerColors.length === 0 ? '1px' : '0px');
-    marker.style.setProperty('--marker-border-color', state.markerColors.length === 0 ? '#17191f' : 'transparent');
-    marker.style.setProperty('--marker-outline', state.markerColors.includes('#ffffff') ? '#17191f' : 'transparent');
+    marker.style.setProperty('--marker-border-color', '#17191f');
     markerLabel.textContent = state.markerText;
     markerLabel.classList.toggle('hidden', !state.markerText);
     syncMarkerColorSelects();
@@ -990,11 +1027,11 @@
     updateCrosshairCoordinates();
     const historyPersisted = saveCurrentMarkerToHistory();
     if (!historyPersisted) {
-      setStatus('Marker salvato solo per questa sessione');
+      setStatus('Punto salvato solo per questa sessione');
       return;
     }
     const markerName = activeHistoryLabel || state.markerText;
-    if (markerWasPlaced) setStatus(markerName ? `Marker aggiornato • ${markerName}` : 'Marker aggiornato');
+    if (markerWasPlaced) setStatus(markerName ? `Punto aggiornato • ${markerName}` : 'Punto aggiornato');
     else setStatus(markerName ? `Punto selezionato • ${markerName}` : 'Punto selezionato');
   }
 
@@ -1396,8 +1433,8 @@
       } else {
         ctx.fillStyle = state.markerColors[0];
       }
-      ctx.strokeStyle = state.markerColors.includes('#ffffff') ? '#17191f' : 'transparent';
-      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#17191f';
+      ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.arc(centerX, centerY, 12, 0, Math.PI * 2);
       ctx.fill();

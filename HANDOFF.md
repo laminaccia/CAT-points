@@ -5,6 +5,30 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-30 — Punti bordati, mappa più nitida e coordinate geografiche
+
+*Agente: Codex con skill Impeccable e PDF. Toccati `assets/map-placeholder.jpg`,
+`app.js`, `styles.css`, `index.html`, `service-worker.js`,
+`tools/merge-streets.py`, `README.md`, `AGENTS.md`, `HANDOFF.md`.*
+
+Il punto ha ora un bordo nero sottile con qualunque colore, anche bicolore,
+bianco o trasparente; lo stesso bordo viene disegnato nel PNG e nelle anteprime
+della cronologia. Tutte le stringhe visibili usano «Punto» al posto di
+«Marker», senza rinominare identificatori e chiavi di storage per non perdere
+la cronologia esistente.
+
+La mappa è stata rigenerata dal PDF a 8192×5787 px, JPEG progressivo qualità
+88: risulta più netta con un aumento contenuto da 4,4 a 4,7 MB. Lo zoom massimo
+passa da 5× a 6× rispetto alla vista iniziale.
+
+Gli strumenti coordinate mostrano anche latitudine e longitudine WGS84
+stimate. La trasformazione affine usa sei riferimenti OpenStreetMap e resta
+entro circa 20 metri sui punti di controllo. `x`/`y` non cambiano: continuano
+a guidare ricerca, lotti manuali e **Copia x/y**. La cronologia deriva le
+coordinate geografiche al volo e le include negli export.
+
+Bumpati `styles.css?v=33`, `app.js?v=34` e `mappa-squadra-v43`.
+
 ## 2026-07-30 — Intera area della mappa raggiungibile
 
 *Agente: Codex con skill Impeccable. Toccati `app.js`, `styles.css`,

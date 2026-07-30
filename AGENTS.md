@@ -51,12 +51,12 @@ altro.
 ## 3. Struttura
 
 ```
-index.html              Struttura dell'app: mappa, mirino, marker, 5 dialog
+index.html              Struttura dell'app: mappa, mirino, punto, 5 dialog
 styles.css              Interfaccia e stile (tema scuro/oro)
-app.js                  Pan, zoom, marker, ricerca, esportazione, condivisione
+app.js                  Pan, zoom, punto, ricerca, esportazione, condivisione
 service-worker.js       Cache offline
 manifest.webmanifest    Installazione PWA
-assets/map-placeholder.jpg   La mappa servita (4,4 MB)
+assets/map-placeholder.jpg   La mappa servita (8192×5787 px, 4,7 MB)
 assets/map-placeholder.pdf   Sorgente con livello testuale ricercabile
 assets/streets.json          Indice dei punti — GENERATO, vedi §5-bis
 assets/icons/                icon-192.png, icon-512.png
@@ -98,10 +98,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=32` e
-   `app.js?v=33`.
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=33` e
+   `app.js?v=34`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v42`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v43`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
@@ -250,6 +250,26 @@ coprire tutto lo schermo.
 
 ---
 
+## 5-quinquies. Coordinate geografiche senza rompere x/y
+
+Le coordinate `x`/`y` normalizzate restano la fonte autorevole per
+`assets/streets.json`, per la ricerca e per i lotti manuali. Il pulsante
+**Copia x/y** non deve cambiare formato.
+
+L'interfaccia mostra in aggiunta latitudine e longitudine WGS84 in gradi
+decimali. La scansione non è georeferenziata: `geographicCalibration` in
+`app.js` applica quindi una trasformazione affine calibrata su sei riferimenti
+riconoscibili nella carta e in OpenStreetMap (Crocifisso, Chiesa Madre,
+PalaSegesta, Castello Eufemio, Villa Comunale/Garibaldi e Cimitero). Sui
+riferimenti lo scarto rilevato resta entro circa 20 metri, ma il risultato va
+sempre presentato come **stima cartografica**, mai come posizione GPS.
+
+La cronologia continua a salvare `x`/`y`; latitudine e longitudine vengono
+derivate al momento della visualizzazione o dell'esportazione. In questo modo
+una futura calibrazione migliore correggerà anche i punti già salvati.
+
+---
+
 ## 6. Identità partecipante
 
 Il partecipante inserisce un nome al primo accesso. Il valore è salvato in
@@ -258,15 +278,16 @@ sinistra. Anche la lista manuale dei punti vive in `localStorage`: è **legata
 al browser di quel dispositivo**, non viaggia con il progetto. Per questo
 esiste l'export JSON — chi raccoglie punti deve poterli portare via.
 
-La cronologia marker usa lo stesso principio (`mappa-marker-history-v1`):
+La cronologia punti usa lo stesso principio (`mappa-marker-history-v1`, chiave
+mantenuta per compatibilità con i dati già salvati):
 resta soltanto nel browser, è separata per nome partecipante e non si
 sincronizza. Confermare un punto crea una voce; modificarlo o riposizionarlo
 aggiorna la voce attiva invece di duplicarla. Reimpostare la mappa conclude
-quel marker, quindi la conferma successiva crea una nuova voce. Ogni voce può
-avere un'etichetta facoltativa distinta dal testo visibile sul marker:
+quel punto, quindi la conferma successiva crea una nuova voce. Ogni voce può
+avere un'etichetta facoltativa distinta dal testo visibile sul punto:
 «Rivedi» la riporta sulla mappa, «Invia foto» rigenera il PNG con etichetta e
 data originali e apre il normale flusso di condivisione. L'ordine si modifica
-con «Su»/«Giù» e resta salvato; modificare un marker esistente non lo riporta
+con «Su»/«Giù» e resta salvato; modificare un punto esistente non lo riporta
 in testa. L'esportazione produce un JSON ordinato e prova prima la
 condivisione nativa, poi il testo condiviso, infine il download.
 
@@ -279,23 +300,26 @@ condivisione nativa, poi il testo condiviso, infine il download.
 - Pan e zoom sono fluidi.
 - Le icone circolari sono geometricamente centrate e i controlli interattivi
   compatti mantengono un'area tattile minima di 44×44 px.
-- Il marker appare al centro esatto del mirino.
+- Il punto appare al centro esatto del mirino.
 - Dopo la conferma la mappa non si muove accidentalmente.
-- Il PNG include mappa, partecipante, marker, data e ora, ma non i pulsanti.
+- Il PNG include mappa, partecipante, punto, data e ora, ma non i pulsanti.
 - Su browser compatibili il pulsante usa Web Share API; altrimenti scarica il
   PNG.
-- Il marker permette di scegliere colore e testo breve; due menu a tendina
+- Il punto permette di scegliere colore e testo breve; due menu a tendina
   gestiscono colore principale e secondo colore, mentre il campo libero
   riconosce nomi italiani, codici HEX e i formati CSS RGB/HSL. Nello stesso
-  dialog si può assegnare subito l'etichetta della cronologia.
-- Dopo la conferma il marker può essere modificato senza riposizionarlo oppure
+  dialog si può assegnare subito l'etichetta della cronologia. Tutti i colori
+  e il trasparente hanno un bordo sottile.
+- Dopo la conferma il punto può essere modificato senza riposizionarlo oppure
   riportato al mirino per scegliere un nuovo punto; annullare una modifica
   ripristina colore e testo precedenti.
-- Ogni conferma salva automaticamente il marker nella cronologia locale del
+- Ogni conferma salva automaticamente il punto nella cronologia locale del
   partecipante; una voce può essere etichettata, rivista, condivisa nuovamente
   o eliminata.
 - Le voci della cronologia possono essere riordinate e l'ordine viene
   mantenuto nell'esportazione condivisibile.
+- Gli strumenti coordinate mostrano x/y e una stima WGS84 in gradi decimali;
+  ricerca e copia JSON continuano a usare le coordinate normalizzate.
 - Il pulsante di copia usa Clipboard API quando disponibile.
 - La PWA si apre anche offline dopo il primo caricamento. *(verificato il
   2026-07-29 col server spento: mappa, ricerca e mirino funzionano)*
@@ -344,10 +368,10 @@ comportamento sui telefoni su cui l'app è già installata.
 
 *(L'offline, che era il terzo, è stato corretto il 2026-07-29: vedi §5.)*
 
-1. **La mappa pesa 4,4 MB** e il service worker la precarica all'installazione:
+1. **La mappa pesa 4,7 MB** e il service worker la precarica all'installazione:
    il primo caricamento su rete mobile è lento proprio nel momento peggiore,
-   cioè quando il giocatore è per strada. Su questa macchina è disponibile solo
-   `sips` per le immagini — niente ImageMagick, niente `cwebp`.
+   cioè quando il giocatore è per strada. La versione attuale è stata
+   rigenerata dal PDF a 8192×5787 px con JPEG progressivo di qualità 88.
 2. **Il PDF è precaricato ma non serve all'app.** `assets/map-placeholder.pdf`
    (1,35 MB) è in `ASSETS`, ma nessuno lo carica a runtime: è il sorgente della
    mappa, utile alle persone, non all'app. Toglierlo da `ASSETS` libera un
@@ -360,7 +384,7 @@ comportamento sui telefoni su cui l'app è già installata.
 
 - Colori distinti per squadra.
 - Selettore missione o giorno.
-- Marker personalizzato SVG.
+- Punto personalizzato SVG.
 - Cornice grafica dedicata all'evento.
 - Memorizzazione locale dell'ultima posizione.
 - Più mappe selezionabili.

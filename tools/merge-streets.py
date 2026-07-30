@@ -62,7 +62,7 @@ PAROLE_GENERICHE = {
 }
 
 # Tre soglie, perché «stesso posto» e «stessa via» non sono la stessa domanda.
-# Le distanze sono in coordinate normalizzate; la mappa è larga 7559 px, quindi
+# Le distanze sono in coordinate normalizzate; la mappa è larga 8192 px, quindi
 # 0.005 valgono una quarantina di pixel.
 #
 # Perché servono davvero: il solo nome è un giudice pessimo. «Strada Patti» e

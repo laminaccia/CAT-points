@@ -51,13 +51,14 @@ http://192.168.1.20:8000
 
 La lista manuale è separata da `assets/streets.json` e viene salvata nel browser utilizzato. Il file esportato ha già la struttura `{ "streets": [...] }` e può essere unito all’indice principale.
 
-## Marker e condivisione
+## Punti e condivisione
 
-- **Segna questo punto** offre due menu a tendina per scegliere uno o due colori, mantiene la scelta personalizzata tramite nomi e codici (`#FF0000`, `rgb(255, 0, 0)`, `hsl(0, 100%, 50%)`) e permette di inserire subito testo marker ed etichetta cronologia.
+- **Segna questo punto** offre due menu a tendina per scegliere uno o due colori, mantiene la scelta personalizzata tramite nomi e codici (`#FF0000`, `rgb(255, 0, 0)`, `hsl(0, 100%, 50%)`) e permette di inserire subito testo del punto ed etichetta cronologia. Tutti i colori, compresi bianco, nero e trasparente, hanno un bordo sottile leggibile.
 - La mappa può essere trascinata finché ciascuno dei quattro bordi raggiunge il centro del mirino: sono quindi selezionabili anche gli angoli estremi. Oltre il bordo vero compare un fondale sfocato che non viene confuso con la carta utilizzabile.
-- Dopo la conferma, **Modifica marker** cambia colore o testo senza spostare il punto; **Cambia posizione** torna al mirino per scegliere nuovamente il punto.
-- L’icona **Home** in alto a destra conclude il marker corrente e riporta mappa e controlli alla vista iniziale.
-- Il pulsante con l’orologio nella barra di ricerca apre la cronologia locale del partecipante: ogni marker può essere riordinato, etichettato, rivisto sulla mappa, inviato nuovamente come foto o eliminato. **Esporta / invia cronologia** condivide un JSON, ripiega su un riepilogo testuale oppure scarica il file. I dati restano soltanto in quel browser/dispositivo.
+- Gli strumenti `x/y` mostrano anche latitudine e longitudine WGS84 in gradi decimali come **stima cartografica**. Il pulsante **Copia x/y** continua intenzionalmente a copiare soltanto le coordinate normalizzate usate da `streets.json`.
+- Dopo la conferma, **Modifica punto** cambia colore o testo senza spostarlo; **Cambia posizione** torna al mirino per scegliere nuovamente il punto.
+- L’icona **Home** in alto a destra conclude il punto corrente e riporta mappa e controlli alla vista iniziale.
+- Il pulsante con l’orologio nella barra di ricerca apre la cronologia locale del partecipante: ogni punto può essere riordinato, etichettato, rivisto sulla mappa, inviato nuovamente come foto o eliminato. **Esporta / invia cronologia** condivide un JSON comprensivo di coordinate x/y e geografiche stimate, ripiega su un riepilogo testuale oppure scarica il file. I dati restano soltanto in quel browser/dispositivo.
 - **Condividi PNG** usa il menu nativo quando il dispositivo supporta la condivisione di file.
 - **Copia immagine** copia il PNG negli appunti; su iPhone, se gli appunti immagine sono bloccati da HTTP, salva il PNG per poterlo condividere dal menu dell’iPhone.
 
