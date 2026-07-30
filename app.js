@@ -4,6 +4,7 @@
   const image = document.getElementById('mapImage');
   const marker = document.getElementById('marker');
   const markerLabel = document.getElementById('markerLabel');
+  const markerHistoryLabelVisual = document.getElementById('markerHistoryLabelVisual');
   const crosshair = document.getElementById('crosshair');
   const coordinatePanel = document.getElementById('coordinatePanel');
   const toggleCoordinatesButton = document.getElementById('toggleCoordinatesButton');
@@ -36,6 +37,12 @@
   const markerHistoryDescription = document.getElementById('markerHistoryDescription');
   const closeMarkerHistoryButton = document.getElementById('closeMarkerHistoryButton');
   const exportMarkerHistoryButton = document.getElementById('exportMarkerHistoryButton');
+  const markerHistorySourceSelect = document.getElementById('markerHistorySourceSelect');
+  const markerHistoryImportFeedback = document.getElementById('markerHistoryImportFeedback');
+  const markerHistoryFooterActions = document.getElementById('markerHistoryFooterActions');
+  const importMarkerHistoryButton = document.getElementById('importMarkerHistoryButton');
+  const importMarkerHistoryInput = document.getElementById('importMarkerHistoryInput');
+  const removeImportedMarkerHistoryButton = document.getElementById('removeImportedMarkerHistoryButton');
   const searchFeedback = document.getElementById('searchFeedback');
   const searchResults = document.getElementById('searchResults');
   const mainControlsRow = document.getElementById('mainControlsRow');
@@ -64,7 +71,11 @@
   const defaultMarkerColor = fixedPointColor;
   const manualStreetStorageKey = 'mappa-manual-streets';
   const markerHistoryStorageKey = 'mappa-marker-history-v1';
+  const markerHistorySourcesStorageKey = 'mappa-marker-history-sources-v1';
   const markerHistoryLimit = 100;
+  const markerHistoryFormat = 'cat-points.marker-history';
+  const markerHistoryFormatVersion = 3;
+  const catPointsSiteUrl = 'https://laminaccia.github.io/CAT-points/';
   // La scansione non contiene metadati geografici. Questa trasformazione
   // affine WGS84 è stata calibrata su sei riferimenti riconoscibili sia nella
   // carta sia in OpenStreetMap; mantiene x/y come coordinate autorevoli per
@@ -125,9 +136,12 @@
   let pendingStreetPoint = null;
   let markerDialogSnapshot = null;
   let markerHistoryStore = {};
+  let markerHistorySources = {};
+  let markerHistoryViewKey = '';
   let activeHistoryEntryId = null;
   let activeHistoryLabel = '';
   let activeHistoryCreatedAt = null;
+  let activeMarkerOwner = '';
   let customColorTarget = 'primary';
 
   document.body.append(streetPointDialog, streetListDialog, markerHistoryDialog);
@@ -169,6 +183,20 @@
     return String(value || '').normalize('NFKC').trim().replace(/\s+/g, ' ').slice(0, 40);
   }
 
+  function normalizeParticipantName(value) {
+    return String(value || '').normalize('NFKC').trim().replace(/\s+/g, ' ').slice(0, 50);
+  }
+
+  function createLocalId(prefix) {
+    const randomId = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    return `${prefix}-${randomId}`;
+  }
+
+  function normalizeIsoDate(value, fallback = new Date().toISOString()) {
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? fallback : date.toISOString();
+  }
+
   function loadMarkerHistoryStore() {
     try {
       const savedStore = JSON.parse(localStorage.getItem(markerHistoryStorageKey) || '{}');
@@ -189,9 +217,76 @@
     }
   }
 
+  function loadMarkerHistorySources() {
+    try {
+      const savedSources = JSON.parse(localStorage.getItem(markerHistorySourcesStorageKey) || '{}');
+      markerHistorySources = savedSources && typeof savedSources === 'object' && !Array.isArray(savedSources)
+        ? savedSources
+        : {};
+    } catch (error) {
+      markerHistorySources = {};
+    }
+  }
+
+  function persistMarkerHistorySources() {
+    try {
+      localStorage.setItem(markerHistorySourcesStorageKey, JSON.stringify(markerHistorySources));
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function ensureLocalMarkerHistorySource() {
+    const playerKey = markerHistoryPlayerKey();
+    if (!playerKey) return null;
+    const existing = markerHistorySources[playerKey];
+    const ownerName = normalizeParticipantName(state.playerName);
+    if (existing?.type === 'local') {
+      if (existing.ownerName !== ownerName) {
+        existing.ownerName = ownerName;
+        persistMarkerHistorySources();
+      }
+      return existing;
+    }
+    const existingEntries = Array.isArray(markerHistoryStore[playerKey]) ? markerHistoryStore[playerKey] : [];
+    const source = {
+      type: 'local',
+      listId: createLocalId('lista'),
+      ownerName,
+      createdAt: normalizeIsoDate(existingEntries[existingEntries.length - 1]?.createdAt)
+    };
+    markerHistorySources[playerKey] = source;
+    persistMarkerHistorySources();
+    return source;
+  }
+
   function getCurrentMarkerHistory() {
     const playerKey = markerHistoryPlayerKey();
     return Array.isArray(markerHistoryStore[playerKey]) ? markerHistoryStore[playerKey] : [];
+  }
+
+  function getVisibleMarkerHistorySource() {
+    const localKey = markerHistoryPlayerKey();
+    const selectedKey = markerHistoryViewKey && markerHistorySources[markerHistoryViewKey]
+      ? markerHistoryViewKey
+      : localKey;
+    const source = selectedKey === localKey
+      ? ensureLocalMarkerHistorySource()
+      : markerHistorySources[selectedKey];
+    return {
+      key: selectedKey,
+      type: source?.type === 'imported' ? 'imported' : 'local',
+      listId: source?.listId || createLocalId('lista'),
+      ownerName: normalizeParticipantName(source?.ownerName || state.playerName),
+      sharedBy: normalizeParticipantName(source?.sharedBy),
+      sharingChain: Array.isArray(source?.sharingChain) ? source.sharingChain : [],
+      createdAt: source?.createdAt || null,
+      exportedAt: source?.exportedAt || null,
+      importedAt: source?.importedAt || null,
+      sourceUrl: source?.sourceUrl || catPointsSiteUrl,
+      entries: Array.isArray(markerHistoryStore[selectedKey]) ? markerHistoryStore[selectedKey] : []
+    };
   }
 
   function updateMarkerHistoryCount() {
@@ -229,15 +324,16 @@
     markerHistoryDialog.classList.add('hidden');
   }
 
-  function restoreMarkerHistoryEntry(entry) {
+  function restoreMarkerHistoryEntry(entry, source = getVisibleMarkerHistorySource()) {
     const x = Number(entry.x);
     const y = Number(entry.y);
     if (!Number.isFinite(x) || !Number.isFinite(y)) return;
     state.markerColors = Array.isArray(entry.colors) ? [...entry.colors].slice(0, 2) : [defaultMarkerColor];
     state.markerText = typeof entry.text === 'string' ? entry.text.slice(0, 12) : '';
-    activeHistoryEntryId = entry.id;
+    activeHistoryEntryId = source.type === 'imported' ? null : entry.id;
     activeHistoryLabel = normalizeHistoryLabel(entry.label);
     activeHistoryCreatedAt = entry.createdAt || entry.updatedAt || null;
+    activeMarkerOwner = normalizeParticipantName(source.ownerName || state.playerName);
     zoomToMapPoint(x, y);
     state.markerPlaced = true;
     setMarkerVisual();
@@ -248,7 +344,8 @@
     closeMarkerHistory();
     updateCrosshairCoordinates();
     const restoredName = activeHistoryLabel || state.markerText;
-    setStatus(restoredName ? `Punto ripristinato • ${restoredName}` : 'Punto ripristinato');
+    const sourceLabel = source.type === 'imported' ? `Importato da ${activeMarkerOwner}` : 'Punto ripristinato';
+    setStatus(restoredName ? `${sourceLabel} • ${restoredName}` : sourceLabel);
   }
 
   function deleteMarkerHistoryEntry(entryId) {
@@ -273,7 +370,10 @@
     entry.label = normalizeHistoryLabel(value);
     entry.labelUpdatedAt = new Date().toISOString();
     markerHistoryStore[playerKey] = entries;
-    if (activeHistoryEntryId === entryId) activeHistoryLabel = entry.label;
+    if (activeHistoryEntryId === entryId) {
+      activeHistoryLabel = entry.label;
+      setMarkerVisual();
+    }
     const persisted = persistMarkerHistoryStore();
     renderMarkerHistory();
     closeMarkerHistoryButton.focus({ preventScroll: true });
@@ -336,17 +436,52 @@
     input.select();
   }
 
+  function renderMarkerHistorySourceOptions(activeSource) {
+    markerHistorySourceSelect.replaceChildren();
+    const localSource = ensureLocalMarkerHistorySource();
+    const localKey = markerHistoryPlayerKey();
+    const localOption = document.createElement('option');
+    localOption.value = localKey;
+    localOption.textContent = `La mia lista · ${localSource?.ownerName || state.playerName}`;
+    markerHistorySourceSelect.append(localOption);
+
+    Object.entries(markerHistorySources)
+      .filter(([sourceKey, source]) => sourceKey !== localKey
+        && source?.type === 'imported'
+        && Array.isArray(markerHistoryStore[sourceKey]))
+      .sort(([, first], [, second]) => String(second.importedAt || '').localeCompare(String(first.importedAt || '')))
+      .forEach(([sourceKey, source]) => {
+        const option = document.createElement('option');
+        option.value = sourceKey;
+        const count = markerHistoryStore[sourceKey].length;
+        option.textContent = `Importata · ${source.ownerName || 'Senza autore'} (${count})`;
+        markerHistorySourceSelect.append(option);
+      });
+
+    markerHistorySourceSelect.value = activeSource.key;
+  }
+
   function renderMarkerHistory() {
     markerHistoryList.replaceChildren();
-    markerHistoryDescription.textContent = state.playerName
-      ? `Cronologia di ${state.playerName}: riordina, rivedi o invia nuovamente i punti.`
-      : 'Riordina, rivedi o invia nuovamente i punti salvati in questo browser.';
-    const entries = getCurrentMarkerHistory();
+    const source = getVisibleMarkerHistorySource();
+    const isImported = source.type === 'imported';
+    renderMarkerHistorySourceOptions(source);
+    markerHistoryFooterActions.classList.toggle('local-view', !isImported);
+    removeImportedMarkerHistoryButton.classList.toggle('hidden', !isImported);
+    exportMarkerHistoryButton.textContent = isImported
+      ? `Condividi lista di ${source.ownerName}`
+      : 'Condividi questa lista';
+    markerHistoryDescription.textContent = isImported
+      ? `Lista di ${source.ownerName}, condivisa da ${source.sharedBy || source.ownerName}. È conservata in sola lettura per non perderne l’attribuzione.`
+      : `Cronologia di ${state.playerName}: riordina, rivedi o invia nuovamente i punti.`;
+    const entries = source.entries;
     exportMarkerHistoryButton.disabled = entries.length === 0;
     if (!entries.length) {
       const empty = document.createElement('p');
       empty.className = 'marker-history-empty';
-      empty.textContent = 'Nessun punto salvato. Il primo verrà aggiunto automaticamente quando confermi un punto.';
+      empty.textContent = isImported
+        ? 'Questa lista importata non contiene punti validi.'
+        : 'Nessun punto salvato. Il primo verrà aggiunto automaticamente quando confermi un punto.';
       markerHistoryList.append(empty);
       return;
     }
@@ -374,26 +509,28 @@
       copy.append(meta);
       item.append(copy);
 
-      const order = document.createElement('div');
-      order.className = 'marker-history-order';
-      const orderLabel = document.createElement('span');
-      orderLabel.textContent = `Posizione ${index + 1} di ${entries.length}`;
-      const moveUpButton = document.createElement('button');
-      moveUpButton.className = 'secondary-wide';
-      moveUpButton.type = 'button';
-      moveUpButton.textContent = 'Su';
-      moveUpButton.disabled = index === 0;
-      moveUpButton.setAttribute('aria-label', `Sposta ${historyLabel || entry.text || 'punto'} verso l'alto`);
-      moveUpButton.addEventListener('click', () => moveMarkerHistoryEntry(entry.id, -1));
-      const moveDownButton = document.createElement('button');
-      moveDownButton.className = 'secondary-wide';
-      moveDownButton.type = 'button';
-      moveDownButton.textContent = 'Giù';
-      moveDownButton.disabled = index === entries.length - 1;
-      moveDownButton.setAttribute('aria-label', `Sposta ${historyLabel || entry.text || 'punto'} verso il basso`);
-      moveDownButton.addEventListener('click', () => moveMarkerHistoryEntry(entry.id, 1));
-      order.append(orderLabel, moveUpButton, moveDownButton);
-      item.append(order);
+      if (!isImported) {
+        const order = document.createElement('div');
+        order.className = 'marker-history-order';
+        const orderLabel = document.createElement('span');
+        orderLabel.textContent = `Posizione ${index + 1} di ${entries.length}`;
+        const moveUpButton = document.createElement('button');
+        moveUpButton.className = 'secondary-wide';
+        moveUpButton.type = 'button';
+        moveUpButton.textContent = 'Su';
+        moveUpButton.disabled = index === 0;
+        moveUpButton.setAttribute('aria-label', `Sposta ${historyLabel || entry.text || 'punto'} verso l'alto`);
+        moveUpButton.addEventListener('click', () => moveMarkerHistoryEntry(entry.id, -1));
+        const moveDownButton = document.createElement('button');
+        moveDownButton.className = 'secondary-wide';
+        moveDownButton.type = 'button';
+        moveDownButton.textContent = 'Giù';
+        moveDownButton.disabled = index === entries.length - 1;
+        moveDownButton.setAttribute('aria-label', `Sposta ${historyLabel || entry.text || 'punto'} verso il basso`);
+        moveDownButton.addEventListener('click', () => moveMarkerHistoryEntry(entry.id, 1));
+        order.append(orderLabel, moveUpButton, moveDownButton);
+        item.append(order);
+      }
 
       const actions = document.createElement('div');
       actions.className = 'marker-history-item-actions';
@@ -401,15 +538,27 @@
       restoreButton.className = 'secondary-wide';
       restoreButton.type = 'button';
       restoreButton.textContent = 'Rivedi';
-      restoreButton.addEventListener('click', () => restoreMarkerHistoryEntry(entry));
+      restoreButton.addEventListener('click', () => restoreMarkerHistoryEntry(entry, source));
       const shareButton = document.createElement('button');
       shareButton.className = 'primary-button';
       shareButton.type = 'button';
       shareButton.textContent = 'Invia foto';
       shareButton.addEventListener('click', async () => {
-        restoreMarkerHistoryEntry(entry);
+        restoreMarkerHistoryEntry(entry, source);
         await shareCurrentMarker();
       });
+
+      if (isImported) {
+        const importedOrder = document.createElement('div');
+        importedOrder.className = 'marker-history-imported-order';
+        importedOrder.textContent = `Posizione ${index + 1} di ${entries.length} · autore ${source.ownerName}`;
+        item.append(importedOrder);
+        actions.append(restoreButton, shareButton);
+        item.append(actions);
+        markerHistoryList.append(item);
+        return;
+      }
+
       const labelButton = document.createElement('button');
       labelButton.className = 'secondary-wide';
       labelButton.type = 'button';
@@ -427,91 +576,241 @@
   }
 
   function buildMarkerHistoryExport() {
+    const source = getVisibleMarkerHistorySource();
+    const sharedAt = new Date().toISOString();
+    const sharedBy = normalizeParticipantName(state.playerName) || source.ownerName;
+    const previousSharingChain = source.sharingChain
+      .map((event) => ({
+        name: normalizeParticipantName(event?.name),
+        at: normalizeIsoDate(event?.at, '')
+      }))
+      .filter((event) => event.name && event.at);
+    const sharingChain = [...previousSharingChain, { name: sharedBy, at: sharedAt }].slice(-20);
     return {
-      version: 2,
-      exportedAt: new Date().toISOString(),
-      participant: state.playerName,
+      format: markerHistoryFormat,
+      version: markerHistoryFormatVersion,
+      app: {
+        id: 'cat-points',
+        name: 'CAT-points',
+        url: catPointsSiteUrl,
+        importInstructions: 'Apri CAT-points, entra nella Cronologia punti e usa “Importa lista JSON”.'
+      },
+      list: {
+        id: source.listId,
+        owner: {
+          name: source.ownerName
+        },
+        responsibility: `Questa lista completa resta attribuita a ${source.ownerName}.`,
+        createdAt: source.createdAt || source.entries[source.entries.length - 1]?.createdAt || sharedAt,
+        exportedAt: sharedAt,
+        markers: source.entries.map((entry, index) => {
+          const normalizedCoordinates = { x: Number(entry.x), y: Number(entry.y) };
+          const realCoordinates = getGeographicCoordinates(normalizedCoordinates);
+          return {
+            id: entry.id,
+            order: index + 1,
+            label: normalizeHistoryLabel(entry.label),
+            markerText: typeof entry.text === 'string' ? entry.text : '',
+            colors: Array.isArray(entry.colors) ? entry.colors : [],
+            x: normalizedCoordinates.x,
+            y: normalizedCoordinates.y,
+            latitude: realCoordinates ? Number(realCoordinates.latitude.toFixed(6)) : null,
+            longitude: realCoordinates ? Number(realCoordinates.longitude.toFixed(6)) : null,
+            createdAt: entry.createdAt || null,
+            updatedAt: entry.updatedAt || null
+          };
+        })
+      },
+      sharing: {
+        sharedBy: {
+          name: sharedBy
+        },
+        sharedAt,
+        chain: sharingChain
+      },
       coordinateSystems: {
         normalized: 'x/y della mappa, intervallo 0–1',
         geographic: 'WGS84 (EPSG:4326), stima cartografica'
-      },
-      markers: getCurrentMarkerHistory().map((entry, index) => {
-        const normalizedCoordinates = { x: Number(entry.x), y: Number(entry.y) };
-        const realCoordinates = getGeographicCoordinates(normalizedCoordinates);
-        return {
-          order: index + 1,
-          label: normalizeHistoryLabel(entry.label),
-          markerText: typeof entry.text === 'string' ? entry.text : '',
-          colors: Array.isArray(entry.colors) ? entry.colors : [],
-          x: normalizedCoordinates.x,
-          y: normalizedCoordinates.y,
-          latitude: realCoordinates ? Number(realCoordinates.latitude.toFixed(6)) : null,
-          longitude: realCoordinates ? Number(realCoordinates.longitude.toFixed(6)) : null,
-          createdAt: entry.createdAt || null,
-          updatedAt: entry.updatedAt || null
-        };
-      })
+      }
     };
   }
 
   function buildMarkerHistoryShareText(payload) {
-    const lines = [`Cronologia punti di ${payload.participant || 'partecipante'}`];
-    payload.markers.forEach((entry) => {
-      const name = entry.label || entry.markerText || `Punto ${entry.order}`;
-      const colors = entry.colors.length ? entry.colors.join(' + ') : 'trasparente';
-      const realCoordinates = Number.isFinite(entry.latitude) && Number.isFinite(entry.longitude)
-        ? `${entry.latitude.toFixed(6)}, ${entry.longitude.toFixed(6)}`
-        : 'non disponibili';
-      lines.push(
-        '',
-        `${entry.order}. ${name}`,
-        `Coordinate mappa: x ${entry.x.toFixed(6)}, y ${entry.y.toFixed(6)}`,
-        `Coordinate reali (stima): ${realCoordinates}`,
-        `Colori: ${colors}`,
-        `Data: ${formatMarkerHistoryTime(entry.createdAt)}`
-      );
-    });
-    return lines.join('\n');
+    const ownerName = payload.list.owner.name;
+    const sharedBy = payload.sharing.sharedBy.name;
+    return [
+      `Lista CAT-points di ${ownerName}.`,
+      `Condivisa da ${sharedBy}; l’attribuzione originale resta salvata nel file.`,
+      `Per aprirla: ${catPointsSiteUrl} → Cronologia punti → Importa lista JSON.`
+    ].join('\n');
   }
 
   async function exportAndShareMarkerHistory() {
     const payload = buildMarkerHistoryExport();
-    if (!payload.markers.length) {
+    if (!payload.list.markers.length) {
       setStatus('Nessun punto da esportare');
       return;
     }
     const json = JSON.stringify(payload, null, 2);
-    const safeName = normalizeText(state.playerName || 'partecipante').toLowerCase().replace(/\s+/g, '-');
-    const fileName = `cronologia-${safeName}-${Date.now()}.json`;
+    const ownerName = payload.list.owner.name;
+    const safeName = normalizeText(ownerName || 'partecipante').toLowerCase().replace(/\s+/g, '-');
+    const fileName = `cat-points-${safeName}-${Date.now()}.catpoints.json`;
     const blob = new Blob([json], { type: 'application/json' });
     const file = typeof File === 'function' ? new File([blob], fileName, { type: blob.type }) : null;
-    const title = `Cronologia punti - ${state.playerName || 'Caccia al Tesoro'}`;
+    const title = `Lista CAT-points di ${ownerName}`;
     setStatus('Preparazione cronologia…');
     exportMarkerHistoryButton.disabled = true;
     try {
       if (file && canShareFile(file)) {
-        await navigator.share({ files: [file], title });
-        setStatus('Cronologia condivisa');
-      } else if (typeof navigator.share === 'function') {
-        await navigator.share({ title, text: buildMarkerHistoryShareText(payload) });
-        setStatus('Cronologia condivisa come testo');
+        await navigator.share({ files: [file], title, text: buildMarkerHistoryShareText(payload) });
+        setStatus(`Lista di ${ownerName} condivisa`);
       } else {
         downloadBlob(blob, fileName);
-        setStatus('Cronologia JSON scaricata');
+        setStatus('File CAT-points scaricato: può essere importato dal sito');
       }
     } catch (error) {
       if (error.name === 'AbortError') {
         setStatus('Esportazione annullata');
       } else {
         downloadBlob(blob, fileName);
-        setStatus('Condivisione non disponibile: JSON scaricato');
+        setStatus('Condivisione non disponibile: file CAT-points scaricato');
       }
     } finally {
       exportMarkerHistoryButton.disabled = false;
     }
   }
 
+  function sanitizeImportedMarker(entry, index) {
+    const x = Number(entry?.x);
+    const y = Number(entry?.y);
+    if (!Number.isFinite(x) || !Number.isFinite(y) || x < 0 || x > 1 || y < 0 || y > 1) return null;
+    const colors = (Array.isArray(entry.colors) ? entry.colors : [])
+      .map((color) => resolveMarkerColor(String(color)))
+      .filter((color) => color && color !== 'none')
+      .slice(0, 2);
+    const now = new Date().toISOString();
+    return {
+      id: String(entry.id || '').slice(0, 100) || createLocalId(`importato-${index + 1}`),
+      x: Number(x.toFixed(6)),
+      y: Number(y.toFixed(6)),
+      colors,
+      text: String(entry.markerText ?? entry.text ?? '').trim().slice(0, 12),
+      label: normalizeHistoryLabel(entry.label),
+      createdAt: normalizeIsoDate(entry.createdAt, now),
+      updatedAt: normalizeIsoDate(entry.updatedAt || entry.createdAt, now)
+    };
+  }
+
+  function parseMarkerHistoryPackage(payload) {
+    const isCatPointsPackage = payload?.format === markerHistoryFormat
+      && Number(payload.version) === markerHistoryFormatVersion
+      && payload.app?.id === 'cat-points';
+    const isLegacyExport = Number(payload?.version) === 2
+      && typeof payload?.participant === 'string'
+      && Array.isArray(payload?.markers);
+    if (!isCatPointsPackage && !isLegacyExport) {
+      throw new Error('Questo JSON non è una lista esportata da CAT-points.');
+    }
+
+    const ownerName = normalizeParticipantName(isCatPointsPackage
+      ? payload.list?.owner?.name
+      : payload.participant);
+    if (!ownerName) throw new Error('Nel file manca il nome del responsabile della lista.');
+
+    const rawMarkers = isCatPointsPackage ? payload.list?.markers : payload.markers;
+    if (!Array.isArray(rawMarkers) || !rawMarkers.length) {
+      throw new Error('La lista non contiene punti.');
+    }
+    const entries = rawMarkers
+      .slice(0, markerHistoryLimit)
+      .map(sanitizeImportedMarker)
+      .filter(Boolean);
+    if (!entries.length) throw new Error('La lista non contiene coordinate valide per questa mappa.');
+
+    const exportedAt = normalizeIsoDate(
+      isCatPointsPackage ? payload.list?.exportedAt || payload.sharing?.sharedAt : payload.exportedAt
+    );
+    const listId = String(isCatPointsPackage
+      ? payload.list?.id || createLocalId('lista-importata')
+      : `legacy-${markerHistoryPlayerKey(ownerName)}-${exportedAt}`).slice(0, 180);
+    const sharedBy = normalizeParticipantName(isCatPointsPackage
+      ? payload.sharing?.sharedBy?.name
+      : ownerName) || ownerName;
+    const sharingChain = isCatPointsPackage && Array.isArray(payload.sharing?.chain)
+      ? payload.sharing.chain.map((event) => ({
+        name: normalizeParticipantName(event?.name),
+        at: normalizeIsoDate(event?.at, '')
+      })).filter((event) => event.name && event.at).slice(-20)
+      : [{ name: ownerName, at: exportedAt }];
+
+    return {
+      listId,
+      ownerName,
+      sharedBy,
+      sharingChain,
+      createdAt: normalizeIsoDate(isCatPointsPackage ? payload.list?.createdAt : entries[entries.length - 1]?.createdAt),
+      exportedAt,
+      sourceUrl: isCatPointsPackage && /^https:\/\//.test(payload.app?.url)
+        ? payload.app.url
+        : catPointsSiteUrl,
+      entries
+    };
+  }
+
+  async function importMarkerHistoryFile(file) {
+    markerHistoryImportFeedback.classList.remove('error');
+    markerHistoryImportFeedback.textContent = 'Controllo del file…';
+    if (!file || file.size > 2_000_000) {
+      throw new Error('Il file è troppo grande. Seleziona un JSON CAT-points sotto 2 MB.');
+    }
+    const payload = JSON.parse(await file.text());
+    const imported = parseMarkerHistoryPackage(payload);
+    const existingSource = Object.entries(markerHistorySources)
+      .find(([, source]) => source?.type === 'imported' && source.listId === imported.listId);
+    const sourceKey = existingSource?.[0] || createLocalId('import');
+    const importedAt = new Date().toISOString();
+    markerHistoryStore[sourceKey] = imported.entries;
+    markerHistorySources[sourceKey] = {
+      type: 'imported',
+      listId: imported.listId,
+      ownerName: imported.ownerName,
+      sharedBy: imported.sharedBy,
+      sharingChain: imported.sharingChain,
+      createdAt: imported.createdAt,
+      exportedAt: imported.exportedAt,
+      importedAt,
+      sourceUrl: imported.sourceUrl
+    };
+    const persisted = persistMarkerHistoryStore() && persistMarkerHistorySources();
+    markerHistoryViewKey = sourceKey;
+    renderMarkerHistory();
+    const message = existingSource
+      ? `Lista di ${imported.ownerName} aggiornata`
+      : `Lista di ${imported.ownerName} importata`;
+    markerHistoryImportFeedback.textContent = persisted
+      ? `${message}. L’autore originale resta associato a tutti i punti.`
+      : `${message} solo per questa sessione.`;
+    setStatus(message);
+  }
+
+  function removeImportedMarkerHistory() {
+    const source = getVisibleMarkerHistorySource();
+    if (source.type !== 'imported') return;
+    if (!window.confirm(`Rimuovere dal dispositivo la lista importata di ${source.ownerName}?`)) return;
+    delete markerHistoryStore[source.key];
+    delete markerHistorySources[source.key];
+    const persisted = persistMarkerHistoryStore() && persistMarkerHistorySources();
+    markerHistoryViewKey = '';
+    renderMarkerHistory();
+    markerHistoryImportFeedback.textContent = persisted
+      ? `Lista importata di ${source.ownerName} rimossa.`
+      : 'Lista rimossa solo per questa sessione.';
+    setStatus('Lista importata rimossa');
+  }
+
   function openMarkerHistory() {
+    markerHistoryImportFeedback.classList.remove('error');
+    markerHistoryImportFeedback.textContent = '';
     renderMarkerHistory();
     markerHistoryDialog.classList.remove('hidden');
     closeMarkerHistoryButton.focus({ preventScroll: true });
@@ -525,7 +824,7 @@
     const entries = getCurrentMarkerHistory();
     const existing = entries.find((entry) => entry.id === activeHistoryEntryId);
     const entry = {
-      id: existing?.id || globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      id: existing?.id || createLocalId('punto'),
       x: Number(coordinates.x.toFixed(6)),
       y: Number(coordinates.y.toFixed(6)),
       colors: [...state.markerColors],
@@ -547,12 +846,15 @@
 
   function setPlayerName(value, persist = true) {
     const previousHistoryKey = markerHistoryPlayerKey(state.playerName);
-    state.playerName = value.trim().replace(/\s+/g, ' ').slice(0, 50);
+    state.playerName = normalizeParticipantName(value);
     if (previousHistoryKey && previousHistoryKey !== markerHistoryPlayerKey()) {
       activeHistoryEntryId = null;
       activeHistoryLabel = '';
       activeHistoryCreatedAt = null;
+      markerHistoryViewKey = '';
     }
+    if (!state.markerPlaced) activeMarkerOwner = state.playerName;
+    ensureLocalMarkerHistorySource();
     playerNameButton.textContent = state.playerName || 'Inserisci nome';
     if (persist && state.playerName) {
       try {
@@ -1032,6 +1334,9 @@
     markerLabel.textContent = state.markerText;
     markerLabel.classList.toggle('marker-label--swatch', !state.markerText);
     markerLabel.classList.toggle('marker-label--no-color', !state.markerColors.length);
+    marker.classList.toggle('marker--swatch', !state.markerText);
+    markerHistoryLabelVisual.textContent = activeHistoryLabel;
+    markerHistoryLabelVisual.classList.toggle('hidden', !activeHistoryLabel);
     syncMarkerColorSelects();
   }
 
@@ -1069,6 +1374,7 @@
     const markerWasPlaced = state.markerPlaced;
     state.markerText = markerTextInput.value.trim().slice(0, 12);
     activeHistoryLabel = normalizeHistoryLabel(markerHistoryLabelInput.value);
+    activeMarkerOwner = normalizeParticipantName(state.playerName);
     state.markerPlaced = true;
     setMarkerVisual();
     marker.classList.remove('hidden');
@@ -1103,6 +1409,7 @@
     activeHistoryEntryId = null;
     activeHistoryLabel = '';
     activeHistoryCreatedAt = null;
+    activeMarkerOwner = normalizeParticipantName(state.playerName);
     markerTextInput.value = '';
     markerHistoryLabelInput.value = '';
     marker.classList.add('hidden');
@@ -1121,6 +1428,7 @@
     activeHistoryEntryId = null;
     activeHistoryLabel = '';
     activeHistoryCreatedAt = null;
+    activeMarkerOwner = normalizeParticipantName(state.playerName);
     markerTextInput.value = '';
     markerHistoryLabelInput.value = '';
     marker.classList.add('hidden');
@@ -1300,6 +1608,30 @@
   historyButton.addEventListener('click', openMarkerHistory);
   closeMarkerHistoryButton.addEventListener('click', closeMarkerHistory);
   exportMarkerHistoryButton.addEventListener('click', exportAndShareMarkerHistory);
+  markerHistorySourceSelect.addEventListener('change', () => {
+    markerHistoryViewKey = markerHistorySourceSelect.value === markerHistoryPlayerKey()
+      ? ''
+      : markerHistorySourceSelect.value;
+    markerHistoryImportFeedback.classList.remove('error');
+    markerHistoryImportFeedback.textContent = '';
+    renderMarkerHistory();
+  });
+  importMarkerHistoryButton.addEventListener('click', () => importMarkerHistoryInput.click());
+  importMarkerHistoryInput.addEventListener('change', async () => {
+    const [file] = importMarkerHistoryInput.files || [];
+    try {
+      await importMarkerHistoryFile(file);
+    } catch (error) {
+      markerHistoryImportFeedback.classList.add('error');
+      markerHistoryImportFeedback.textContent = error instanceof SyntaxError
+        ? 'Il file non contiene un JSON valido.'
+        : error.message || 'Importazione non riuscita.';
+      setStatus('Importazione non riuscita');
+    } finally {
+      importMarkerHistoryInput.value = '';
+    }
+  });
+  removeImportedMarkerHistoryButton.addEventListener('click', removeImportedMarkerHistory);
   document.getElementById('resetButton').addEventListener('click', resetMap);
   toggleCoordinatesButton.addEventListener('click', () => {
     setCoordinateToolsVisible(!state.coordinateToolsVisible);
@@ -1513,12 +1845,14 @@
     ctx.fill();
     ctx.stroke();
 
+    let coloredElementTop;
     if (state.markerText) {
       const captionPalette = markerCaptionPalette(state.markerColors);
       ctx.font = '700 28px sans-serif';
       const labelWidth = ctx.measureText(state.markerText).width + 34;
       const labelX = centerX - labelWidth / 2;
       const labelY = centerY - 108;
+      coloredElementTop = labelY;
       setExportCaptionFill(ctx, state.markerColors, labelX, labelWidth);
       ctx.beginPath();
       roundedRectPath(ctx, labelX, labelY, labelWidth, 52, 18);
@@ -1537,21 +1871,40 @@
       }
       ctx.fillText(state.markerText, centerX, labelY + 35);
       ctx.restore();
-      return;
+    } else {
+      const swatchSize = 44;
+      const swatchX = centerX - swatchSize / 2;
+      const swatchY = centerY - 88;
+      coloredElementTop = swatchY;
+      ctx.beginPath();
+      roundedRectPath(ctx, swatchX, swatchY, swatchSize, swatchSize, 12);
+      if (state.markerColors.length) {
+        setExportCaptionFill(ctx, state.markerColors, swatchX, swatchSize);
+        ctx.fill();
+      }
+      ctx.strokeStyle = '#17191f';
+      ctx.lineWidth = 2;
+      ctx.stroke();
     }
 
-    const swatchSize = 44;
-    const swatchX = centerX - swatchSize / 2;
-    const swatchY = centerY - 88;
+    if (!activeHistoryLabel) return;
+    ctx.save();
+    ctx.font = '700 22px sans-serif';
+    const historyLabelWidth = Math.min(ctx.measureText(activeHistoryLabel).width + 32, 520);
+    const historyLabelHeight = 42;
+    const historyLabelX = centerX - historyLabelWidth / 2;
+    const historyLabelY = coloredElementTop - historyLabelHeight - 12;
+    ctx.fillStyle = 'rgba(8,11,16,.94)';
     ctx.beginPath();
-    roundedRectPath(ctx, swatchX, swatchY, swatchSize, swatchSize, 12);
-    if (state.markerColors.length) {
-      setExportCaptionFill(ctx, state.markerColors, swatchX, swatchSize);
-      ctx.fill();
-    }
-    ctx.strokeStyle = '#17191f';
+    roundedRectPath(ctx, historyLabelX, historyLabelY, historyLabelWidth, historyLabelHeight, 14);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(245,219,139,.72)';
     ctx.lineWidth = 2;
     ctx.stroke();
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
+    ctx.fillText(activeHistoryLabel, centerX, historyLabelY + 28, historyLabelWidth - 20);
+    ctx.restore();
   }
 
   async function createExportBlob() {
@@ -1612,7 +1965,7 @@
     ctx.fillText('CACCIA AL TESORO', 54, 74);
     ctx.fillStyle = '#ffffff';
     ctx.font = '700 42px sans-serif';
-    ctx.fillText(state.playerName || 'CACCIA AL TESORO', 54, 124);
+    ctx.fillText(activeMarkerOwner || state.playerName || 'CACCIA AL TESORO', 54, 124);
     drawExportMarker(ctx, outputWidth / 2, outputHeight / 2);
 
     const historicalDate = activeHistoryCreatedAt ? new Date(activeHistoryCreatedAt) : null;
@@ -1661,7 +2014,8 @@
 
   async function exportFile() {
     const blob = await createExportBlob();
-    const safeName = normalizeText(state.playerName || 'caccia al tesoro').toLowerCase().replace(/\s+/g, '-');
+    const ownerName = activeMarkerOwner || state.playerName;
+    const safeName = normalizeText(ownerName || 'caccia al tesoro').toLowerCase().replace(/\s+/g, '-');
     return { blob, file: new File([blob], `mappa-${safeName}-${Date.now()}.png`, { type: 'image/png' }) };
   }
 
@@ -1671,9 +2025,10 @@
       const { blob, file } = await exportFile();
       if (canShareFile(file)) {
         const shareLabel = normalizeHistoryLabel(activeHistoryLabel);
+        const ownerName = activeMarkerOwner || state.playerName;
         const title = shareLabel
-          ? `${shareLabel} - ${state.playerName}`
-          : `Punto sulla mappa - ${state.playerName}`;
+          ? `${shareLabel} - ${ownerName}`
+          : `Punto sulla mappa - ${ownerName}`;
         await navigator.share({ files: [file], title });
         setStatus('Immagine condivisa');
       } else {
@@ -1711,7 +2066,7 @@
       }
       if (copied) setStatus('Immagine copiata: ora puoi incollarla');
       else if (canShareFile(file)) {
-        await navigator.share({ files: [file], title: `Punto sulla mappa - ${state.playerName}` });
+        await navigator.share({ files: [file], title: `Punto sulla mappa - ${activeMarkerOwner || state.playerName}` });
         setStatus('Menu di condivisione aperto');
       } else if (!window.isSecureContext) {
         downloadBlob(blob, file.name);
@@ -1736,6 +2091,7 @@
   setMarkerVisual();
   loadCoordinateToolsPreference();
   loadMarkerHistoryStore();
+  loadMarkerHistorySources();
   loadPlayerName();
   loadStreetIndex();
   loadManualStreetPoints();

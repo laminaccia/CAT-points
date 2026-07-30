@@ -5,6 +5,34 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-30 — Etichetta sul punto e liste CAT-points importabili
+
+*Agente: Codex con skill Impeccable. Toccati `app.js`, `styles.css`,
+`index.html`, `service-worker.js`, `README.md`, `AGENTS.md`, `HANDOFF.md`.*
+
+Quando un punto ha un'etichetta cronologia, la mappa e il PNG mostrano ora
+questa gerarchia: etichetta neutra in alto, didascalia o quadratino colorato al
+centro, punto oro in basso. Verificato su viewport iPhone con «Busta 1» e
+«A1»: i tre elementi non si sovrappongono.
+
+La condivisione cronologia genera ora un pacchetto
+`cat-points.marker-history` versione 3 con suffisso `*.catpoints.json`.
+Contiene l'URL ufficiale del sito e le istruzioni per importarlo, un ID stabile
+della lista, il proprietario responsabile, chi la sta condividendo e una
+catena degli inoltri. Ricondividere una lista ricevuta conserva il proprietario
+e aggiunge il partecipante corrente alla catena. Se Web Share non supporta il
+file, viene scaricato il pacchetto importabile invece di condividere un
+riepilogo testuale che perderebbe i dati.
+
+La cronologia offre **Importa lista JSON** e un selettore tra lista personale e
+liste ricevute. Le importazioni sono persistenti, separate e in sola lettura:
+permettono solo «Rivedi», «Invia foto», ricondivisione e rimozione completa.
+Sono accettati anche i vecchi export versione 2, convertiti al nuovo modello.
+Verificato importando due punti attribuiti a Mario Rossi e condivisi da Luigi
+Bianchi, persistenza dopo ricaricamento e assenza di errori console.
+
+Bumpati `styles.css?v=36`, `app.js?v=37` e `mappa-squadra-v46`.
+
 ## 2026-07-30 — Punto oro e colore applicato alla didascalia
 
 *Agente: Codex con skill Impeccable. Toccati `app.js`, `styles.css`,

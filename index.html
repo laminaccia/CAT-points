@@ -10,7 +10,7 @@
   <title>Mappa Squadra</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=35">
+  <link rel="stylesheet" href="styles.css?v=36">
 </head>
 <body>
   <main class="app-shell">
@@ -63,6 +63,7 @@
 
       <div class="marker hidden" id="marker" aria-label="Punto selezionato">
         <span class="marker-head"></span>
+        <span class="marker-history-label-visual hidden" id="markerHistoryLabelVisual"></span>
         <span class="marker-label" id="markerLabel"></span>
         <span class="marker-tail"></span>
       </div>
@@ -246,10 +247,20 @@
             </div>
             <button id="closeMarkerHistoryButton" class="dialog-close" type="button" aria-label="Chiudi">×</button>
           </div>
+          <label class="marker-history-source" for="markerHistorySourceSelect">
+            <span>Lista visualizzata</span>
+            <select id="markerHistorySourceSelect"></select>
+          </label>
           <p class="dialog-description marker-history-description" id="markerHistoryDescription">Rivedi, etichetta o invia nuovamente un punto salvato su questo browser.</p>
           <div class="marker-history-list" id="markerHistoryList"></div>
           <div class="marker-history-footer">
-            <button id="exportMarkerHistoryButton" class="primary-button" type="button">Esporta / invia cronologia</button>
+            <p class="marker-history-import-feedback" id="markerHistoryImportFeedback" role="status" aria-live="polite"></p>
+            <div class="marker-history-footer-actions local-view" id="markerHistoryFooterActions">
+              <button id="exportMarkerHistoryButton" class="primary-button" type="button">Condividi questa lista</button>
+              <button id="importMarkerHistoryButton" class="secondary-wide" type="button">Importa lista JSON</button>
+              <button id="removeImportedMarkerHistoryButton" class="marker-history-remove-import hidden" type="button">Rimuovi importazione</button>
+            </div>
+            <input id="importMarkerHistoryInput" class="hidden" type="file" accept=".json,.catpoints,application/json">
           </div>
         </div>
       </div>
@@ -258,6 +269,6 @@
     <canvas id="exportCanvas" hidden></canvas>
   </main>
 
-  <script src="app.js?v=36" defer></script>
+  <script src="app.js?v=37" defer></script>
 </body>
 </html>

@@ -98,10 +98,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=35` e
-   `app.js?v=36`.
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=36` e
+   `app.js?v=37`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v45`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v46`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
@@ -291,8 +291,20 @@ voce può avere un'etichetta facoltativa distinta dal testo visibile sul punto:
 «Rivedi» la riporta sulla mappa, «Invia foto» rigenera il PNG con etichetta e
 data originali e apre il normale flusso di condivisione. L'ordine si modifica
 con «Su»/«Giù» e resta salvato; modificare un punto esistente non lo riporta
-in testa. L'esportazione produce un JSON ordinato e prova prima la
-condivisione nativa, poi il testo condiviso, infine il download.
+in testa. L'esportazione prova prima la condivisione nativa del pacchetto
+importabile e, se i file non sono supportati, lo scarica: non ripiega più su
+un riepilogo testuale che perderebbe i dati necessari all'importazione.
+
+Le cronologie condivise usano il formato `cat-points.marker-history` versione
+3 e il suffisso `*.catpoints.json`. Il pacchetto non è un JSON anonimo:
+contiene l'identità e l'URL di CAT-points, il proprietario responsabile della
+lista, chi la sta condividendo e una catena degli inoltri. L'import accetta
+anche il vecchio formato versione 2, ma lo converte subito nel modello nuovo.
+Le liste ricevute vengono salvate nello stesso `localStorage`, restano
+separate dalla cronologia del partecipante corrente e sono **in sola lettura**:
+si possono rivedere, usare per rigenerare una foto, ricondividere o rimuovere
+dal dispositivo, ma non modificare. Una nuova condivisione mantiene sempre il
+proprietario originale e aggiunge il partecipante corrente alla catena.
 
 ---
 
@@ -317,6 +329,9 @@ condivisione nativa, poi il testo condiviso, infine il download.
   del colore scelto, oppure solo bordato se è trasparente. La stessa regola
   vale nel PNG e nelle anteprime della cronologia. Nello stesso dialog si può
   assegnare subito l'etichetta della cronologia.
+- Quando l'etichetta della cronologia è presente viene mostrata sopra la
+  didascalia colorata o il quadratino; sotto resta il punto oro. Il PNG
+  conserva lo stesso ordine visivo.
 - Dopo la conferma il punto può essere modificato senza riposizionarlo oppure
   riportato al mirino per scegliere un nuovo punto; annullare una modifica
   ripristina colore e testo precedenti.
@@ -328,6 +343,9 @@ condivisione nativa, poi il testo condiviso, infine il download.
   o eliminata.
 - Le voci della cronologia possono essere riordinate e l'ordine viene
   mantenuto nell'esportazione condivisibile.
+- Una lista `*.catpoints.json` può essere importata dal pannello cronologia;
+  proprietario, condivisore e catena dei passaggi restano memorizzati. Le
+  liste importate sono separate, persistenti e non modificabili.
 - Gli strumenti coordinate mostrano x/y e una stima WGS84 in gradi decimali;
   ricerca e copia JSON continuano a usare le coordinate normalizzate.
 - Il pulsante di copia usa Clipboard API quando disponibile.
