@@ -5,6 +5,30 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-30 — Cronologia crescente e importazione nativa
+
+*Agente: Codex con skill Impeccable. Toccati `app.js`, `styles.css`,
+`index.html`, `service-worker.js`, `README.md`, `AGENTS.md`, `HANDOFF.md`.*
+
+I nuovi punti vengono ora aggiunti in fondo alla cronologia invece che in
+testa: l'ordine predefinito va quindi dal più vecchio al più recente secondo
+`createdAt`. Modificare un punto continua ad aggiornare la voce sul posto e
+non ne cambia la posizione. Nella scheda viene mostrata esplicitamente la data
+di creazione, non `updatedAt`.
+
+Le cronologie già salvate vengono ordinate una sola volta al primo avvio di
+questa versione; la chiave `mappa-marker-history-order-v2` impedisce che la
+migrazione si ripeta e sovrascriva successivi riordini manuali. Le liste
+importate conservano invece l'ordine stabilito dal proprietario.
+
+Il controllo è stato rinominato **Importa punti** e trasformato in
+un'etichetta collegata direttamente all'input file: su touch apre il selettore
+nativo senza dipendere da un click JavaScript su un input con `display:none`,
+che è meno affidabile su iPhone. Mostra formato atteso, icona, stato
+«Importazione…», errori nel pannello e accetta anche JSON con BOM.
+
+Bumpati `styles.css?v=37`, `app.js?v=38` e `mappa-squadra-v47`.
+
 ## 2026-07-30 — Etichetta sul punto e liste CAT-points importabili
 
 *Agente: Codex con skill Impeccable. Toccati `app.js`, `styles.css`,

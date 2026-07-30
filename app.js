@@ -41,6 +41,7 @@
   const markerHistoryImportFeedback = document.getElementById('markerHistoryImportFeedback');
   const markerHistoryFooterActions = document.getElementById('markerHistoryFooterActions');
   const importMarkerHistoryButton = document.getElementById('importMarkerHistoryButton');
+  const importMarkerHistoryButtonLabel = document.getElementById('importMarkerHistoryButtonLabel');
   const importMarkerHistoryInput = document.getElementById('importMarkerHistoryInput');
   const removeImportedMarkerHistoryButton = document.getElementById('removeImportedMarkerHistoryButton');
   const searchFeedback = document.getElementById('searchFeedback');
@@ -72,6 +73,7 @@
   const manualStreetStorageKey = 'mappa-manual-streets';
   const markerHistoryStorageKey = 'mappa-marker-history-v1';
   const markerHistorySourcesStorageKey = 'mappa-marker-history-sources-v1';
+  const markerHistoryOrderStorageKey = 'mappa-marker-history-order-v2';
   const markerHistoryLimit = 100;
   const markerHistoryFormat = 'cat-points.marker-history';
   const markerHistoryFormatVersion = 3;
@@ -234,6 +236,33 @@
       return true;
     } catch (error) {
       return false;
+    }
+  }
+
+  function markerCreationTimestamp(entry) {
+    const timestamp = new Date(entry?.createdAt).getTime();
+    return Number.isNaN(timestamp) ? Number.MAX_SAFE_INTEGER : timestamp;
+  }
+
+  function migrateMarkerHistoryToCreationOrder() {
+    try {
+      if (localStorage.getItem(markerHistoryOrderStorageKey) === 'done') return;
+    } catch (error) {
+      // Se lo storage è bloccato, l'ordinamento resta valido per la sessione.
+    }
+    Object.entries(markerHistoryStore).forEach(([sourceKey, entries]) => {
+      if (!Array.isArray(entries) || markerHistorySources[sourceKey]?.type === 'imported') return;
+      markerHistoryStore[sourceKey] = entries
+        .map((entry, originalIndex) => ({ entry, originalIndex }))
+        .sort((first, second) => markerCreationTimestamp(first.entry) - markerCreationTimestamp(second.entry)
+          || first.originalIndex - second.originalIndex)
+        .map(({ entry }) => entry);
+    });
+    persistMarkerHistoryStore();
+    try {
+      localStorage.setItem(markerHistoryOrderStorageKey, 'done');
+    } catch (error) {
+      // La migrazione è comunque applicata ai dati disponibili in memoria.
     }
   }
 
@@ -503,7 +532,7 @@
       const meta = document.createElement('small');
       const normalizedCoordinates = { x: Number(entry.x), y: Number(entry.y) };
       const realCoordinates = getGeographicCoordinates(normalizedCoordinates);
-      meta.textContent = `${formatMarkerHistoryTime(entry.updatedAt || entry.createdAt)} · x ${normalizedCoordinates.x.toFixed(4)} · y ${normalizedCoordinates.y.toFixed(4)}`
+      meta.textContent = `Creato ${formatMarkerHistoryTime(entry.createdAt)} · x ${normalizedCoordinates.x.toFixed(4)} · y ${normalizedCoordinates.y.toFixed(4)}`
         + (realCoordinates ? ` · ${realCoordinates.latitude.toFixed(5)}°, ${realCoordinates.longitude.toFixed(5)}° ≈` : '');
       copy.prepend(title);
       copy.append(meta);
@@ -593,7 +622,7 @@
         id: 'cat-points',
         name: 'CAT-points',
         url: catPointsSiteUrl,
-        importInstructions: 'Apri CAT-points, entra nella Cronologia punti e usa “Importa lista JSON”.'
+        importInstructions: 'Apri CAT-points, entra nella Cronologia punti e usa “Importa punti”.'
       },
       list: {
         id: source.listId,
@@ -641,7 +670,7 @@
     return [
       `Lista CAT-points di ${ownerName}.`,
       `Condivisa da ${sharedBy}; l’attribuzione originale resta salvata nel file.`,
-      `Per aprirla: ${catPointsSiteUrl} → Cronologia punti → Importa lista JSON.`
+      `Per aprirla: ${catPointsSiteUrl} → Cronologia punti → Importa punti.`
     ].join('\n');
   }
 
@@ -763,7 +792,7 @@
     if (!file || file.size > 2_000_000) {
       throw new Error('Il file è troppo grande. Seleziona un JSON CAT-points sotto 2 MB.');
     }
-    const payload = JSON.parse(await file.text());
+    const payload = JSON.parse((await file.text()).replace(/^\uFEFF/, ''));
     const imported = parseMarkerHistoryPackage(payload);
     const existingSource = Object.entries(markerHistorySources)
       .find(([, source]) => source?.type === 'imported' && source.listId === imported.listId);
@@ -791,6 +820,13 @@
       ? `${message}. L’autore originale resta associato a tutti i punti.`
       : `${message} solo per questa sessione.`;
     setStatus(message);
+  }
+
+  function setMarkerHistoryImportBusy(isBusy) {
+    importMarkerHistoryButton.classList.toggle('is-loading', isBusy);
+    importMarkerHistoryButton.setAttribute('aria-busy', String(isBusy));
+    importMarkerHistoryButton.setAttribute('aria-disabled', String(isBusy));
+    importMarkerHistoryButtonLabel.textContent = isBusy ? 'Importazione…' : 'Importa punti';
   }
 
   function removeImportedMarkerHistory() {
@@ -838,7 +874,7 @@
     activeHistoryCreatedAt = entry.createdAt;
     markerHistoryStore[playerKey] = existing
       ? entries.map((historyEntry) => historyEntry.id === entry.id ? entry : historyEntry)
-      : [entry, ...entries].slice(0, markerHistoryLimit);
+      : [...entries, entry].slice(-markerHistoryLimit);
     const persisted = persistMarkerHistoryStore();
     updateMarkerHistoryCount();
     return persisted;
@@ -1616,9 +1652,15 @@
     markerHistoryImportFeedback.textContent = '';
     renderMarkerHistory();
   });
-  importMarkerHistoryButton.addEventListener('click', () => importMarkerHistoryInput.click());
+  importMarkerHistoryButton.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    importMarkerHistoryInput.click();
+  });
   importMarkerHistoryInput.addEventListener('change', async () => {
     const [file] = importMarkerHistoryInput.files || [];
+    if (!file) return;
+    setMarkerHistoryImportBusy(true);
     try {
       await importMarkerHistoryFile(file);
     } catch (error) {
@@ -1628,6 +1670,7 @@
         : error.message || 'Importazione non riuscita.';
       setStatus('Importazione non riuscita');
     } finally {
+      setMarkerHistoryImportBusy(false);
       importMarkerHistoryInput.value = '';
     }
   });
@@ -2092,6 +2135,7 @@
   loadCoordinateToolsPreference();
   loadMarkerHistoryStore();
   loadMarkerHistorySources();
+  migrateMarkerHistoryToCreationOrder();
   loadPlayerName();
   loadStreetIndex();
   loadManualStreetPoints();

@@ -111,6 +111,7 @@ button:active { transform: translateY(1px) scale(.97); }
 
 @media (hover: hover) and (pointer: fine) {
   button:hover { border-color: rgba(245,219,139,.42); background-color: #1c2330; }
+  .marker-history-import-trigger:hover { border-color: rgba(245,219,139,.42); background-color: #1c2330; }
   .primary-button:hover, .searchbar button:hover, .color-name-form button:hover { border-color: var(--accent-2); background-color: #ffe49a; }
 }
 
@@ -204,9 +205,17 @@ button:active { transform: translateY(1px) scale(.97); }
 .marker-history-import-feedback { min-height: 16px; margin: 0 0 8px; color: var(--muted); font-size: 11px; line-height: 1.35; }
 .marker-history-import-feedback.error { color: #ff9aa1; }
 .marker-history-footer-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.marker-history-footer-actions button { width: 100%; min-height: 48px; padding: 0 10px; border-radius: 12px; font-size: 12px; }
+.marker-history-footer-actions button, .marker-history-import-trigger { width: 100%; min-height: 48px; padding: 0 10px; border: 1px solid var(--line); border-radius: 12px; font-size: 12px; }
 .marker-history-footer-actions #exportMarkerHistoryButton { grid-column: 1 / -1; }
-.marker-history-footer-actions.local-view #importMarkerHistoryButton { grid-column: 1 / -1; }
+.marker-history-footer-actions.local-view .marker-history-import-trigger { grid-column: 1 / -1; }
+.marker-history-import-trigger { display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; font-weight: 700; user-select: none; transition: transform .14s ease-out, border-color .14s ease-out, background-color .14s ease-out; -webkit-tap-highlight-color: transparent; }
+.marker-history-import-trigger svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.marker-history-import-trigger:focus { outline: none; }
+.marker-history-import-trigger:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+.marker-history-import-trigger:active { transform: translateY(1px) scale(.98); }
+.marker-history-import-trigger.is-loading { cursor: progress; opacity: .68; pointer-events: none; }
+.marker-history-import-hint { margin: 8px 2px 0; color: var(--muted); font-size: 10px; line-height: 1.4; text-align: center; }
+.marker-history-import-hint strong { color: var(--text); font-weight: 700; }
 .marker-history-remove-import { color: #ffb0b5; background: rgba(255,92,101,.07); }
 
 .identity-dialog { position: absolute; z-index: 11; inset: 0; display: grid; place-items: center; padding: 16px; background: rgba(3,5,9,.68); backdrop-filter: blur(6px); }

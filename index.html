@@ -10,7 +10,7 @@
   <title>Mappa Squadra</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=36">
+  <link rel="stylesheet" href="styles.css?v=37">
 </head>
 <body>
   <main class="app-shell">
@@ -257,10 +257,18 @@
             <p class="marker-history-import-feedback" id="markerHistoryImportFeedback" role="status" aria-live="polite"></p>
             <div class="marker-history-footer-actions local-view" id="markerHistoryFooterActions">
               <button id="exportMarkerHistoryButton" class="primary-button" type="button">Condividi questa lista</button>
-              <button id="importMarkerHistoryButton" class="secondary-wide" type="button">Importa lista JSON</button>
+              <label id="importMarkerHistoryButton" class="marker-history-import-trigger secondary-wide" for="importMarkerHistoryInput" role="button" tabindex="0" aria-describedby="markerHistoryImportHint">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 4v10"></path>
+                  <path d="m8 10 4 4 4-4"></path>
+                  <path d="M5 16v3h14v-3"></path>
+                </svg>
+                <span id="importMarkerHistoryButtonLabel">Importa punti</span>
+              </label>
               <button id="removeImportedMarkerHistoryButton" class="marker-history-remove-import hidden" type="button">Rimuovi importazione</button>
             </div>
-            <input id="importMarkerHistoryInput" class="hidden" type="file" accept=".json,.catpoints,application/json">
+            <p class="marker-history-import-hint" id="markerHistoryImportHint">Apri un file <strong>.catpoints.json</strong> ricevuto da un altro partecipante.</p>
+            <input id="importMarkerHistoryInput" class="sr-only" type="file" accept=".json,application/json,text/json" tabindex="-1" aria-hidden="true">
           </div>
         </div>
       </div>
@@ -269,6 +277,6 @@
     <canvas id="exportCanvas" hidden></canvas>
   </main>
 
-  <script src="app.js?v=37" defer></script>
+  <script src="app.js?v=38" defer></script>
 </body>
 </html>

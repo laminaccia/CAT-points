@@ -98,10 +98,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=36` e
-   `app.js?v=37`.
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=37` e
+   `app.js?v=38`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v46`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v47`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
@@ -289,9 +289,13 @@ che la conferma successiva crei una nuova voce. Reimpostare la mappa ottiene
 lo stesso risultato, ma riporta anche carta e colori allo stato iniziale. Ogni
 voce può avere un'etichetta facoltativa distinta dal testo visibile sul punto:
 «Rivedi» la riporta sulla mappa, «Invia foto» rigenera il PNG con etichetta e
-data originali e apre il normale flusso di condivisione. L'ordine si modifica
-con «Su»/«Giù» e resta salvato; modificare un punto esistente non lo riporta
-in testa. L'esportazione prova prima la condivisione nativa del pacchetto
+data originali e apre il normale flusso di condivisione. I nuovi punti vengono
+aggiunti in fondo, quindi l'ordine iniziale cresce per `createdAt`; la scheda
+mostra la data di creazione e non quella dell'ultima modifica. L'ordine si può
+poi cambiare con «Su»/«Giù» e resta salvato; modificare un punto esistente non
+lo sposta. La chiave `mappa-marker-history-order-v2` rende la conversione delle
+vecchie cronologie dal più vecchio al più recente una migrazione una tantum.
+L'esportazione prova prima la condivisione nativa del pacchetto
 importabile e, se i file non sono supportati, lo scarica: non ripiega più su
 un riepilogo testuale che perderebbe i dati necessari all'importazione.
 
@@ -343,6 +347,13 @@ proprietario originale e aggiunge il partecipante corrente alla catena.
   o eliminata.
 - Le voci della cronologia possono essere riordinate e l'ordine viene
   mantenuto nell'esportazione condivisibile.
+- Il controllo **Importa punti** apre tramite la sua etichetta nativa il
+  selettore file del dispositivo, senza dipendere da un click JavaScript su un
+  input nascosto; accetta i pacchetti `.catpoints.json` e i precedenti export
+  versione 2.
+- Prima di un eventuale riordino manuale, la cronologia cresce per data di
+  creazione dal punto più vecchio al più recente; una modifica non sposta la
+  voce e non sostituisce la data mostrata.
 - Una lista `*.catpoints.json` può essere importata dal pannello cronologia;
   proprietario, condivisore e catena dei passaggi restano memorizzati. Le
   liste importate sono separate, persistenti e non modificabili.
