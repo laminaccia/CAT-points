@@ -10,7 +10,7 @@
   <title>Mappa Squadra</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=34">
+  <link rel="stylesheet" href="styles.css?v=35">
 </head>
 <body>
   <main class="app-shell">
@@ -126,7 +126,7 @@
             <button id="cancelMarkerButton" class="dialog-close" type="button" aria-label="Chiudi">×</button>
           </div>
           <fieldset class="color-fieldset">
-            <legend>Colore</legend>
+            <legend>Colore didascalia</legend>
             <div class="color-select-grid" aria-describedby="colorHelp">
               <label class="color-select-field" for="primaryColorSelect">
                 <span>Colore principale</span>
@@ -175,9 +175,9 @@
               </p>
               <p class="color-name-feedback" id="colorNameFeedback" role="status" aria-live="polite">Scrivi un nome o usa uno degli esempi.</p>
             </div>
-            <p class="color-help" id="colorHelp">Scegli un colore oppure aggiungine un secondo per creare un punto bicolore.</p>
+            <p class="color-help" id="colorHelp">Il punto resta oro. Il colore scelto riempie la didascalia oppure il quadratino mostrato quando non inserisci testo.</p>
           </fieldset>
-          <label class="marker-text-field" for="markerText">Lettere o numeri (facoltativo)</label>
+          <label class="marker-text-field" for="markerText">Testo della didascalia (facoltativo)</label>
           <input id="markerText" type="text" inputmode="text" maxlength="12" placeholder="Es. A12 o B">
           <label class="marker-history-label-field" for="markerHistoryLabelInput">Etichetta cronologia (facoltativa)</label>
           <input id="markerHistoryLabelInput" type="text" maxlength="40" autocomplete="off" placeholder="Es. Tappa 3 o Piazza">
@@ -258,6 +258,6 @@
     <canvas id="exportCanvas" hidden></canvas>
   </main>
 
-  <script src="app.js?v=35" defer></script>
+  <script src="app.js?v=36" defer></script>
 </body>
 </html>

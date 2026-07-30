@@ -60,7 +60,8 @@
   const identityFeedback = document.getElementById('identityFeedback');
   const cancelIdentityButton = document.getElementById('cancelIdentityButton');
   const exportCanvas = document.getElementById('exportCanvas');
-  const defaultMarkerColor = '#d9b45b';
+  const fixedPointColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#d9b45b';
+  const defaultMarkerColor = fixedPointColor;
   const manualStreetStorageKey = 'mappa-manual-streets';
   const markerHistoryStorageKey = 'mappa-marker-history-v1';
   const markerHistoryLimit = 100;
@@ -972,14 +973,65 @@
     secondaryColorSelect.disabled = state.markerColors.length === 0;
   }
 
+  function markerCaptionBackground(colors) {
+    if (colors.length === 2) {
+      return `linear-gradient(90deg, ${colors[0]} 0 50%, ${colors[1]} 50% 100%)`;
+    }
+    return colors[0] || 'rgba(8,11,16,.9)';
+  }
+
+  function colorLuminance(color) {
+    const channels = /^#([0-9a-f]{6})$/i.exec(color)?.[1].match(/.{2}/g)?.map((channel) => parseInt(channel, 16) / 255);
+    if (!channels) return null;
+    const linearChannels = channels.map((channel) => channel <= .04045
+      ? channel / 12.92
+      : ((channel + .055) / 1.055) ** 2.4);
+    return .2126 * linearChannels[0] + .7152 * linearChannels[1] + .0722 * linearChannels[2];
+  }
+
+  function contrastRatio(firstLuminance, secondLuminance) {
+    const lighter = Math.max(firstLuminance, secondLuminance);
+    const darker = Math.min(firstLuminance, secondLuminance);
+    return (lighter + .05) / (darker + .05);
+  }
+
+  function markerCaptionPalette(colors) {
+    const backgroundLuminances = colors.map(colorLuminance).filter((value) => value !== null);
+    if (!backgroundLuminances.length) {
+      return {
+        text: '#ffffff',
+        outline: '#17191f',
+        needsOutline: false
+      };
+    }
+    const darkText = '#111318';
+    const lightText = '#ffffff';
+    const darkLuminance = colorLuminance(darkText);
+    const lightLuminance = colorLuminance(lightText);
+    const darkScore = Math.min(...backgroundLuminances.map((value) => contrastRatio(value, darkLuminance)));
+    const lightScore = Math.min(...backgroundLuminances.map((value) => contrastRatio(value, lightLuminance)));
+    const useDarkText = darkScore >= lightScore;
+    return {
+      text: useDarkText ? darkText : lightText,
+      outline: useDarkText ? lightText : '#111318',
+      needsOutline: Math.max(darkScore, lightScore) < 4.5
+    };
+  }
+
   function setMarkerVisual() {
-    const markerBackground = state.markerColors.length === 2
-      ? `linear-gradient(90deg, ${state.markerColors[0]} 0 50%, ${state.markerColors[1]} 50% 100%)`
-      : state.markerColors[0] || 'transparent';
-    marker.style.setProperty('--marker-background', markerBackground);
+    const captionPalette = markerCaptionPalette(state.markerColors);
+    const captionShadow = captionPalette.needsOutline
+      ? `-1px -1px 0 ${captionPalette.outline}, 1px -1px 0 ${captionPalette.outline}, -1px 1px 0 ${captionPalette.outline}, 1px 1px 0 ${captionPalette.outline}`
+      : '0 1px 2px rgba(0,0,0,.3)';
+    marker.style.setProperty('--marker-background', fixedPointColor);
     marker.style.setProperty('--marker-border-color', '#17191f');
+    markerLabel.style.setProperty('--marker-caption-background', markerCaptionBackground(state.markerColors));
+    markerLabel.style.setProperty('--marker-caption-color', captionPalette.text);
+    markerLabel.style.setProperty('--marker-caption-border', '#17191f');
+    markerLabel.style.setProperty('--marker-caption-shadow', captionShadow);
     markerLabel.textContent = state.markerText;
-    markerLabel.classList.toggle('hidden', !state.markerText);
+    markerLabel.classList.toggle('marker-label--swatch', !state.markerText);
+    markerLabel.classList.toggle('marker-label--no-color', !state.markerColors.length);
     syncMarkerColorSelects();
   }
 
@@ -1439,46 +1491,67 @@
     ctx.quadraticCurveTo(x, y, x + r, y);
   }
 
-  function drawExportMarker(ctx, centerX, centerY) {
-    if (state.markerColors.length) {
-      if (state.markerColors.length === 2) {
-        const gradient = ctx.createLinearGradient(centerX - 12, centerY, centerX + 12, centerY);
-        gradient.addColorStop(0, state.markerColors[0]);
-        gradient.addColorStop(.5, state.markerColors[0]);
-        gradient.addColorStop(.5, state.markerColors[1]);
-        gradient.addColorStop(1, state.markerColors[1]);
-        ctx.fillStyle = gradient;
-      } else {
-        ctx.fillStyle = state.markerColors[0];
-      }
-      ctx.strokeStyle = '#17191f';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, 12, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-    } else {
-      ctx.strokeStyle = '#17191f';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, 10, 0, Math.PI * 2);
-      ctx.stroke();
+  function setExportCaptionFill(ctx, colors, startX, width) {
+    if (colors.length === 2) {
+      const gradient = ctx.createLinearGradient(startX, 0, startX + width, 0);
+      gradient.addColorStop(0, colors[0]);
+      gradient.addColorStop(.5, colors[0]);
+      gradient.addColorStop(.5, colors[1]);
+      gradient.addColorStop(1, colors[1]);
+      ctx.fillStyle = gradient;
+      return;
     }
+    ctx.fillStyle = colors[0] || 'rgba(8,11,16,.9)';
+  }
+
+  function drawExportMarker(ctx, centerX, centerY) {
+    ctx.fillStyle = fixedPointColor;
+    ctx.strokeStyle = '#17191f';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, 12, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
 
     if (state.markerText) {
+      const captionPalette = markerCaptionPalette(state.markerColors);
       ctx.font = '700 28px sans-serif';
       const labelWidth = ctx.measureText(state.markerText).width + 34;
       const labelX = centerX - labelWidth / 2;
       const labelY = centerY - 108;
-      ctx.fillStyle = 'rgba(8,11,16,.9)';
+      setExportCaptionFill(ctx, state.markerColors, labelX, labelWidth);
       ctx.beginPath();
       roundedRectPath(ctx, labelX, labelY, labelWidth, 52, 18);
       ctx.fill();
-      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = '#17191f';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.save();
+      ctx.fillStyle = captionPalette.text;
       ctx.textAlign = 'center';
+      if (captionPalette.needsOutline) {
+        ctx.strokeStyle = captionPalette.outline;
+        ctx.lineWidth = 4;
+        ctx.lineJoin = 'round';
+        ctx.strokeText(state.markerText, centerX, labelY + 35);
+      }
       ctx.fillText(state.markerText, centerX, labelY + 35);
-      ctx.textAlign = 'start';
+      ctx.restore();
+      return;
     }
+
+    const swatchSize = 44;
+    const swatchX = centerX - swatchSize / 2;
+    const swatchY = centerY - 88;
+    ctx.beginPath();
+    roundedRectPath(ctx, swatchX, swatchY, swatchSize, swatchSize, 12);
+    if (state.markerColors.length) {
+      setExportCaptionFill(ctx, state.markerColors, swatchX, swatchSize);
+      ctx.fill();
+    }
+    ctx.strokeStyle = '#17191f';
+    ctx.lineWidth = 2;
+    ctx.stroke();
   }
 
   async function createExportBlob() {

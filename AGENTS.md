@@ -98,10 +98,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=34` e
-   `app.js?v=35`.
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=35` e
+   `app.js?v=36`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v44`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v45`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
@@ -308,11 +308,15 @@ condivisione nativa, poi il testo condiviso, infine il download.
 - Il PNG include mappa, partecipante, punto, data e ora, ma non i pulsanti.
 - Su browser compatibili il pulsante usa Web Share API; altrimenti scarica il
   PNG.
-- Il punto permette di scegliere colore e testo breve; due menu a tendina
-  gestiscono colore principale e secondo colore, mentre il campo libero
-  riconosce nomi italiani, codici HEX e i formati CSS RGB/HSL. Nello stesso
-  dialog si può assegnare subito l'etichetta della cronologia. Tutti i colori
-  e il trasparente hanno un bordo sottile.
+- Il punto centrale resta sempre oro, uguale al centro del mirino. Due menu a
+  tendina e il campo libero gestiscono invece il colore della didascalia,
+  monocolore o bicolore, riconoscendo nomi italiani, codici HEX e i formati
+  CSS RGB/HSL. Il testo usa automaticamente il bianco o il nero con il
+  contrasto migliore; quando nessuno dei due basta su entrambi i colori viene
+  aggiunto un contorno opposto. Senza testo compare un quadratino arrotondato
+  del colore scelto, oppure solo bordato se è trasparente. La stessa regola
+  vale nel PNG e nelle anteprime della cronologia. Nello stesso dialog si può
+  assegnare subito l'etichetta della cronologia.
 - Dopo la conferma il punto può essere modificato senza riposizionarlo oppure
   riportato al mirino per scegliere un nuovo punto; annullare una modifica
   ripristina colore e testo precedenti.

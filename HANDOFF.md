@@ -5,6 +5,26 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-30 — Punto oro e colore applicato alla didascalia
+
+*Agente: Codex con skill Impeccable. Toccati `app.js`, `styles.css`,
+`index.html`, `service-worker.js`, `README.md`, `AGENTS.md`, `HANDOFF.md`.*
+
+Il punto centrale è ora sempre oro, uguale al centro del mirino. Il colore
+scelto dall'utente viene applicato alla didascalia del testo; se il testo manca
+compare sopra il punto un quadratino arrotondato monocolore, bicolore o solo
+bordato quando si sceglie il trasparente.
+
+Il contrasto viene calcolato sulla luminanza dei colori: l'app sceglie bianco
+o nero e, nei casi misti in cui nessuno dei due raggiunge un buon contrasto su
+entrambe le metà, aggiunge un contorno opposto. La stessa resa è usata nel PNG.
+Le anteprime della cronologia mostrano il colore della didascalia come
+quadratino e il punto oro al centro.
+
+Verificati su viewport iPhone quadratino rosso senza testo, didascalia gialla
+con testo nero e didascalia nero/bianca con contorno; nessun errore console.
+Bumpati `styles.css?v=35`, `app.js?v=36` e `mappa-squadra-v45`.
+
 ## 2026-07-30 — Flusso esplicito per segnare più punti
 
 *Agente: Codex. Toccati `index.html`, `styles.css`, `app.js`,
