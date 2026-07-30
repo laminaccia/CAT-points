@@ -31,6 +31,8 @@
   const copyStreetListButton = document.getElementById('copyStreetListButton');
   const downloadStreetListButton = document.getElementById('downloadStreetListButton');
   const statusPill = document.getElementById('statusPill');
+  const lensToggleButton = document.getElementById('lensToggleButton');
+  const lensToggleLabel = document.getElementById('lensToggleLabel');
   const searchForm = document.getElementById('searchForm');
   const streetSearch = document.getElementById('streetSearch');
   const searchButton = document.getElementById('searchButton');
@@ -99,6 +101,7 @@
   const markerHistoryConnectionsStorageKey = 'mappa-marker-history-connections-v1';
   const overviewCrosshairStorageKey = 'mappa-overview-crosshair-v1';
   const markerHistoryTabStorageKey = 'mappa-marker-history-tab-v1';
+  const crosshairLensStorageKey = 'mappa-crosshair-lens-v1';
   const markerHistoryLimit = 100;
   const markerHistoryFormat = 'cat-points.marker-history';
   const markerHistoryFormatVersion = 3;
@@ -176,6 +179,7 @@
   let activeMarkerOwner = '';
   let customColorTarget = 'primary';
   let crosshairLensFrame = 0;
+  let statusPillTimer = 0;
   const crosshairLensDiameter = 64;
   const crosshairLensMagnification = 2.35;
 
@@ -194,6 +198,7 @@
     markerPlaced: false,
     overviewMode: false,
     overviewCrosshairVisible: false,
+    crosshairLensEnabled: true,
     markerHistoryTab: 'points',
     markerColors: [defaultMarkerColor],
     markerText: '',
@@ -1523,6 +1528,35 @@
     };
   }
 
+  function setCrosshairLensEnabled(enabled, persist = true) {
+    state.crosshairLensEnabled = enabled;
+    crosshair.classList.toggle('lens-disabled', !enabled);
+    lensToggleButton.setAttribute('aria-pressed', String(enabled));
+    lensToggleButton.setAttribute(
+      'aria-label',
+      enabled ? 'Disattiva lente di ingrandimento' : 'Attiva lente di ingrandimento'
+    );
+    lensToggleLabel.textContent = enabled ? 'Lente attiva' : 'Lente disattivata';
+    if (persist) {
+      try {
+        localStorage.setItem(crosshairLensStorageKey, enabled ? '1' : '0');
+      } catch (error) {
+        // La scelta resta valida per la sessione se lo storage non è disponibile.
+      }
+    }
+    scheduleCrosshairLensRender();
+  }
+
+  function loadCrosshairLensPreference() {
+    let savedPreference = null;
+    try {
+      savedPreference = localStorage.getItem(crosshairLensStorageKey);
+    } catch (error) {
+      savedPreference = null;
+    }
+    setCrosshairLensEnabled(savedPreference !== '0', false);
+  }
+
   function renderCrosshairLens() {
     if (!image.naturalWidth || !image.naturalHeight || !state.scale || crosshair.classList.contains('hidden')) return;
     const coordinates = getCrosshairCoordinates();
@@ -1535,6 +1569,7 @@
       crosshairLens.height = canvasSize;
     }
     context.clearRect(0, 0, canvasSize, canvasSize);
+    if (!state.crosshairLensEnabled) return;
     context.fillStyle = '#10151d';
     context.fillRect(0, 0, canvasSize, canvasSize);
     context.imageSmoothingEnabled = true;
@@ -1866,7 +1901,21 @@
   }
 
   function setStatus(message) {
+    if (statusPillTimer) {
+      window.clearTimeout(statusPillTimer);
+      statusPillTimer = 0;
+    }
+    if (!message || message === 'Sposta la mappa sotto il mirino') {
+      statusPill.textContent = '';
+      statusPill.classList.add('hidden');
+      return;
+    }
     statusPill.textContent = message;
+    statusPill.classList.remove('hidden');
+    statusPillTimer = window.setTimeout(() => {
+      statusPill.classList.add('hidden');
+      statusPillTimer = 0;
+    }, 2800);
   }
 
   function setColorSelectValue(select, value, customLabel) {
@@ -2339,12 +2388,15 @@
   }, { passive: false });
   stage.addEventListener('touchend', () => { state.pinchDistance = 0; });
 
+  lensToggleButton.addEventListener('click', () => {
+    setCrosshairLensEnabled(!state.crosshairLensEnabled);
+  });
   document.getElementById('zoomInButton').addEventListener('click', () => zoomAt(1.25));
   document.getElementById('zoomOutButton').addEventListener('click', () => zoomAt(0.8));
   placeButton.addEventListener('click', () => {
     if (state.overviewMode && crosshair.classList.contains('hidden')) {
       setOverviewCrosshairVisible(true);
-      setStatus('Mirino e lente visibili nella vista d’insieme');
+      setStatus('Mirino visibile nella vista d’insieme');
       return;
     }
     if (state.overviewMode) leaveOverviewMode(false);
@@ -2862,6 +2914,7 @@
   if (image.complete && image.naturalWidth) fitImage();
   window.addEventListener('resize', fitImage);
   setMarkerVisual();
+  loadCrosshairLensPreference();
   loadCoordinateToolsPreference();
   loadMarkerHistoryStore();
   loadMarkerHistorySources();

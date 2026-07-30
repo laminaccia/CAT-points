@@ -5,6 +5,29 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-30 — Interruttore persistente per la lente
+
+*Agente: Codex con skill Impeccable. Toccati `app.js`, `styles.css`,
+`index.html`, `service-worker.js`, `README.md`, `AGENTS.md`, `HANDOFF.md`.*
+
+Il messaggio fisso «Sposta la mappa sotto il mirino» è stato sostituito dal
+pulsante **Lente attiva/disattivata**. Lo stato usa
+`mappa-crosshair-lens-v1`, resta sul dispositivo e aggiorna testo,
+`aria-pressed` e nome accessibile. Quando la lente è spenta, il canvas viene
+svuotato: il cerchio trasparente e il punto oro restano visibili senza
+ingrandire la mappa.
+
+Gli avvisi non competono con il nuovo controllo: `#statusPill` compare
+temporaneamente subito sopra e si nasconde dopo 2,8 secondi. Il pulsante viene
+nascosto quando il punto è già confermato, perché in quella fase anche il
+mirino non è operativo.
+
+Verificati viewport 390×844 e 1440×900, attivazione/disattivazione,
+persistenza dopo ricaricamento, avviso separato, centratura con i controlli e
+assenza di errori console.
+
+Bumpati `styles.css?v=44`, `app.js?v=44` e `mappa-squadra-v56`.
+
 ## 2026-07-30 — Cronologia a schede e workspace desktop
 
 *Agente: Codex con skill Impeccable. Toccati `app.js`, `styles.css`,

@@ -98,10 +98,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=43` e
-   `app.js?v=43`.
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=44` e
+   `app.js?v=44`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v55`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v56`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
@@ -306,8 +306,16 @@ contenuto delle liste. **Vedi insieme** conclude l'eventuale punto attivo,
 centra il gruppo compatibilmente con lo zoom minimo e lascia pan e zoom
 disponibili. Rimuovere una lista o un punto elimina anche le selezioni rimaste
 senza sorgente. `mappa-overview-crosshair-v1` conserva la scelta di mostrare
-mirino e lente nella vista d'insieme: sono nascosti per impostazione
-predefinita e il comando centrale **Mostra mirino** li riattiva insieme.
+il mirino nella vista d'insieme: è nascosto per impostazione predefinita e il
+comando centrale **Mostra mirino** lo riattiva.
+
+La lente del mirino ha un interruttore indipendente nella posizione del vecchio
+messaggio «Sposta la mappa sotto il mirino». La scelta usa
+`mappa-crosshair-lens-v1`, è attiva al primo accesso e resta sul dispositivo.
+Quando è spenta il canvas viene svuotato e diventa trasparente: cerchio e punto
+centrale restano visibili, ma la carta non viene ingrandita. `#statusPill`
+continua a mostrare gli avvisi sopra il pulsante e li nasconde dopo 2,8 secondi;
+il messaggio di istruzione predefinito non viene più visualizzato.
 
 Il dialog cronologia separa le attività in **Punti** e **Mappa e linee**; la
 scheda attiva usa `mappa-marker-history-tab-v1`. La prima contiene gestione,
@@ -382,9 +390,9 @@ proprietario originale e aggiunge il partecipante corrente alla catena.
 - **Mappa e linee** offre selezione singola e collettiva per la lista corrente,
   mantiene visibile il totale globale e rende immediatamente riconoscibili i
   punti disponibili per un collegamento.
-- In **Vedi insieme** mirino e lente possono essere mostrati o nascosti
-  insieme; la preferenza resta sul dispositivo e, se nascosti, il comando
-  centrale permette di riattivarli senza uscire dalla vista.
+- In **Vedi insieme** il mirino può essere mostrato o nascosto; la preferenza
+  resta sul dispositivo e, se nascosto, il comando centrale permette di
+  riattivarlo senza uscire dalla vista.
 - Due punti visibili, anche di liste diverse, possono essere collegati. Le
   linee persistono sul dispositivo, vengono mostrate soltanto con entrambi gli
   estremi visibili e possono essere rimosse singolarmente.
@@ -405,7 +413,8 @@ proprietario originale e aggiunge il partecipante corrente alla catena.
   ricerca e copia JSON continuano a usare le coordinate normalizzate.
 - Lo zoom massimo è 5 volte la scala iniziale; il mirino usa un canvas
   circolare come lente 2,35× e continua a restituire le stesse coordinate x/y
-  del suo punto centrale.
+  del suo punto centrale. Un pulsante persistente attiva o disattiva
+  l'ingrandimento senza rimuovere il cerchio del mirino.
 - Il pulsante di copia usa Clipboard API quando disponibile.
 - La PWA si apre anche offline dopo il primo caricamento. *(verificato il
   2026-07-29 col server spento: mappa, ricerca e mirino funzionano)*

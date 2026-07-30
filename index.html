@@ -10,7 +10,7 @@
   <title>Mappa Squadra</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=43">
+  <link rel="stylesheet" href="styles.css?v=44">
 </head>
 <body>
   <main class="app-shell">
@@ -83,7 +83,14 @@
         </div>
       </div>
 
-      <div class="status-pill" id="statusPill">Sposta la mappa sotto il mirino</div>
+      <button id="lensToggleButton" class="lens-toggle-button" type="button" aria-pressed="true" aria-label="Disattiva lente di ingrandimento">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="10.5" cy="10.5" r="5.5"></circle>
+          <path d="m15 15 4.5 4.5"></path>
+        </svg>
+        <span id="lensToggleLabel">Lente attiva</span>
+      </button>
+      <div class="status-pill hidden" id="statusPill" role="status" aria-live="polite"></div>
 
       <div class="controls-panel">
         <div class="control-row" id="mainControlsRow">
@@ -299,7 +306,7 @@
                 </div>
                 <label class="overview-crosshair-toggle" for="overviewCrosshairToggle">
                   <input id="overviewCrosshairToggle" type="checkbox">
-                  <span>Mostra mirino e lente nella vista d’insieme</span>
+                  <span>Mostra il mirino nella vista d’insieme</span>
                 </label>
               </div>
               <section class="marker-history-map-selection" aria-labelledby="markerHistoryMapSelectionTitle">
@@ -333,6 +340,6 @@
     <canvas id="exportCanvas" hidden></canvas>
   </main>
 
-  <script src="app.js?v=43" defer></script>
+  <script src="app.js?v=44" defer></script>
 </body>
 </html>
