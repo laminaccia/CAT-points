@@ -5,6 +5,34 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-30 — Vista d'insieme selettiva e mirino con lente
+
+*Agente: Codex con skill Impeccable. Toccati `app.js`, `styles.css`,
+`index.html`, `service-worker.js`, `README.md`, `AGENTS.md`, `HANDOFF.md`.*
+
+Ogni punto della cronologia ha ora **Mostra sulla mappa**. La selezione è
+separata per sorgente ma viene resa come un unico insieme: si possono quindi
+combinare punti della lista personale e di più liste importate senza
+modificarle. La scelta persiste in
+`mappa-marker-history-visibility-v1`; cancellare un punto o una lista ripulisce
+anche i riferimenti rimasti. Il riepilogo globale mostra il totale,
+**Nascondi** azzera tutto e **Vedi insieme** chiude l'eventuale punto attivo,
+centra il gruppo e restituisce pan e zoom.
+
+I punti d'insieme conservano etichetta, didascalia/quadratino colorato e punto
+oro, ma compensano la scala della mappa per rimanere leggibili a ogni zoom.
+Verificata su viewport 393×852 una selezione composta da un punto locale e uno
+importato, la persistenza dopo ricaricamento e l'azzeramento collettivo.
+
+Il massimo zoom torna da 6× a 5×, valore precedente all'aumento che non era
+stabile su tutti i dispositivi. Il cerchio del mirino è ora un canvas che
+disegna in tempo reale una lente 2,35× sulla porzione esatta della mappa; il
+punto oro centrale e le coordinate normalizzate non cambiano. Verificato che
+la scala passa da `0.147227` a `0.736133`, rapporto 5 esatto, senza errori
+console.
+
+Bumpati `styles.css?v=38`, `app.js?v=39` e `mappa-squadra-v48`.
+
 ## 2026-07-30 — Cronologia crescente e importazione nativa
 
 *Agente: Codex con skill Impeccable. Toccati `app.js`, `styles.css`,

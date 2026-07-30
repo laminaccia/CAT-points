@@ -98,10 +98,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=37` e
-   `app.js?v=38`.
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=38` e
+   `app.js?v=39`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v47`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v48`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
@@ -299,6 +299,14 @@ L'esportazione prova prima la condivisione nativa del pacchetto
 importabile e, se i file non sono supportati, lo scarica: non ripiega più su
 un riepilogo testuale che perderebbe i dati necessari all'importazione.
 
+La visibilità d'insieme usa `mappa-marker-history-visibility-v1`: per ogni
+lista salva soltanto gli ID selezionati. Le selezioni locali e importate
+convivono, restano sul dispositivo e non modificano né l'ordine né il
+contenuto delle liste. **Vedi insieme** conclude l'eventuale punto attivo,
+centra il gruppo compatibilmente con lo zoom minimo e lascia pan e zoom
+disponibili. Rimuovere una lista o un punto elimina anche le selezioni rimaste
+senza sorgente.
+
 Le cronologie condivise usano il formato `cat-points.marker-history` versione
 3 e il suffisso `*.catpoints.json`. Il pacchetto non è un JSON anonimo:
 contiene l'identità e l'URL di CAT-points, il proprietario responsabile della
@@ -347,6 +355,9 @@ proprietario originale e aggiunge il partecipante corrente alla catena.
   o eliminata.
 - Le voci della cronologia possono essere riordinate e l'ordine viene
   mantenuto nell'esportazione condivisibile.
+- Ogni voce, locale o importata, può essere inclusa o esclusa dalla mappa. Le
+  selezioni di tutte le liste vengono mostrate contemporaneamente, restano
+  salvate sul dispositivo e possono essere azzerate insieme.
 - Il controllo **Importa punti** apre tramite la sua etichetta nativa il
   selettore file del dispositivo, senza dipendere da un click JavaScript su un
   input nascosto; accetta i pacchetti `.catpoints.json` e i precedenti export
@@ -359,6 +370,9 @@ proprietario originale e aggiunge il partecipante corrente alla catena.
   liste importate sono separate, persistenti e non modificabili.
 - Gli strumenti coordinate mostrano x/y e una stima WGS84 in gradi decimali;
   ricerca e copia JSON continuano a usare le coordinate normalizzate.
+- Lo zoom massimo è 5 volte la scala iniziale; il mirino usa un canvas
+  circolare come lente 2,35× e continua a restituire le stesse coordinate x/y
+  del suo punto centrale.
 - Il pulsante di copia usa Clipboard API quando disponibile.
 - La PWA si apre anche offline dopo il primo caricamento. *(verificato il
   2026-07-29 col server spento: mappa, ricerca e mirino funzionano)*
