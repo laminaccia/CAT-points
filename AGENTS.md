@@ -98,10 +98,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=38` e
-   `app.js?v=39`.
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=39` e
+   `app.js?v=42`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v48`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v51`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
@@ -305,7 +305,16 @@ convivono, restano sul dispositivo e non modificano né l'ordine né il
 contenuto delle liste. **Vedi insieme** conclude l'eventuale punto attivo,
 centra il gruppo compatibilmente con lo zoom minimo e lascia pan e zoom
 disponibili. Rimuovere una lista o un punto elimina anche le selezioni rimaste
-senza sorgente.
+senza sorgente. `mappa-overview-crosshair-v1` conserva la scelta di mostrare
+mirino e lente nella vista d'insieme: sono nascosti per impostazione
+predefinita e il comando centrale **Mostra mirino** li riattiva insieme.
+
+I collegamenti tra punti usano `mappa-marker-history-connections-v1`. Ogni
+estremo conserva soltanto `{ sourceKey, entryId }`, quindi può riferirsi anche
+a due liste diverse senza duplicarne i dati. Una linea viene disegnata solo
+quando entrambi gli estremi sono selezionati per la vista d'insieme, ma resta
+salvata se uno dei due viene temporaneamente nascosto. Rimuovere un punto o
+una lista elimina automaticamente i collegamenti rimasti senza estremi.
 
 Le cronologie condivise usano il formato `cat-points.marker-history` versione
 3 e il suffisso `*.catpoints.json`. Il pacchetto non è un JSON anonimo:
@@ -358,6 +367,12 @@ proprietario originale e aggiunge il partecipante corrente alla catena.
 - Ogni voce, locale o importata, può essere inclusa o esclusa dalla mappa. Le
   selezioni di tutte le liste vengono mostrate contemporaneamente, restano
   salvate sul dispositivo e possono essere azzerate insieme.
+- In **Vedi insieme** mirino e lente possono essere mostrati o nascosti
+  insieme; la preferenza resta sul dispositivo e, se nascosti, il comando
+  centrale permette di riattivarli senza uscire dalla vista.
+- Due punti visibili, anche di liste diverse, possono essere collegati. Le
+  linee persistono sul dispositivo, vengono mostrate soltanto con entrambi gli
+  estremi visibili e possono essere rimosse singolarmente.
 - Il controllo **Importa punti** apre tramite la sua etichetta nativa il
   selettore file del dispositivo, senza dipendere da un click JavaScript su un
   input nascosto; accetta i pacchetti `.catpoints.json` e i precedenti export

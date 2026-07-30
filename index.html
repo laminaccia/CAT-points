@@ -10,14 +10,17 @@
   <title>Mappa Squadra</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=38">
+  <link rel="stylesheet" href="styles.css?v=39">
 </head>
 <body>
   <main class="app-shell">
     <section class="map-stage" id="mapStage" aria-label="Mappa interattiva">
       <div class="map-viewport" id="mapViewport">
         <img id="mapImage" src="assets/map-placeholder.jpg" alt="Mappa del gioco">
-        <div class="history-map-layer" id="historyMapLayer" aria-hidden="true"></div>
+        <div class="history-map-layer" id="historyMapLayer" aria-hidden="true">
+          <svg class="history-map-connections" id="historyMapConnections"></svg>
+          <div class="history-map-points" id="historyMapPoints"></div>
+        </div>
       </div>
 
       <div class="topbar">
@@ -262,6 +265,19 @@
               <button id="showSelectedHistoryPointsButton" class="primary-button" type="button">Vedi insieme</button>
               <button id="clearSelectedHistoryPointsButton" class="secondary-wide" type="button">Nascondi</button>
             </div>
+            <label class="overview-crosshair-toggle" for="overviewCrosshairToggle">
+              <input id="overviewCrosshairToggle" type="checkbox">
+              <span>Mostra il mirino in “Vedi insieme”</span>
+            </label>
+          </div>
+          <div class="marker-history-connections-panel">
+            <div class="marker-history-connections-heading">
+              <strong>Linee tra punti</strong>
+              <span id="historyConnectionCount">0 create</span>
+            </div>
+            <p id="historyConnectionHelp">Mostra due punti sulla mappa, poi usa “Collega” sul primo e sul secondo.</p>
+            <div class="marker-history-connections-list" id="historyConnectionsList"></div>
+            <button id="cancelHistoryConnectionButton" class="secondary-wide hidden" type="button">Annulla primo punto</button>
           </div>
           <div class="marker-history-list" id="markerHistoryList"></div>
           <div class="marker-history-footer">
@@ -288,6 +304,6 @@
     <canvas id="exportCanvas" hidden></canvas>
   </main>
 
-  <script src="app.js?v=39" defer></script>
+  <script src="app.js?v=42" defer></script>
 </body>
 </html>

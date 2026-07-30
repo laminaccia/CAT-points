@@ -5,6 +5,32 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-30 — Mirino opzionale e linee tra punti
+
+*Agente: Codex con skill Impeccable. Toccati `app.js`, `styles.css`,
+`index.html`, `service-worker.js`, `README.md`, `AGENTS.md`, `HANDOFF.md`.*
+
+La vista **Vedi insieme** offre ora una preferenza persistente per mostrare o
+nascondere contemporaneamente mirino e lente. La modalità pulita è quella
+predefinita; quando è attiva, il comando centrale diventa **Mostra mirino** e
+riporta entrambi senza uscire dalla vista d'insieme. La scelta usa
+`mappa-overview-crosshair-v1`.
+
+I punti selezionati possono essere collegati anche tra liste diverse:
+**Collega** sceglie il primo estremo, **Collega qui** completa la linea e il
+riepilogo globale **Linee tra punti** permette di rimuoverla con **Togli**. I
+collegamenti usano riferimenti stabili alla lista e al punto, persistono in
+`mappa-marker-history-connections-v1` e vengono ripuliti se un estremo non
+esiste più. Una linea resta memorizzata quando un punto viene nascosto, ma si
+disegna solo quando entrambi gli estremi sono visibili.
+
+Verificati su viewport mobile: collegamento tra punto locale e importato,
+persistenza dopo ricaricamento, rimozione singola, due segmenti SVG per la resa
+con contorno, mirino/lente visibili insieme o entrambi nascosti e assenza di
+errori console.
+
+Bumpati `styles.css?v=39`, `app.js?v=42` e `mappa-squadra-v51`.
+
 ## 2026-07-30 — Vista d'insieme selettiva e mirino con lente
 
 *Agente: Codex con skill Impeccable. Toccati `app.js`, `styles.css`,
