@@ -98,10 +98,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=33` e
-   `app.js?v=34`.
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=34` e
+   `app.js?v=35`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v43`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v44`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
@@ -282,9 +282,12 @@ La cronologia punti usa lo stesso principio (`mappa-marker-history-v1`, chiave
 mantenuta per compatibilità con i dati già salvati):
 resta soltanto nel browser, è separata per nome partecipante e non si
 sincronizza. Confermare un punto crea una voce; modificarlo o riposizionarlo
-aggiorna la voce attiva invece di duplicarla. Reimpostare la mappa conclude
-quel punto, quindi la conferma successiva crea una nuova voce. Ogni voce può
-avere un'etichetta facoltativa distinta dal testo visibile sul punto:
+con **Cambia posizione** aggiorna la voce attiva invece di duplicarla.
+**Segna nuovo punto** conclude esplicitamente quella voce, mantiene posizione
+e colori per velocizzare l'uso sul campo, azzera testo ed etichetta e fa sì
+che la conferma successiva crei una nuova voce. Reimpostare la mappa ottiene
+lo stesso risultato, ma riporta anche carta e colori allo stato iniziale. Ogni
+voce può avere un'etichetta facoltativa distinta dal testo visibile sul punto:
 «Rivedi» la riporta sulla mappa, «Invia foto» rigenera il PNG con etichetta e
 data originali e apre il normale flusso di condivisione. L'ordine si modifica
 con «Su»/«Giù» e resta salvato; modificare un punto esistente non lo riporta
@@ -313,6 +316,9 @@ condivisione nativa, poi il testo condiviso, infine il download.
 - Dopo la conferma il punto può essere modificato senza riposizionarlo oppure
   riportato al mirino per scegliere un nuovo punto; annullare una modifica
   ripristina colore e testo precedenti.
+- **Segna nuovo punto** torna al mirino senza spostare la mappa e la conferma
+  seguente crea una voce distinta; **Cambia posizione** aggiorna invece la voce
+  attiva.
 - Ogni conferma salva automaticamente il punto nella cronologia locale del
   partecipante; una voce può essere etichettata, rivista, condivisa nuovamente
   o eliminata.

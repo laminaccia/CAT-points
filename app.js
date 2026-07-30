@@ -1045,6 +1045,23 @@
     setStatus('Sposta la mappa sotto il mirino');
   }
 
+  function startNewPoint() {
+    state.markerPlaced = false;
+    state.markerText = '';
+    activeHistoryEntryId = null;
+    activeHistoryLabel = '';
+    activeHistoryCreatedAt = null;
+    markerTextInput.value = '';
+    markerHistoryLabelInput.value = '';
+    marker.classList.add('hidden');
+    crosshair.classList.remove('hidden');
+    mainControlsRow.classList.remove('hidden');
+    confirmRow.classList.add('hidden');
+    setMarkerVisual();
+    updateCrosshairCoordinates();
+    setStatus('Sposta la mappa e segna un nuovo punto');
+  }
+
   function resetMap() {
     state.markerPlaced = false;
     state.markerColors = [defaultMarkerColor];
@@ -1225,6 +1242,7 @@
   document.getElementById('zoomInButton').addEventListener('click', () => zoomAt(1.25));
   document.getElementById('zoomOutButton').addEventListener('click', () => zoomAt(0.8));
   document.getElementById('placeButton').addEventListener('click', openMarkerDialog);
+  document.getElementById('newPointButton').addEventListener('click', startNewPoint);
   document.getElementById('moveButton').addEventListener('click', enableMarkerMove);
   editMarkerButton.addEventListener('click', openMarkerDialog);
   historyButton.addEventListener('click', openMarkerHistory);

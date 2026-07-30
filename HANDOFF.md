@@ -5,6 +5,22 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-30 — Flusso esplicito per segnare più punti
+
+*Agente: Codex. Toccati `index.html`, `styles.css`, `app.js`,
+`service-worker.js`, `README.md`, `AGENTS.md`, `HANDOFF.md`.*
+
+Dopo la conferma compare ora **Segna nuovo punto**: conclude la voce attiva,
+lascia la mappa nella posizione raggiunta e conserva i colori, ma svuota testo
+ed etichetta. La conferma successiva crea quindi una nuova voce nella
+cronologia. **Cambia posizione** mantiene invece il significato precedente:
+riposiziona e aggiorna lo stesso punto.
+
+Il nuovo comando occupa una riga intera per essere evidente e il messaggio di
+stato si alza quando sono visibili i controlli successivi alla conferma, senza
+sovrapporsi su mobile. Bumpati `styles.css?v=34`, `app.js?v=35` e
+`mappa-squadra-v44`.
+
 ## 2026-07-30 — Punti bordati, mappa più nitida e coordinate geografiche
 
 *Agente: Codex con skill Impeccable e PDF. Toccati `assets/map-placeholder.jpg`,
