@@ -10,7 +10,7 @@
   <title>Mappa Squadra</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=39">
+  <link rel="stylesheet" href="styles.css?v=43">
 </head>
 <body>
   <main class="app-shell">
@@ -256,47 +256,76 @@
             <select id="markerHistorySourceSelect"></select>
           </label>
           <p class="dialog-description marker-history-description" id="markerHistoryDescription">Rivedi, etichetta o invia nuovamente un punto salvato su questo browser.</p>
-          <div class="marker-history-map-summary">
-            <div>
-              <strong><span id="selectedHistoryPointCount">0</span> visibili sulla mappa</strong>
-              <small>La selezione comprende tutte le liste.</small>
-            </div>
-            <div class="marker-history-map-summary-actions">
-              <button id="showSelectedHistoryPointsButton" class="primary-button" type="button">Vedi insieme</button>
-              <button id="clearSelectedHistoryPointsButton" class="secondary-wide" type="button">Nascondi</button>
-            </div>
-            <label class="overview-crosshair-toggle" for="overviewCrosshairToggle">
-              <input id="overviewCrosshairToggle" type="checkbox">
-              <span>Mostra il mirino in “Vedi insieme”</span>
-            </label>
+          <div class="marker-history-tabs" role="tablist" aria-label="Sezioni della cronologia">
+            <button id="markerHistoryPointsTab" class="marker-history-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="markerHistoryPointsPanel">
+              <span>Punti</span>
+              <small>Rivedi e modifica</small>
+            </button>
+            <button id="markerHistoryMapTab" class="marker-history-tab" type="button" role="tab" aria-selected="false" aria-controls="markerHistoryMapPanel" tabindex="-1">
+              <span>Mappa e linee</span>
+              <small>Seleziona e collega</small>
+            </button>
           </div>
-          <div class="marker-history-connections-panel">
-            <div class="marker-history-connections-heading">
-              <strong>Linee tra punti</strong>
-              <span id="historyConnectionCount">0 create</span>
+          <section id="markerHistoryPointsPanel" class="marker-history-tab-panel marker-history-points-panel" role="tabpanel" aria-labelledby="markerHistoryPointsTab">
+            <div class="marker-history-list" id="markerHistoryList"></div>
+            <div class="marker-history-footer">
+              <p class="marker-history-import-feedback" id="markerHistoryImportFeedback" role="status" aria-live="polite"></p>
+              <div class="marker-history-footer-actions local-view" id="markerHistoryFooterActions">
+                <button id="exportMarkerHistoryButton" class="primary-button" type="button">Condividi questa lista</button>
+                <label id="importMarkerHistoryButton" class="marker-history-import-trigger secondary-wide" for="importMarkerHistoryInput" role="button" tabindex="0" aria-describedby="markerHistoryImportHint">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 4v10"></path>
+                    <path d="m8 10 4 4 4-4"></path>
+                    <path d="M5 16v3h14v-3"></path>
+                  </svg>
+                  <span id="importMarkerHistoryButtonLabel">Importa punti</span>
+                </label>
+                <button id="removeImportedMarkerHistoryButton" class="marker-history-remove-import hidden" type="button">Rimuovi importazione</button>
+              </div>
+              <p class="marker-history-import-hint" id="markerHistoryImportHint">Apri un file <strong>.catpoints.json</strong> ricevuto da un altro partecipante.</p>
+              <input id="importMarkerHistoryInput" class="sr-only" type="file" accept=".json,application/json,text/json" tabindex="-1" aria-hidden="true">
             </div>
-            <p id="historyConnectionHelp">Mostra due punti sulla mappa, poi usa “Collega” sul primo e sul secondo.</p>
-            <div class="marker-history-connections-list" id="historyConnectionsList"></div>
-            <button id="cancelHistoryConnectionButton" class="secondary-wide hidden" type="button">Annulla primo punto</button>
-          </div>
-          <div class="marker-history-list" id="markerHistoryList"></div>
-          <div class="marker-history-footer">
-            <p class="marker-history-import-feedback" id="markerHistoryImportFeedback" role="status" aria-live="polite"></p>
-            <div class="marker-history-footer-actions local-view" id="markerHistoryFooterActions">
-              <button id="exportMarkerHistoryButton" class="primary-button" type="button">Condividi questa lista</button>
-              <label id="importMarkerHistoryButton" class="marker-history-import-trigger secondary-wide" for="importMarkerHistoryInput" role="button" tabindex="0" aria-describedby="markerHistoryImportHint">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 4v10"></path>
-                  <path d="m8 10 4 4 4-4"></path>
-                  <path d="M5 16v3h14v-3"></path>
-                </svg>
-                <span id="importMarkerHistoryButtonLabel">Importa punti</span>
-              </label>
-              <button id="removeImportedMarkerHistoryButton" class="marker-history-remove-import hidden" type="button">Rimuovi importazione</button>
+          </section>
+          <section id="markerHistoryMapPanel" class="marker-history-tab-panel marker-history-map-panel hidden" role="tabpanel" aria-labelledby="markerHistoryMapTab">
+            <div class="marker-history-map-workspace">
+              <div class="marker-history-map-summary">
+                <div>
+                  <strong><span id="selectedHistoryPointCount">0</span> visibili sulla mappa</strong>
+                  <small>Il totale comprende tutte le liste.</small>
+                </div>
+                <div class="marker-history-map-summary-actions">
+                  <button id="showSelectedHistoryPointsButton" class="primary-button" type="button">Vedi insieme</button>
+                  <button id="clearSelectedHistoryPointsButton" class="secondary-wide" type="button">Nascondi tutti</button>
+                </div>
+                <label class="overview-crosshair-toggle" for="overviewCrosshairToggle">
+                  <input id="overviewCrosshairToggle" type="checkbox">
+                  <span>Mostra mirino e lente nella vista d’insieme</span>
+                </label>
+              </div>
+              <section class="marker-history-map-selection" aria-labelledby="markerHistoryMapSelectionTitle">
+                <div class="marker-history-map-selection-heading">
+                  <div>
+                    <strong id="markerHistoryMapSelectionTitle">Punti di questa lista</strong>
+                    <small><span id="currentHistorySourceSelectionCount">0</span> selezionati</small>
+                  </div>
+                  <div class="marker-history-map-bulk-actions">
+                    <button id="selectAllCurrentHistoryPointsButton" class="secondary-wide" type="button">Mostra tutti</button>
+                    <button id="clearCurrentHistoryPointsButton" class="secondary-wide" type="button">Nessuno</button>
+                  </div>
+                </div>
+                <div class="marker-history-map-selection-list" id="markerHistoryMapList"></div>
+              </section>
+              <div class="marker-history-connections-panel">
+                <div class="marker-history-connections-heading">
+                  <strong>Linee tra punti</strong>
+                  <span id="historyConnectionCount">0 create</span>
+                </div>
+                <p id="historyConnectionHelp">Mostra due punti, poi usa “Collega” sul primo e sul secondo.</p>
+                <div class="marker-history-connections-list" id="historyConnectionsList"></div>
+                <button id="cancelHistoryConnectionButton" class="secondary-wide hidden" type="button">Annulla primo punto</button>
+              </div>
             </div>
-            <p class="marker-history-import-hint" id="markerHistoryImportHint">Apri un file <strong>.catpoints.json</strong> ricevuto da un altro partecipante.</p>
-            <input id="importMarkerHistoryInput" class="sr-only" type="file" accept=".json,application/json,text/json" tabindex="-1" aria-hidden="true">
-          </div>
+          </section>
         </div>
       </div>
     </section>
@@ -304,6 +333,6 @@
     <canvas id="exportCanvas" hidden></canvas>
   </main>
 
-  <script src="app.js?v=42" defer></script>
+  <script src="app.js?v=43" defer></script>
 </body>
 </html>

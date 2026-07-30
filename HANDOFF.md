@@ -5,6 +5,34 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-30 — Cronologia a schede e workspace desktop
+
+*Agente: Codex con skill Impeccable. Toccati `app.js`, `styles.css`,
+`index.html`, `service-worker.js`, `README.md`, `AGENTS.md`, `HANDOFF.md`.*
+
+La cronologia è stata separata in due schede accessibili e persistenti:
+**Punti** contiene revisione, riordino, etichette, foto, import/export ed
+eliminazione; **Mappa e linee** raccoglie esclusivamente selezione e
+collegamenti. La scheda attiva usa `mappa-marker-history-tab-v1` ed è
+navigabile anche con frecce, Home ed End.
+
+La selezione cartografica usa righe compatte con checkbox e pulsante
+**Collega**, conteggio della lista corrente e totale globale. **Mostra tutti**
+e **Nessuno** agiscono sulla lista visualizzata, **Nascondi tutti** su tutte le
+liste. La logica persistente di visibilità e linee non cambia.
+
+Da 900 px la mappa occupa tutta la viewport, i controlli restano centrati entro
+760 px e il dialog cronologia raggiunge 1120 px: **Punti** usa una griglia a
+due colonne, mentre **Mappa e linee** affianca elenco e pannello collegamenti.
+Su mobile il dialog è stato ridotto a massimo 720 px e le sezioni scorrono
+senza sovrapposizioni.
+
+Verificati viewport 390×844 e 1440×900: quattro punti, selezione singola e
+collettiva, collegamento/rimozione, persistenza della scheda, navigazione da
+tastiera, mappa desktop a piena larghezza e assenza di errori console.
+
+Bumpati `styles.css?v=43`, `app.js?v=43` e `mappa-squadra-v55`.
+
 ## 2026-07-30 — Mirino opzionale e linee tra punti
 
 *Agente: Codex con skill Impeccable. Toccati `app.js`, `styles.css`,

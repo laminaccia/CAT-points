@@ -98,10 +98,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=39` e
-   `app.js?v=42`.
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=43` e
+   `app.js?v=43`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v51`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v55`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
@@ -309,6 +309,15 @@ senza sorgente. `mappa-overview-crosshair-v1` conserva la scelta di mostrare
 mirino e lente nella vista d'insieme: sono nascosti per impostazione
 predefinita e il comando centrale **Mostra mirino** li riattiva insieme.
 
+Il dialog cronologia separa le attività in **Punti** e **Mappa e linee**; la
+scheda attiva usa `mappa-marker-history-tab-v1`. La prima contiene gestione,
+condivisione e importazione, la seconda un elenco compatto con selezione
+singola, **Mostra tutti**, **Nessuno**, conteggio locale/globale e collegamenti.
+Su desktop il dialog diventa un workspace a due colonne e la mappa usa tutta
+la viewport, mentre i controlli principali restano centrati entro 760 px. Su
+mobile il pannello è alto al massimo 720 px e ogni scheda gestisce il proprio
+scorrimento verticale.
+
 I collegamenti tra punti usano `mappa-marker-history-connections-v1`. Ogni
 estremo conserva soltanto `{ sourceKey, entryId }`, quindi può riferirsi anche
 a due liste diverse senza duplicarne i dati. Una linea viene disegnata solo
@@ -367,12 +376,21 @@ proprietario originale e aggiunge il partecipante corrente alla catena.
 - Ogni voce, locale o importata, può essere inclusa o esclusa dalla mappa. Le
   selezioni di tutte le liste vengono mostrate contemporaneamente, restano
   salvate sul dispositivo e possono essere azzerate insieme.
+- La cronologia separa chiaramente la gestione dei punti dalla selezione
+  cartografica. Le due schede sono navigabili anche da tastiera e ricordano
+  l'ultima scelta sul dispositivo.
+- **Mappa e linee** offre selezione singola e collettiva per la lista corrente,
+  mantiene visibile il totale globale e rende immediatamente riconoscibili i
+  punti disponibili per un collegamento.
 - In **Vedi insieme** mirino e lente possono essere mostrati o nascosti
   insieme; la preferenza resta sul dispositivo e, se nascosti, il comando
   centrale permette di riattivarli senza uscire dalla vista.
 - Due punti visibili, anche di liste diverse, possono essere collegati. Le
   linee persistono sul dispositivo, vengono mostrate soltanto con entrambi gli
   estremi visibili e possono essere rimosse singolarmente.
+- Da 900 px la mappa occupa l'intera viewport, i controlli restano centrati e
+  la cronologia sfrutta due colonne; sotto tale soglia le funzioni restano
+  complete, toccabili e prive di sovrapposizioni.
 - Il controllo **Importa punti** apre tramite la sua etichetta nativa il
   selettore file del dispositivo, senza dipendere da un click JavaScript su un
   input nascosto; accetta i pacchetti `.catpoints.json` e i precedenti export

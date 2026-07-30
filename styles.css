@@ -127,6 +127,9 @@ button:active { transform: translateY(1px) scale(.97); }
 @media (hover: hover) and (pointer: fine) {
   button:hover { border-color: rgba(245,219,139,.42); background-color: #1c2330; }
   .marker-history-import-trigger:hover { border-color: rgba(245,219,139,.42); background-color: #1c2330; }
+  .marker-history-tab:not(.is-active):hover { color: var(--text); background: rgba(255,255,255,.055); }
+  .marker-history-tab.is-active:hover { color: #15171b; background: var(--accent-2); }
+  .marker-history-map-choice:hover { border-color: rgba(245,219,139,.3); background: rgba(255,255,255,.05); }
   .primary-button:hover, .searchbar button:hover, .color-name-form button:hover { border-color: var(--accent-2); background-color: #ffe49a; }
 }
 
@@ -187,13 +190,23 @@ button:active { transform: translateY(1px) scale(.97); }
 .street-list-item small { grid-column: 1; color: var(--text); font-size: 11px; line-height: 1.35; }
 .street-list-item button { grid-column: 2; grid-row: 1 / 4; align-self: center; min-height: 44px; padding: 0 10px; border-radius: 10px; color: #ff9aa1; font-size: 11px; }
 .street-list-actions { display: grid; grid-template-columns: 1fr 1.2fr; gap: 9px; }
-.marker-history-card { display: flex; flex-direction: column; max-height: min(82svh, 720px); }
+.marker-history-card { display: flex; flex-direction: column; width: min(100%, 560px); height: min(88svh, 720px); max-height: calc(100svh - 24px); overflow: hidden; }
 .marker-history-source { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 10px; margin: 16px 0 10px; color: var(--muted); font-size: 11px; }
 .marker-history-source select { min-width: 0; min-height: 44px; padding: 0 10px; border: 1px solid rgba(255,255,255,.16); border-radius: 12px; outline: 0; color: var(--text); background: var(--surface-raised); font: 600 12px/1 system-ui, sans-serif; color-scheme: dark; }
 .marker-history-source select option { color: var(--text); background-color: var(--surface-raised); }
 .marker-history-source select:focus { border-color: rgba(217,180,91,.72); box-shadow: 0 0 0 3px rgba(217,180,91,.12); }
-.marker-history-description { margin: 0 0 8px; }
-.marker-history-map-summary { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; margin: 4px 0 10px; padding: 10px 11px; border: 1px solid rgba(245,219,139,.2); border-radius: 13px; background: rgba(217,180,91,.07); }
+.marker-history-description { margin: 0 0 10px; font-size: 12px; }
+.marker-history-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; flex: 0 0 auto; margin-bottom: 10px; padding: 4px; border: 1px solid rgba(255,255,255,.1); border-radius: 14px; background: rgba(255,255,255,.035); }
+.marker-history-tab { min-height: 52px; padding: 6px 10px; border: 0; border-radius: 10px; color: var(--muted); background: transparent; box-shadow: none; text-align: left; }
+.marker-history-tab span, .marker-history-tab small { display: block; }
+.marker-history-tab span { color: inherit; font-size: 12px; font-weight: 800; }
+.marker-history-tab small { margin-top: 2px; color: inherit; font-size: 9px; font-weight: 600; }
+.marker-history-tab.is-active { color: #15171b; background: var(--accent-2); box-shadow: 0 5px 14px rgba(0,0,0,.22); }
+.marker-history-tab-panel { min-height: 0; flex: 1 1 auto; }
+.marker-history-points-panel { display: flex; flex-direction: column; }
+.marker-history-map-panel { overflow: hidden; touch-action: pan-y; overscroll-behavior: contain; }
+.marker-history-map-workspace { display: grid; grid-template-areas: "summary" "selection" "connections"; gap: 10px; min-height: 100%; overflow-y: auto; touch-action: pan-y; overscroll-behavior: contain; padding-right: 2px; }
+.marker-history-map-summary { grid-area: summary; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 11px; border: 1px solid rgba(245,219,139,.2); border-radius: 13px; background: rgba(217,180,91,.07); }
 .marker-history-map-summary strong, .marker-history-map-summary small { display: block; }
 .marker-history-map-summary strong { color: var(--text); font-size: 12px; }
 .marker-history-map-summary strong span { color: var(--accent-2); }
@@ -203,7 +216,29 @@ button:active { transform: translateY(1px) scale(.97); }
 .marker-history-map-summary button:disabled { cursor: default; opacity: .4; transform: none; }
 .overview-crosshair-toggle { grid-column: 1 / -1; display: flex; align-items: center; gap: 9px; min-height: 38px; padding-top: 7px; border-top: 1px solid rgba(245,219,139,.14); color: var(--text); cursor: pointer; font-size: 11px; font-weight: 700; }
 .overview-crosshair-toggle input { flex: 0 0 auto; width: 19px; height: 19px; margin: 0; accent-color: var(--accent); }
-.marker-history-connections-panel { margin: 0 0 10px; padding: 10px 11px; border: 1px solid rgba(255,255,255,.1); border-radius: 13px; background: rgba(255,255,255,.035); }
+.marker-history-map-selection { grid-area: selection; padding: 11px; border: 1px solid rgba(255,255,255,.1); border-radius: 13px; background: rgba(255,255,255,.035); }
+.marker-history-map-selection-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 9px; }
+.marker-history-map-selection-heading strong, .marker-history-map-selection-heading small { display: block; }
+.marker-history-map-selection-heading strong { color: var(--text); font-size: 12px; }
+.marker-history-map-selection-heading small { margin-top: 2px; color: var(--muted); font-size: 10px; }
+.marker-history-map-selection-heading small span { color: var(--accent-2); font-weight: 800; }
+.marker-history-map-bulk-actions { display: grid; grid-template-columns: repeat(2, auto); gap: 6px; }
+.marker-history-map-bulk-actions button { min-height: 38px; padding: 0 9px; border-radius: 9px; font-size: 10px; }
+.marker-history-map-bulk-actions button:disabled { cursor: default; opacity: .38; transform: none; }
+.marker-history-map-selection-list { display: grid; align-content: start; gap: 7px; min-height: 90px; }
+.marker-history-map-selection-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: stretch; gap: 7px; min-height: 58px; }
+.marker-history-map-choice { display: grid; grid-template-columns: 22px 34px minmax(0, 1fr); align-items: center; gap: 9px; min-width: 0; padding: 7px 9px; border: 1px solid rgba(255,255,255,.1); border-radius: 11px; color: var(--muted); background: rgba(255,255,255,.025); cursor: pointer; }
+.marker-history-map-choice input { width: 20px; height: 20px; margin: 0; accent-color: var(--accent); }
+.marker-history-map-choice .history-marker-swatch { width: 32px; height: 32px; border-radius: 9px; box-shadow: none; }
+.marker-history-map-choice-copy { min-width: 0; }
+.marker-history-map-choice-copy strong, .marker-history-map-choice-copy small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.marker-history-map-choice-copy strong { color: var(--text); font-size: 12px; }
+.marker-history-map-choice-copy small { margin-top: 3px; color: var(--muted); font-size: 9px; }
+.marker-history-map-choice.is-selected { border-color: rgba(245,219,139,.42); color: var(--text); background: rgba(217,180,91,.09); }
+.marker-history-connect-button { min-width: 78px; min-height: 44px; padding: 0 9px; border-radius: 11px; font-size: 11px; }
+.marker-history-connect-button.is-pending { border-color: rgba(245,219,139,.58); color: #15171b; background: var(--accent-2); }
+.marker-history-connect-button:disabled { cursor: default; opacity: .38; transform: none; }
+.marker-history-connections-panel { grid-area: connections; padding: 10px 11px; border: 1px solid rgba(255,255,255,.1); border-radius: 13px; background: rgba(255,255,255,.035); }
 .marker-history-connections-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .marker-history-connections-heading strong { color: var(--text); font-size: 12px; }
 .marker-history-connections-heading > span { color: var(--accent-2); font-size: 10px; font-weight: 800; }
@@ -213,7 +248,7 @@ button:active { transform: translateY(1px) scale(.97); }
 .marker-history-connection-item span { overflow: hidden; color: var(--text); font-size: 10px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
 .marker-history-connection-item button, #cancelHistoryConnectionButton { min-height: 36px; padding: 0 9px; border-radius: 9px; font-size: 10px; }
 #cancelHistoryConnectionButton { width: 100%; margin-top: 8px; }
-.marker-history-list { display: grid; gap: 9px; min-height: 120px; margin-top: 6px; overflow-y: auto; touch-action: pan-y; overscroll-behavior: contain; }
+.marker-history-list { display: grid; align-content: start; gap: 9px; min-height: 0; flex: 1 1 auto; overflow-y: auto; touch-action: pan-y; overscroll-behavior: contain; padding-right: 2px; }
 .marker-history-empty { align-self: center; margin: auto; padding: 28px 18px; color: var(--muted); font-size: 13px; line-height: 1.45; text-align: center; }
 .marker-history-item { display: grid; grid-template-columns: 42px minmax(0, 1fr); gap: 9px 11px; padding: 12px; border: 1px solid rgba(255,255,255,.11); border-radius: 14px; background: rgba(255,255,255,.045); }
 .history-marker-swatch { position: relative; align-self: center; width: 40px; height: 40px; border: 1px solid #17191f; border-radius: 12px; background: var(--history-background, var(--accent)); box-shadow: 0 5px 12px rgba(0,0,0,.3); }
@@ -223,14 +258,6 @@ button:active { transform: translateY(1px) scale(.97); }
 .marker-history-copy strong { display: block; overflow: hidden; color: var(--text); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
 .marker-history-copy span { display: block; margin-top: 3px; overflow: hidden; color: var(--accent-2); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 .marker-history-copy small { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; line-height: 1.35; }
-.marker-history-map-controls { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 7px; }
-.marker-history-map-toggle { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 10px; border: 1px solid rgba(255,255,255,.11); border-radius: 11px; color: var(--muted); background: rgba(255,255,255,.035); cursor: pointer; font-size: 12px; font-weight: 700; }
-.marker-history-map-toggle input { flex: 0 0 auto; width: 20px; height: 20px; margin: 0; accent-color: var(--accent); }
-.marker-history-map-toggle span { min-width: 0; }
-.marker-history-map-toggle.is-selected { border-color: rgba(245,219,139,.42); color: var(--text); background: rgba(217,180,91,.1); }
-.marker-history-connect-button { min-width: 74px; min-height: 44px; padding: 0 9px; border-radius: 11px; font-size: 11px; }
-.marker-history-connect-button.is-pending { border-color: rgba(245,219,139,.58); color: #15171b; background: var(--accent-2); }
-.marker-history-connect-button:disabled { cursor: default; opacity: .38; transform: none; }
 .marker-history-order { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) 58px 58px; align-items: center; gap: 8px; }
 .marker-history-order span { overflow: hidden; color: var(--muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 .marker-history-order button { min-height: 44px; padding: 0 9px; border-radius: 11px; font-size: 12px; }
@@ -244,7 +271,7 @@ button:active { transform: translateY(1px) scale(.97); }
 .marker-history-label-form input:focus { border-color: var(--accent-2); box-shadow: 0 0 0 3px rgba(245,219,139,.12); }
 .marker-history-label-actions { display: grid; grid-template-columns: .8fr 1.2fr; gap: 8px; }
 .marker-history-label-actions button { min-height: 44px; padding: 0 10px; border-radius: 11px; font-size: 12px; }
-.marker-history-footer { flex: 0 0 auto; padding-top: 12px; border-top: 1px solid var(--line); }
+.marker-history-footer { flex: 0 0 auto; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
 .marker-history-import-feedback { min-height: 16px; margin: 0 0 8px; color: var(--muted); font-size: 11px; line-height: 1.35; }
 .marker-history-import-feedback.error { color: #ff9aa1; }
 .marker-history-footer-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -278,8 +305,34 @@ button:active { transform: translateY(1px) scale(.97); }
   .color-name-feedback { margin-left: 48px; }
   .marker-history-map-summary { grid-template-columns: 1fr; }
   .marker-history-map-summary-actions { width: 100%; }
+  .marker-history-map-selection-heading { align-items: stretch; flex-direction: column; }
+  .marker-history-map-bulk-actions { grid-template-columns: 1fr 1fr; }
+  .marker-history-connect-button { min-width: 68px; padding: 0 7px; }
 }
 
 @media (min-width: 760px) {
   .map-stage { max-width: 760px; margin: 0 auto; box-shadow: 0 0 80px rgba(0,0,0,.45); }
+}
+
+@media (min-width: 900px) {
+  .map-stage { width: 100%; max-width: none; box-shadow: none; }
+  .topbar, .searchbar, .search-feedback, .search-results, .controls-panel { left: 50%; right: auto; width: min(760px, calc(100% - 36px)); transform: translateX(-50%); }
+  .marker-history-dialog { place-items: center; padding: 24px; }
+  .marker-history-card { width: min(calc(100vw - 48px), 1120px); height: min(calc(100svh - 48px), 820px); max-height: none; padding: 24px; }
+  .marker-history-card .dialog-heading h2 { font-size: 24px; }
+  .marker-history-source { grid-template-columns: 120px minmax(280px, 430px); margin-top: 14px; }
+  .marker-history-description { max-width: 72ch; }
+  .marker-history-tabs { width: 460px; }
+  .marker-history-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+  .marker-history-footer-actions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .marker-history-footer-actions.local-view { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .marker-history-footer-actions #exportMarkerHistoryButton,
+  .marker-history-footer-actions.local-view .marker-history-import-trigger { grid-column: auto; }
+  .marker-history-import-hint { text-align: left; }
+  .marker-history-map-workspace { grid-template: "selection summary" auto "selection connections" minmax(0, 1fr) / minmax(0, 1.45fr) minmax(320px, .8fr); height: 100%; min-height: 0; overflow: hidden; }
+  .marker-history-map-selection { display: flex; flex-direction: column; }
+  .marker-history-map-selection-list, .marker-history-connections-list { min-height: 0; overflow-y: auto; touch-action: pan-y; overscroll-behavior: contain; padding-right: 3px; }
+  .marker-history-map-selection-list { flex: 1 1 auto; }
+  .marker-history-connections-panel { min-height: 0; overflow: hidden; }
+  .marker-history-connections-list { max-height: calc(100% - 72px); }
 }
