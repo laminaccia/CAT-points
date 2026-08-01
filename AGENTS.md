@@ -98,10 +98,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=44` e
-   `app.js?v=44`.
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=53` e
+   `app.js?v=52`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v56`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v70`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
@@ -351,6 +351,17 @@ senza sorgente. `mappa-overview-crosshair-v1` conserva la scelta di mostrare
 il mirino nella vista d'insieme: è nascosto per impostazione predefinita e il
 comando centrale **Mostra mirino** lo riattiva.
 
+Il menu delle liste contiene anche **Selezionati**, una sorgente sintetica che
+riunisce i punti scelti dalla lista locale e da tutte quelle importate. Ogni
+voce conserva il proprio `sourceKey` e il proprietario originale: la vista non
+duplica, fonde o rende modificabile una lista ricevuta. L'ordine trasversale è
+salvato separatamente in `mappa-ordine-selezione` come chiavi opache
+`sourceKey` + `entryId`; i punti appena selezionati entrano in fondo, i comandi
+**Su**/**Giù** li riordinano e deselezionare o rimuovere un punto ripulisce
+anche la chiave rimasta senza sorgente. I collegamenti continuano a usare gli
+estremi originali `{ sourceKey, entryId }`, quindi dalla lista aggregata si
+possono collegare direttamente punti appartenenti a liste diverse.
+
 La lente del mirino ha un interruttore indipendente nella posizione del vecchio
 messaggio «Sposta la mappa sotto il mirino». La scelta usa
 `mappa-crosshair-lens-v1`, è attiva al primo accesso e resta sul dispositivo.
@@ -432,6 +443,10 @@ proprietario originale e aggiunge il partecipante corrente alla catena.
 - **Mappa e linee** offre selezione singola e collettiva per la lista corrente,
   mantiene visibile il totale globale e rende immediatamente riconoscibili i
   punti disponibili per un collegamento.
+- La sorgente **Selezionati** riunisce i punti scelti da tutte le liste, mostra
+  sempre il rispettivo proprietario e permette di riordinarli e collegarli
+  senza cambiare lista; ordine, attribuzione e collegamenti sopravvivono al
+  ricaricamento del browser.
 - In **Vedi insieme** il mirino può essere mostrato o nascosto; la preferenza
   resta sul dispositivo e, se nascosto, il comando centrale permette di
   riattivarlo senza uscire dalla vista.
@@ -451,8 +466,9 @@ proprietario originale e aggiunge il partecipante corrente alla catena.
 - Una lista `*.catpoints.json` può essere importata dal pannello cronologia;
   proprietario, condivisore e catena dei passaggi restano memorizzati. Le
   liste importate sono separate, persistenti e non modificabili.
-- Gli strumenti coordinate mostrano x/y e una stima WGS84 in gradi decimali;
-  ricerca e copia JSON continuano a usare le coordinate normalizzate.
+- Gli strumenti coordinate mostrano x/y e una stima WGS84 in gradi decimali:
+  **Copia x/y** è allineato alla riga normalizzata e **Copia per Maps** alla
+  riga geografica; ricerca e copia JSON continuano a usare x/y.
 - Lo zoom massimo è 5 volte la scala iniziale; il mirino usa un canvas
   circolare come lente 2,35× e continua a restituire le stesse coordinate x/y
   del suo punto centrale. Un pulsante persistente attiva o disattiva

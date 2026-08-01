@@ -103,14 +103,14 @@ h1 { margin: 0; font-size: 22px; letter-spacing: .08em; }
 .marker.marker--swatch .marker-history-label-visual { top: -64px; }
 .marker-tail { display: none; }
 .coordinate-panel { position: absolute; z-index: 6; top: calc(50% + 42px); left: 50%; display: grid; grid-template-columns: auto auto; align-items: center; gap: 2px 9px; width: max-content; max-width: calc(100% - 32px); padding: 7px 8px 7px 11px; transform: translateX(-50%); border: 1px solid rgba(255,255,255,.16); border-radius: 13px; color: var(--text); background: rgba(9,11,16,.86); box-shadow: 0 8px 24px rgba(0,0,0,.3); backdrop-filter: blur(12px); }
-.coordinate-label { color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.coordinate-label { grid-column: 1 / -1; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .coordinate-panel output { grid-column: 1; font: 700 12px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: nowrap; }
 .coordinate-panel .geographic-coordinates { color: var(--accent-2); font-size: 10px; font-weight: 650; }
 /* Due copie, due destinazioni: la geografica si incolla su Maps, la
    normalizzata serve a chi costruisce streets.json. Ognuna dice cosa fa —
    un solo pulsante «Copia» costringerebbe a ricordare quale delle due esce. */
-.coordinate-panel button { grid-column: 2; grid-row: 1 / 3; min-height: 44px; padding: 0 10px; border-radius: 9px; border-color: rgba(217,180,91,.5); color: #12151c; background: var(--accent-2); font-size: 11px; }
-.coordinate-panel button.coordinate-secondary-copy { grid-row: 3; min-height: 44px; border-color: rgba(255,255,255,.16); color: var(--muted); background: rgba(255,255,255,.07); font-size: 10px; font-weight: 700; }
+.coordinate-panel button { grid-column: 2; min-height: 44px; padding: 0 10px; border-radius: 9px; border-color: rgba(217,180,91,.5); color: #12151c; background: var(--accent-2); font-size: 11px; }
+.coordinate-panel button.coordinate-secondary-copy { border-color: rgba(255,255,255,.16); color: var(--muted); background: rgba(255,255,255,.07); font-size: 10px; font-weight: 700; }
 .coordinate-actions { grid-column: 1 / -1; display: grid; grid-template-columns: 1.35fr 1fr; gap: 6px; margin-top: 5px; }
 .coordinate-actions button { grid-column: auto; grid-row: auto; min-height: 44px; padding: 0 9px; border-color: rgba(255,255,255,.14); color: var(--text); background: rgba(255,255,255,.08); }
 .hidden { display: none !important; }
@@ -269,7 +269,11 @@ button:active { transform: translateY(1px) scale(.97); }
 .marker-history-map-choice-copy strong { color: var(--text); font-size: 12px; }
 .marker-history-map-choice-copy small { margin-top: 3px; color: var(--muted); font-size: 9px; }
 .marker-history-map-choice.is-selected { border-color: rgba(245,219,139,.42); color: var(--text); background: rgba(217,180,91,.09); }
+.marker-history-map-item-actions { display: grid; align-content: stretch; gap: 5px; min-width: 78px; }
+.marker-history-selection-order { display: grid; grid-template-columns: repeat(2, minmax(44px, 1fr)); gap: 4px; }
+.marker-history-selection-order button { min-width: 44px; min-height: 44px; padding: 0 6px; border-radius: 10px; font-size: 10px; }
 .marker-history-connect-button { min-width: 78px; min-height: 44px; padding: 0 9px; border-radius: 11px; font-size: 11px; }
+.marker-history-map-item-actions .marker-history-connect-button { width: 100%; }
 .marker-history-connect-button.is-pending { border-color: rgba(245,219,139,.58); color: #15171b; background: var(--accent-2); }
 .marker-history-connect-button:disabled { cursor: default; opacity: .38; transform: none; }
 .marker-history-connections-panel { grid-area: connections; padding: 10px 11px; border: 1px solid rgba(255,255,255,.1); border-radius: 13px; background: rgba(255,255,255,.035); }
@@ -371,6 +375,7 @@ button:active { transform: translateY(1px) scale(.97); }
   .marker-history-footer-actions.local-view .marker-history-import-trigger { grid-column: auto; }
   .marker-history-import-hint { text-align: left; }
   .marker-history-map-workspace { grid-template: "selection summary" auto "selection connections" minmax(0, 1fr) / minmax(0, 1.45fr) minmax(320px, .8fr); height: 100%; min-height: 0; overflow: hidden; }
+  .marker-history-map-summary { grid-template-columns: minmax(0, 1fr); align-items: start; }
   .marker-history-map-selection { display: flex; flex-direction: column; }
   .marker-history-map-selection-list, .marker-history-connections-list { min-height: 0; overflow-y: auto; touch-action: pan-y; overscroll-behavior: contain; padding-right: 3px; }
   .marker-history-map-selection-list { flex: 1 1 auto; }

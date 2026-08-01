@@ -52,12 +52,16 @@
   const markerHistorySourceSelect = document.getElementById('markerHistorySourceSelect');
   const markerHistoryImportFeedback = document.getElementById('markerHistoryImportFeedback');
   const markerHistoryFooterActions = document.getElementById('markerHistoryFooterActions');
+  const markerHistoryImportHint = document.getElementById('markerHistoryImportHint');
   const selectedHistoryPointCount = document.getElementById('selectedHistoryPointCount');
   const showSelectedHistoryPointsButton = document.getElementById('showSelectedHistoryPointsButton');
   const clearSelectedHistoryPointsButton = document.getElementById('clearSelectedHistoryPointsButton');
   const toggleHistoryPointsVisibilityButton = document.getElementById('toggleHistoryPointsVisibilityButton');
   const historyVisibilityState = document.getElementById('historyVisibilityState');
+  const markerHistoryMapSelectionTitle = document.getElementById('markerHistoryMapSelectionTitle');
+  const selectedHistoryPointLabel = document.getElementById('selectedHistoryPointLabel');
   const currentHistorySourceSelectionCount = document.getElementById('currentHistorySourceSelectionCount');
+  const currentHistorySourceSelectionLabel = document.getElementById('currentHistorySourceSelectionLabel');
   const selectAllCurrentHistoryPointsButton = document.getElementById('selectAllCurrentHistoryPointsButton');
   const clearCurrentHistoryPointsButton = document.getElementById('clearCurrentHistoryPointsButton');
   const overviewCrosshairToggle = document.getElementById('overviewCrosshairToggle');
@@ -101,6 +105,7 @@
   const markerHistorySourcesStorageKey = 'mappa-marker-history-sources-v1';
   const markerHistoryOrderStorageKey = 'mappa-marker-history-order-v2';
   const markerHistoryVisibilityStorageKey = 'mappa-marker-history-visibility-v1';
+  const markerHistorySelectionOrderStorageKey = 'mappa-ordine-selezione';
   const markerHistoryConnectionsStorageKey = 'mappa-marker-history-connections-v1';
   const overviewCrosshairStorageKey = 'mappa-overview-crosshair-v1';
   const markerHistoryTabStorageKey = 'mappa-marker-history-tab-v1';
@@ -108,6 +113,7 @@
   const markerHistoryLimit = 100;
   const markerHistoryFormat = 'cat-points.marker-history';
   const markerHistoryFormatVersion = 3;
+  const selectedMarkerHistorySourceKey = '__selected__';
   const catPointsSiteUrl = 'https://laminaccia.github.io/CAT-points/';
   // La scansione non contiene metadati geografici. Questa trasformazione
   // affine WGS84 è stata calibrata su sei riferimenti riconoscibili sia nella
@@ -171,6 +177,7 @@
   let markerHistoryStore = {};
   let markerHistorySources = {};
   let markerHistoryVisibility = {};
+  let markerHistorySelectionOrder = [];
   // Nascondere non è deselezionare. `markerHistoryVisibility` dice *quali*
   // punti hai scelto; questo dice soltanto se in questo momento vanno
   // disegnati. Prima i due concetti erano lo stesso oggetto, e «Nascondi
@@ -309,6 +316,30 @@
   function persistMarkerHistoryVisibility() {
     try {
       localStorage.setItem(markerHistoryVisibilityStorageKey, JSON.stringify(markerHistoryVisibility));
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function markerHistorySelectionOrderKey(sourceKey, entryId) {
+    return JSON.stringify([String(sourceKey), String(entryId)]);
+  }
+
+  function loadMarkerHistorySelectionOrder() {
+    try {
+      const savedOrder = JSON.parse(localStorage.getItem(markerHistorySelectionOrderStorageKey) || '[]');
+      markerHistorySelectionOrder = Array.isArray(savedOrder)
+        ? [...new Set(savedOrder.map(String).filter(Boolean))].slice(0, markerHistoryLimit * 10)
+        : [];
+    } catch (error) {
+      markerHistorySelectionOrder = [];
+    }
+  }
+
+  function persistMarkerHistorySelectionOrder() {
+    try {
+      localStorage.setItem(markerHistorySelectionOrderStorageKey, JSON.stringify(markerHistorySelectionOrder));
       return true;
     } catch (error) {
       return false;
@@ -500,11 +531,13 @@
       }
     });
     if (changed) persistMarkerHistoryVisibility();
+    getSelectedMarkerHistoryEntries();
   }
 
   function updateMarkerHistoryMapSummary() {
     const count = selectedMarkerHistoryCount();
     selectedHistoryPointCount.textContent = String(count);
+    selectedHistoryPointLabel.textContent = count === 1 ? 'punto selezionato' : 'punti selezionati';
     showSelectedHistoryPointsButton.disabled = count === 0;
     clearSelectedHistoryPointsButton.disabled = count === 0;
     toggleHistoryPointsVisibilityButton.disabled = count === 0;
@@ -535,11 +568,14 @@
 
   function setMarkerHistoryVisibility(sourceKey, entryId, visible, announce = true) {
     const selectedIds = selectedMarkerHistoryIds(sourceKey);
+    const orderKey = markerHistorySelectionOrderKey(sourceKey, entryId);
     if (visible) selectedIds.add(String(entryId));
     else selectedIds.delete(String(entryId));
     if (selectedIds.size) markerHistoryVisibility[sourceKey] = [...selectedIds].slice(0, markerHistoryLimit);
     else delete markerHistoryVisibility[sourceKey];
-    const persisted = persistMarkerHistoryVisibility();
+    if (visible && !markerHistorySelectionOrder.includes(orderKey)) markerHistorySelectionOrder.push(orderKey);
+    if (!visible) markerHistorySelectionOrder = markerHistorySelectionOrder.filter((key) => key !== orderKey);
+    const persisted = persistMarkerHistoryVisibility() && persistMarkerHistorySelectionOrder();
     updateMarkerHistoryMapSummary();
     renderHistoryMapPoints();
     if (!announce) return;
@@ -549,16 +585,28 @@
 
   function setCurrentMarkerHistoryVisibility(visible) {
     const source = getVisibleMarkerHistorySource();
+    if (source.type === 'selected') {
+      if (!visible) clearSelectedMarkerHistoryPoints();
+      return;
+    }
     const entryIds = source.entries.map((entry) => String(entry.id));
-    if (visible) markerHistoryVisibility[source.key] = entryIds.slice(0, markerHistoryLimit);
-    else {
+    if (visible) {
+      markerHistoryVisibility[source.key] = entryIds.slice(0, markerHistoryLimit);
+      entryIds.forEach((entryId) => {
+        const orderKey = markerHistorySelectionOrderKey(source.key, entryId);
+        if (!markerHistorySelectionOrder.includes(orderKey)) markerHistorySelectionOrder.push(orderKey);
+      });
+    } else {
       delete markerHistoryVisibility[source.key];
+      const sourceOrderKeys = new Set(entryIds.map((entryId) => markerHistorySelectionOrderKey(source.key, entryId)));
+      markerHistorySelectionOrder = markerHistorySelectionOrder.filter((key) => !sourceOrderKeys.has(key));
       if (pendingHistoryConnectionEndpoint?.sourceKey === source.key) pendingHistoryConnectionEndpoint = null;
     }
-    const persisted = persistMarkerHistoryVisibility();
+    const persisted = persistMarkerHistoryVisibility() && persistMarkerHistorySelectionOrder();
     updateMarkerHistoryMapSummary();
     renderHistoryMapPoints();
     renderMarkerHistoryMapList(source);
+    renderMarkerHistorySourceOptions(source);
     renderMarkerHistoryConnectionsPanel();
     const action = visible ? 'Tutti i punti della lista sono visibili' : 'Punti della lista nascosti';
     setStatus(persisted ? action : `${action} solo per questa sessione`);
@@ -566,6 +614,7 @@
 
   function clearSelectedMarkerHistoryPoints() {
     markerHistoryVisibility = {};
+    markerHistorySelectionOrder = [];
     pendingHistoryConnectionEndpoint = null;
     // Svuotata la selezione, «nascosto» non si riferisce più a niente: se
     // restasse acceso resterebbe in agguato per la scelta successiva, e chi
@@ -573,7 +622,7 @@
     // sgombrare una selezione che esiste, non a mettere un filtro permanente.
     markerHistoryPointsHidden = false;
     persistMarkerHistoryPointsHidden();
-    const persisted = persistMarkerHistoryVisibility();
+    const persisted = persistMarkerHistoryVisibility() && persistMarkerHistorySelectionOrder();
     updateMarkerHistoryMapSummary();
     renderHistoryMapPoints();
     renderMarkerHistory();
@@ -617,9 +666,9 @@
     });
   }
 
-  function chooseHistoryConnectionEndpoint(source, entry) {
-    const endpoint = { sourceKey: source.key, entryId: String(entry.id) };
-    if (!selectedMarkerHistoryIds(source.key).has(endpoint.entryId)) {
+  function chooseHistoryConnectionEndpoint(sourceKey, entry) {
+    const endpoint = { sourceKey, entryId: String(entry.id) };
+    if (!selectedMarkerHistoryIds(sourceKey).has(endpoint.entryId)) {
       setStatus('Mostra prima il punto sulla mappa');
       return;
     }
@@ -778,11 +827,9 @@
     return Array.isArray(markerHistoryStore[playerKey]) ? markerHistoryStore[playerKey] : [];
   }
 
-  function getVisibleMarkerHistorySource() {
+  function getMarkerHistorySourceByKey(sourceKey) {
     const localKey = markerHistoryPlayerKey();
-    const selectedKey = markerHistoryViewKey && markerHistorySources[markerHistoryViewKey]
-      ? markerHistoryViewKey
-      : localKey;
+    const selectedKey = sourceKey && markerHistorySources[sourceKey] ? sourceKey : localKey;
     const source = selectedKey === localKey
       ? ensureLocalMarkerHistorySource()
       : markerHistorySources[selectedKey];
@@ -798,6 +845,43 @@
       importedAt: source?.importedAt || null,
       sourceUrl: source?.sourceUrl || catPointsSiteUrl,
       entries: Array.isArray(markerHistoryStore[selectedKey]) ? markerHistoryStore[selectedKey] : []
+    };
+  }
+
+  function getSelectedMarkerHistorySource() {
+    const records = getSelectedMarkerHistoryEntries();
+    return {
+      key: selectedMarkerHistorySourceKey,
+      type: 'selected',
+      listId: selectedMarkerHistorySourceKey,
+      ownerName: normalizeParticipantName(state.playerName) || 'Selezione corrente',
+      sharedBy: '',
+      sharingChain: [],
+      createdAt: null,
+      exportedAt: null,
+      importedAt: null,
+      sourceUrl: catPointsSiteUrl,
+      entries: records.map(({ entry, sourceKey, ownerName, sourceType }) => ({
+        ...entry,
+        sourceKey,
+        ownerName,
+        sourceType
+      }))
+    };
+  }
+
+  function getVisibleMarkerHistorySource() {
+    if (markerHistoryViewKey === selectedMarkerHistorySourceKey) return getSelectedMarkerHistorySource();
+    return getMarkerHistorySourceByKey(markerHistoryViewKey || markerHistoryPlayerKey());
+  }
+
+  function markerHistoryEntryContext(source, entry) {
+    const sourceKey = source.type === 'selected' ? String(entry.sourceKey || '') : source.key;
+    const actualSource = source.type === 'selected' ? getMarkerHistorySourceByKey(sourceKey) : source;
+    return {
+      sourceKey,
+      source: actualSource,
+      ownerName: normalizeParticipantName(entry.ownerName || actualSource.ownerName || state.playerName)
     };
   }
 
@@ -834,29 +918,37 @@
 
   function renderMarkerHistoryMapList(source = getVisibleMarkerHistorySource()) {
     markerHistoryMapList.replaceChildren();
-    const selectedIds = selectedMarkerHistoryIds(source.key);
-    const selectedCount = source.entries.reduce((total, entry) => (
-      total + (selectedIds.has(String(entry.id)) ? 1 : 0)
-    ), 0);
+    const isSelectedSource = source.type === 'selected';
+    const selectedCount = source.entries.reduce((total, entry) => {
+      const context = markerHistoryEntryContext(source, entry);
+      return total + (selectedMarkerHistoryIds(context.sourceKey).has(String(entry.id)) ? 1 : 0);
+    }, 0);
+    markerHistoryMapSelectionTitle.textContent = isSelectedSource ? 'Punti selezionati' : 'Punti di questa lista';
     currentHistorySourceSelectionCount.textContent = String(selectedCount);
-    selectAllCurrentHistoryPointsButton.disabled = source.entries.length === 0
+    currentHistorySourceSelectionLabel.textContent = selectedCount === 1 ? 'selezionato' : 'selezionati';
+    selectAllCurrentHistoryPointsButton.classList.toggle('hidden', isSelectedSource);
+    selectAllCurrentHistoryPointsButton.disabled = isSelectedSource || source.entries.length === 0
       || selectedCount === source.entries.length;
+    clearCurrentHistoryPointsButton.textContent = isSelectedSource ? 'Svuota' : 'Nessuno';
     clearCurrentHistoryPointsButton.disabled = selectedCount === 0;
 
     if (!source.entries.length) {
       const empty = document.createElement('p');
       empty.className = 'marker-history-empty';
-      empty.textContent = 'Questa lista non contiene punti da mostrare sulla mappa.';
+      empty.textContent = isSelectedSource
+        ? 'Nessun punto selezionato. Scegline uno da una lista personale o importata.'
+        : 'Questa lista non contiene punti da mostrare sulla mappa.';
       markerHistoryMapList.append(empty);
       return;
     }
 
     source.entries.forEach((entry, index) => {
+      const context = markerHistoryEntryContext(source, entry);
       const entryId = String(entry.id);
       const historyLabel = normalizeHistoryLabel(entry.label);
       const pointName = historyLabel || entry.text || 'Punto senza etichetta';
-      const endpoint = { sourceKey: source.key, entryId };
-      const isSelected = selectedIds.has(entryId);
+      const endpoint = { sourceKey: context.sourceKey, entryId };
+      const isSelected = selectedMarkerHistoryIds(context.sourceKey).has(entryId);
       const isPendingEndpoint = pendingHistoryConnectionEndpoint
         && historyConnectionEndpointKey(pendingHistoryConnectionEndpoint) === historyConnectionEndpointKey(endpoint);
       const item = document.createElement('article');
@@ -867,15 +959,44 @@
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.checked = isSelected;
-      checkbox.setAttribute('aria-label', `Mostra sulla mappa ${pointName} dalla lista di ${source.ownerName}`);
+      checkbox.setAttribute('aria-label', `Mostra sulla mappa ${pointName} dalla lista di ${context.ownerName}`);
       const copy = document.createElement('span');
       copy.className = 'marker-history-map-choice-copy';
       const title = document.createElement('strong');
       title.textContent = pointName;
       const meta = document.createElement('small');
-      meta.textContent = `Punto ${index + 1} · ${formatMarkerHistoryTime(entry.createdAt)}`;
+      meta.textContent = isSelectedSource
+        ? `Selezione ${index + 1} · ${context.ownerName}`
+        : `Punto ${index + 1} · ${formatMarkerHistoryTime(entry.createdAt)}`;
       copy.append(title, meta);
       choice.append(checkbox, createHistoryMarkerSwatch(Array.isArray(entry.colors) ? entry.colors : []), copy);
+
+      const itemActions = document.createElement('div');
+      itemActions.className = 'marker-history-map-item-actions';
+      if (isSelectedSource) {
+        const orderActions = document.createElement('div');
+        orderActions.className = 'marker-history-selection-order';
+        const moveUpButton = document.createElement('button');
+        moveUpButton.className = 'secondary-wide';
+        moveUpButton.type = 'button';
+        moveUpButton.textContent = 'Su';
+        moveUpButton.disabled = index === 0;
+        moveUpButton.setAttribute('aria-label', `Sposta ${pointName} verso l’alto nella lista dei selezionati`);
+        moveUpButton.addEventListener('click', () => (
+          moveSelectedMarkerHistoryEntry(context.sourceKey, entry.id, -1)
+        ));
+        const moveDownButton = document.createElement('button');
+        moveDownButton.className = 'secondary-wide';
+        moveDownButton.type = 'button';
+        moveDownButton.textContent = 'Giù';
+        moveDownButton.disabled = index === source.entries.length - 1;
+        moveDownButton.setAttribute('aria-label', `Sposta ${pointName} verso il basso nella lista dei selezionati`);
+        moveDownButton.addEventListener('click', () => (
+          moveSelectedMarkerHistoryEntry(context.sourceKey, entry.id, 1)
+        ));
+        orderActions.append(moveUpButton, moveDownButton);
+        itemActions.append(orderActions);
+      }
 
       const connectButton = document.createElement('button');
       connectButton.className = 'marker-history-connect-button secondary-wide';
@@ -892,12 +1013,17 @@
 
       checkbox.addEventListener('change', () => {
         if (!checkbox.checked && isPendingEndpoint) pendingHistoryConnectionEndpoint = null;
-        setMarkerHistoryVisibility(source.key, entry.id, checkbox.checked);
-        renderMarkerHistoryMapList(source);
-        renderMarkerHistoryConnectionsPanel();
+        setMarkerHistoryVisibility(context.sourceKey, entry.id, checkbox.checked);
+        if (isSelectedSource) renderMarkerHistory();
+        else {
+          renderMarkerHistoryMapList(source);
+          renderMarkerHistorySourceOptions(source);
+          renderMarkerHistoryConnectionsPanel();
+        }
       });
-      connectButton.addEventListener('click', () => chooseHistoryConnectionEndpoint(source, entry));
-      item.append(choice, connectButton);
+      connectButton.addEventListener('click', () => chooseHistoryConnectionEndpoint(context.sourceKey, entry));
+      itemActions.append(connectButton);
+      item.append(choice, itemActions);
       markerHistoryMapList.append(item);
     });
   }
@@ -912,7 +1038,8 @@
     if (!Number.isFinite(x) || !Number.isFinite(y)) return;
     state.markerColors = Array.isArray(entry.colors) ? [...entry.colors].slice(0, 2) : [defaultMarkerColor];
     state.markerText = typeof entry.text === 'string' ? entry.text.slice(0, 12) : '';
-    activeHistoryEntryId = source.type === 'imported' ? null : entry.id;
+    const isEditableSource = source.type !== 'imported' && source.key === markerHistoryPlayerKey();
+    activeHistoryEntryId = isEditableSource ? entry.id : null;
     activeHistoryMapEntryId = entry.id;
     activeHistoryMapSourceKey = source.key;
     activeHistoryLabel = normalizeHistoryLabel(entry.label);
@@ -930,7 +1057,7 @@
     updateCrosshairCoordinates();
     renderHistoryMapPoints();
     const restoredName = activeHistoryLabel || state.markerText;
-    const sourceLabel = source.type === 'imported' ? `Importato da ${activeMarkerOwner}` : 'Punto ripristinato';
+    const sourceLabel = isEditableSource ? 'Punto ripristinato' : `Punto di ${activeMarkerOwner}`;
     setStatus(restoredName ? `${sourceLabel} • ${restoredName}` : sourceLabel);
   }
 
@@ -986,6 +1113,22 @@
     setStatus(persisted ? 'Ordine cronologia aggiornato' : 'Ordine valido solo per questa sessione');
   }
 
+  function moveSelectedMarkerHistoryEntry(sourceKey, entryId, offset) {
+    const records = getSelectedMarkerHistoryEntries();
+    const currentKey = markerHistorySelectionOrderKey(sourceKey, entryId);
+    const currentIndex = records.findIndex((record) => (
+      markerHistorySelectionOrderKey(record.sourceKey, record.entry.id) === currentKey
+    ));
+    const targetIndex = currentIndex + offset;
+    if (currentIndex < 0 || targetIndex < 0 || targetIndex >= records.length) return;
+    const orderedKeys = records.map((record) => markerHistorySelectionOrderKey(record.sourceKey, record.entry.id));
+    [orderedKeys[currentIndex], orderedKeys[targetIndex]] = [orderedKeys[targetIndex], orderedKeys[currentIndex]];
+    markerHistorySelectionOrder = orderedKeys;
+    const persisted = persistMarkerHistorySelectionOrder();
+    renderMarkerHistory();
+    setStatus(persisted ? 'Ordine dei selezionati aggiornato' : 'Ordine valido solo per questa sessione');
+  }
+
   function openMarkerHistoryLabelEditor(item, actions, entry, triggerButton) {
     actions.classList.add('hidden');
     const form = document.createElement('form');
@@ -1037,6 +1180,12 @@
     localOption.textContent = `La mia lista · ${localSource?.ownerName || state.playerName}`;
     markerHistorySourceSelect.append(localOption);
 
+    const selectedOption = document.createElement('option');
+    const selectedCount = selectedMarkerHistoryCount();
+    selectedOption.value = selectedMarkerHistorySourceKey;
+    selectedOption.textContent = `Selezionati · tutte le liste (${selectedCount})`;
+    markerHistorySourceSelect.append(selectedOption);
+
     Object.entries(markerHistorySources)
       .filter(([sourceKey, source]) => sourceKey !== localKey
         && source?.type === 'imported'
@@ -1057,32 +1206,43 @@
     markerHistoryList.replaceChildren();
     const source = getVisibleMarkerHistorySource();
     const isImported = source.type === 'imported';
+    const isSelectedSource = source.type === 'selected';
     pruneMarkerHistoryConnections();
     updateMarkerHistoryMapSummary();
     renderMarkerHistoryConnectionsPanel();
     renderMarkerHistoryMapList(source);
     renderMarkerHistorySourceOptions(source);
-    markerHistoryFooterActions.classList.toggle('local-view', !isImported);
-    removeImportedMarkerHistoryButton.classList.toggle('hidden', !isImported);
+    markerHistoryFooterActions.classList.toggle('local-view', !isImported && !isSelectedSource);
+    markerHistoryFooterActions.classList.toggle('hidden', isSelectedSource);
+    markerHistoryImportHint.classList.toggle('hidden', isSelectedSource);
+    removeImportedMarkerHistoryButton.classList.toggle('hidden', !isImported || isSelectedSource);
     exportMarkerHistoryButton.textContent = isImported
       ? `Condividi lista di ${source.ownerName}`
       : 'Condividi questa lista';
     const entries = source.entries;
     const pointCountLabel = `${entries.length} ${entries.length === 1 ? 'punto' : 'punti'}`;
-    markerHistoryDescription.textContent = isImported
-      ? `Lista di ${source.ownerName}, condivisa da ${source.sharedBy || source.ownerName}: ${pointCountLabel}.`
-      : `Cronologia di ${state.playerName}: ${pointCountLabel} ${entries.length === 1 ? 'salvato' : 'salvati'} su questo dispositivo.`;
-    exportMarkerHistoryButton.disabled = entries.length === 0;
+    markerHistoryDescription.textContent = isSelectedSource
+      ? `${pointCountLabel} ${entries.length === 1 ? 'scelto' : 'scelti'} da tutte le liste. ${entries.length === 1 ? 'Riordinalo e collegalo' : 'Riordinali e collegali'} nella scheda “Mappa e linee”.`
+      : isImported
+        ? `Lista di ${source.ownerName}, condivisa da ${source.sharedBy || source.ownerName}: ${pointCountLabel}.`
+        : `Cronologia di ${state.playerName}: ${pointCountLabel} ${entries.length === 1 ? 'salvato' : 'salvati'} su questo dispositivo.`;
+    exportMarkerHistoryButton.disabled = isSelectedSource || entries.length === 0;
     if (!entries.length) {
       const empty = document.createElement('p');
       empty.className = 'marker-history-empty';
-      empty.textContent = isImported
-        ? 'Questa lista importata non contiene punti validi.'
-        : 'Nessun punto salvato. Il primo verrà aggiunto automaticamente quando confermi un punto.';
+      empty.textContent = isSelectedSource
+        ? 'Nessun punto selezionato. Apri “Mappa e linee” e scegli i punti dalle liste disponibili.'
+        : isImported
+          ? 'Questa lista importata non contiene punti validi.'
+          : 'Nessun punto salvato. Il primo verrà aggiunto automaticamente quando confermi un punto.';
       markerHistoryList.append(empty);
       return;
     }
     entries.forEach((entry, index) => {
+      const entryContext = markerHistoryEntryContext(source, entry);
+      const entrySource = entryContext.source;
+      const entryIsImported = entrySource.type === 'imported';
+      const entryIsReadOnly = entryIsImported || entryContext.sourceKey !== markerHistoryPlayerKey();
       const item = document.createElement('article');
       item.className = 'marker-history-item';
       item.append(createHistoryMarkerSwatch(Array.isArray(entry.colors) ? entry.colors : []));
@@ -1118,7 +1278,7 @@
       }
       item.append(copy);
 
-      if (!isImported) {
+      if (!entryIsReadOnly && !isSelectedSource) {
         const order = document.createElement('div');
         order.className = 'marker-history-order';
         const orderLabel = document.createElement('span');
@@ -1147,20 +1307,29 @@
       restoreButton.className = 'secondary-wide';
       restoreButton.type = 'button';
       restoreButton.textContent = 'Rivedi';
-      restoreButton.addEventListener('click', () => restoreMarkerHistoryEntry(entry, source));
+      restoreButton.addEventListener('click', () => restoreMarkerHistoryEntry(entry, entrySource));
       const shareButton = document.createElement('button');
       shareButton.className = 'primary-button';
       shareButton.type = 'button';
       shareButton.textContent = 'Invia foto';
       shareButton.addEventListener('click', async () => {
-        restoreMarkerHistoryEntry(entry, source);
+        restoreMarkerHistoryEntry(entry, entrySource);
         await shareCurrentMarker();
       });
 
-      if (isImported) {
+      if (isSelectedSource) {
+        const selectedOrder = document.createElement('div');
+        selectedOrder.className = 'marker-history-imported-order';
+        selectedOrder.textContent = `Selezione ${index + 1} di ${entries.length} · lista di ${entryContext.ownerName}`;
+        item.append(selectedOrder);
+      }
+
+      if (entryIsReadOnly) {
         const importedOrder = document.createElement('div');
         importedOrder.className = 'marker-history-imported-order';
-        importedOrder.textContent = `Posizione ${index + 1} di ${entries.length} · autore ${source.ownerName}`;
+        importedOrder.textContent = isSelectedSource
+          ? `Punto di ${entryContext.ownerName}: la lista originale resta in sola lettura.`
+          : `Posizione ${index + 1} di ${entries.length} · autore ${entryContext.ownerName}`;
         item.append(importedOrder);
         actions.append(restoreButton, shareButton);
         item.append(actions);
@@ -1186,6 +1355,7 @@
 
   function buildMarkerHistoryExport() {
     const source = getVisibleMarkerHistorySource();
+    if (source.type === 'selected') return null;
     const sharedAt = new Date().toISOString();
     const sharedBy = normalizeParticipantName(state.playerName) || source.ownerName;
     const previousSharingChain = source.sharingChain
@@ -1256,7 +1426,7 @@
 
   async function exportAndShareMarkerHistory() {
     const payload = buildMarkerHistoryExport();
-    if (!payload.list.markers.length) {
+    if (!payload || !payload.list.markers.length) {
       setStatus('Nessun punto da esportare');
       return;
     }
@@ -2164,7 +2334,7 @@
     };
   }
 
-  function getSelectedMarkerHistoryEntries() {
+  function collectSelectedMarkerHistoryEntries() {
     const selectedEntries = [];
     Object.entries(markerHistoryVisibility).forEach(([sourceKey, entryIds]) => {
       const selectedIds = new Set(entryIds);
@@ -2175,10 +2345,41 @@
       (Array.isArray(markerHistoryStore[sourceKey]) ? markerHistoryStore[sourceKey] : [])
         .forEach((entry) => {
           if (!selectedIds.has(String(entry.id))) return;
-          selectedEntries.push({ entry, sourceKey, ownerName });
+          selectedEntries.push({
+            entry,
+            sourceKey,
+            ownerName,
+            sourceType: source?.type === 'imported' ? 'imported' : 'local'
+          });
         });
     });
     return selectedEntries;
+  }
+
+  function getSelectedMarkerHistoryEntries() {
+    const records = collectSelectedMarkerHistoryEntries();
+    const recordsByKey = new Map(records.map((record) => [
+      markerHistorySelectionOrderKey(record.sourceKey, record.entry.id),
+      record
+    ]));
+    const seen = new Set();
+    const nextOrder = markerHistorySelectionOrder.filter((key) => {
+      if (!recordsByKey.has(key) || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    records.forEach((record) => {
+      const key = markerHistorySelectionOrderKey(record.sourceKey, record.entry.id);
+      if (seen.has(key)) return;
+      seen.add(key);
+      nextOrder.push(key);
+    });
+    if (nextOrder.length !== markerHistorySelectionOrder.length
+      || nextOrder.some((key, index) => key !== markerHistorySelectionOrder[index])) {
+      markerHistorySelectionOrder = nextOrder;
+      persistMarkerHistorySelectionOrder();
+    }
+    return markerHistorySelectionOrder.map((key) => recordsByKey.get(key)).filter(Boolean);
   }
 
   function updateHistoryMapOverlayScale() {
@@ -3107,6 +3308,7 @@
   loadMarkerHistoryStore();
   loadMarkerHistorySources();
   loadMarkerHistoryVisibility();
+  loadMarkerHistorySelectionOrder();
   readMarkerHistoryPointsHidden();
   loadMarkerHistoryConnections();
   loadOverviewCrosshairPreference();

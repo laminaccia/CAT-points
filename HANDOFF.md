@@ -5,6 +5,48 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-08-01 — Lista trasversale dei selezionati e copie coordinate riallineate
+
+*Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,
+`app.js`, `service-worker.js`, `README.md`, `AGENTS.md`.*
+
+Ripresa la traccia lasciata da Claude nel passaggio precedente. Il menu
+**Lista visualizzata** contiene ora **Selezionati · tutte le liste (N)**: non è
+una nuova cronologia e non copia dati, ma costruisce una sorgente sintetica in
+cui ogni voce porta il proprio `sourceKey`, il proprietario e il tipo della
+lista originale. Le liste importate restano quindi attribuite e in sola
+lettura.
+
+La sorgente aggregata permette di togliere una spunta, collegare direttamente
+punti di liste diverse e riordinarli con **Su**/**Giù**. L'ordine trasversale
+usa `mappa-ordine-selezione` e chiavi opache composte da lista e ID del punto;
+un nuovo selezionato entra in fondo, deselezionare o cancellare ripulisce la
+chiave e il rendering della mappa segue lo stesso ordine. L'export resta
+volutamente legato alle liste originali: una selezione con più responsabili non
+viene mascherata da lista autonoma.
+
+Nel pannello del mirino **Copia x/y** è ora sulla riga dei valori normalizzati;
+**Copia per Maps** sta sotto, perfettamente centrato sulla riga Lat/Lon. A
+390×844 gli assi verticali coincidono al decimo di pixel; entrambi i pulsanti
+mantengono 44 px di altezza.
+
+Collaudo con due punti locali e due importati: selezione da sorgenti diverse,
+riordino, collegamento incrociato, deselezione dalla vista aggregata e ricarica.
+Ordine e linea persistono; console pulita. Verificati 390×844 e 1440×900 senza
+overflow; sul desktop il riepilogo resta impilato nella colonna stretta per non
+ridurre il testo a una parola per riga.
+
+Chiuso anche il caso cambio identità: un punto locale scelto sotto un altro
+nome può restare nella selezione trasversale, ma viene trattato in sola lettura
+come una lista non corrente. Ripristinarlo non lo rende modificabile sotto il
+nuovo partecipante e non espone azioni che cancellerebbero la cronologia
+sbagliata.
+
+Versioni pubblicabili: `styles.css?v=53`, `app.js?v=52`, cache
+`mappa-squadra-v70`.
+
+---
+
 ## 2026-08-01 — Passaggio con Impeccable 4.0.4 e una trappola di stato chiusa
 
 *Agente: Claude. Toccato `app.js`.*

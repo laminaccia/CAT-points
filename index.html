@@ -10,7 +10,7 @@
   <title>Mappa Squadra</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=51">
+  <link rel="stylesheet" href="styles.css?v=53">
 </head>
 <body>
   <main class="app-shell">
@@ -75,9 +75,9 @@
       <div class="coordinate-panel hidden" id="coordinatePanel">
         <span class="coordinate-label" id="coordinateLabel">Coordinate mirino</span>
         <output id="crosshairCoordinates" aria-label="Coordinate normalizzate del mirino">x — · y —</output>
+        <button id="copyCoordinatesButton" class="coordinate-secondary-copy" type="button" aria-describedby="crosshairCoordinates">Copia x/y</button>
         <output class="geographic-coordinates" id="geographicCoordinates" aria-label="Coordinate geografiche stimate del mirino">Lat — · Lon —</output>
         <button id="copyGeographicButton" type="button" aria-describedby="geographicCoordinates">Copia per Maps</button>
-        <button id="copyCoordinatesButton" class="coordinate-secondary-copy" type="button" aria-describedby="crosshairCoordinates">Copia x/y</button>
         <div class="coordinate-actions">
           <button id="addStreetPointButton" type="button">＋ Aggiungi punto</button>
           <button id="openStreetPointListButton" type="button">Lista (<span id="streetPointCount">0</span>)</button>
@@ -298,7 +298,7 @@
             <div class="marker-history-map-workspace">
               <div class="marker-history-map-summary">
                 <div>
-                  <strong><span id="selectedHistoryPointCount">0</span> punti selezionati</strong>
+                  <strong><span id="selectedHistoryPointCount">0</span> <span id="selectedHistoryPointLabel">punti selezionati</span></strong>
                   <small id="historyVisibilityState">Da tutte le liste, disegnati sulla mappa.</small>
                 </div>
                 <div class="marker-history-map-summary-actions">
@@ -315,7 +315,7 @@
                 <div class="marker-history-map-selection-heading">
                   <div>
                     <strong id="markerHistoryMapSelectionTitle">Punti di questa lista</strong>
-                    <small><span id="currentHistorySourceSelectionCount">0</span> selezionati</small>
+                    <small><span id="currentHistorySourceSelectionCount">0</span> <span id="currentHistorySourceSelectionLabel">selezionati</span></small>
                   </div>
                   <div class="marker-history-map-bulk-actions">
                     <button id="selectAllCurrentHistoryPointsButton" class="secondary-wide" type="button">Mostra tutti</button>
@@ -342,6 +342,6 @@
     <canvas id="exportCanvas" hidden></canvas>
   </main>
 
-  <script src="app.js?v=49" defer></script>
+  <script src="app.js?v=52" defer></script>
 </body>
 </html>
