@@ -5,6 +5,40 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-29 — Tolti due errori del PDF, con la ragione scritta accanto
+
+*Agente: Claude. Toccati `assets/streets.json` (rigenerato),
+`tools/merge-streets.py`, `data/sorgenti/esclusi.json` (nuovo).*
+
+L'utente ha confermato la cancellazione dei due punti che avevo segnalato:
+
+* **`Via Acquanuova`** (0.50805, 0.379187) — grafia alternativa di
+  `Via Acquanova`, curata nel lotto 01 a 0.018 di distanza: la stessa via
+  scritta in due modi.
+* **`Via Palermo`** (0.115774, 0.073224) — angolo in alto a sinistra, a 0.78
+  dalla Via Palermo del paese: è l'indicazione stradale *per* Palermo letta dal
+  livello testo del PDF. Le altre due occorrenze, accanto alla via vera,
+  restano.
+
+**Non le ho cancellate da `estrazione-pdf.json`.** Quel file è la fotografia
+intatta di ciò che il PDF conteneva e serve a poter riconfrontare; cancellarci
+dentro avrebbe reso la decisione invisibile e irreversibile. È nato invece
+`data/sorgenti/esclusi.json`: ogni voce si identifica con label più coordinate
+esatte e porta scritto il motivo, che lo script stampa a ogni ricostruzione.
+Se un'esclusione non trova più il suo bersaglio viene segnalata — vuol dire che
+la sorgente è cambiata sotto e la regola va riletta.
+
+Indice: **423 → 421 voci**. Il rapporto sulle varianti di grafia è ora vuoto.
+`CACHE` a `mappa-squadra-v59`; nessun CSS o JS toccato, quindi nessun `?v=N`
+da muovere.
+
+Verificato nell'app da cache azzerata: `acquan` trova solo `Via ACQUANOVA` (e
+`Largo Duca degli ABRUZZI`, che ha *l'acquanova* fra gli alias dialettali —
+funzionano ancora), `palermo` dà tre punti tutti raccolti lungo la via vera,
+e nessuna voce Palermo sopravvive nell'angolo della mappa. Console pulita.
+
+---
+
 ## 2026-07-29 — Secondo lotto; etichette col cognome in risalto
 
 *Agente: Claude. Toccati `assets/streets.json` (rigenerato), `tools/merge-streets.py`,

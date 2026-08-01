@@ -53,6 +53,7 @@ RADICE = pathlib.Path(__file__).resolve().parent.parent
 INDICE = RADICE / "assets" / "streets.json"
 SORGENTI = RADICE / "data" / "sorgenti"
 ESTRAZIONE = SORGENTI / "estrazione-pdf.json"
+ESCLUSI = SORGENTI / "esclusi.json"
 
 # Stessa lista di app.js: sono parole che il motore toglie dalla query, quindi
 # un tag fatto solo di queste non può essere trovato in nessun modo.
@@ -480,6 +481,36 @@ def unisci(automatiche, manuali):
     return unite, rapporto
 
 
+def applica_esclusioni(voci):
+    """Toglie dall'estrazione i punti che l'utente ha dichiarato errati.
+
+    Sta qui e non dentro `estrazione-pdf.json` perché quel file è la fotografia
+    intatta di ciò che il PDF conteneva: cancellarci dentro renderebbe la
+    decisione invisibile e irreversibile. Così invece resta scritto *che cosa*
+    si è tolto e *perché*.
+
+    Un'esclusione che non trova il suo punto viene segnalata: vuol dire che la
+    sorgente è cambiata sotto e che la regola va riletta, non lasciata a
+    marcire in silenzio.
+    """
+    if not ESCLUSI.exists():
+        return voci, [], []
+    elenco = json.loads(ESCLUSI.read_text(encoding="utf-8")).get("esclusi", [])
+    rimaste, tolte, orfane = list(voci), [], []
+    for regola in elenco:
+        bersaglio = next(
+            (v for v in rimaste
+             if abs(v["x"] - regola["x"]) < 1e-6 and abs(v["y"] - regola["y"]) < 1e-6
+             and normalizza(v["label"]) == normalizza(regola["label"])), None
+        )
+        if bersaglio is None:
+            orfane.append(regola)
+            continue
+        rimaste.remove(bersaglio)
+        tolte.append((bersaglio, regola.get("motivo", "")))
+    return rimaste, tolte, orfane
+
+
 def quasi_omonimi(rimaste, manuali, somiglianza_minima=0.85, distanza_massima=0.05):
     """Nomi che si somigliano ma non combaciano, su punti vicini.
 
@@ -543,9 +574,17 @@ def main():
     print("sorgenti:", ", ".join(p.name for p in [ESTRAZIONE] + lotti), "\n")
 
     indice = json.loads(ESTRAZIONE.read_text(encoding="utf-8"))
-    automatiche = collassa_doppioni_interni(
-        [normalizza_voce(v) for v in indice["streets"]]
-    )
+    grezze, tolte, orfane = applica_esclusioni(indice["streets"])
+    automatiche = collassa_doppioni_interni([normalizza_voce(v) for v in grezze])
+
+    if tolte:
+        print(f"esclusi          {len(tolte)} punti dichiarati errati dall'utente:")
+        for voce, motivo in tolte:
+            print(f"     «{voce['label']}» ({voce['x']}, {voce['y']})")
+            print(f"       {motivo}")
+    for regola in orfane:
+        print(f"  ⚠ esclusione senza bersaglio: «{regola['label']}» "
+              f"({regola['x']}, {regola['y']}) — la sorgente è cambiata?")
 
     manuali, doppi_fra_lotti = [], []
     for lotto in lotti:

@@ -2291,12 +2291,6 @@
     },
     {
       "label": "Via PALERMO",
-      "x": 0.115774,
-      "tags": ["Via PALERMO","Palermo"],
-      "y": 0.073224
-    },
-    {
-      "label": "Via PALERMO",
       "x": 0.763573,
       "tags": ["Via PALERMO","Palermo"],
       "y": 0.568809
@@ -2396,12 +2390,6 @@
       "x": 0.743028,
       "tags": ["Via A. DE GASPERI","A de Gasperi","De","Gasperi"],
       "y": 0.197496
-    },
-    {
-      "label": "Via ACQUANUOVA",
-      "x": 0.50805,
-      "tags": ["Via ACQUANUOVA","Acquanuova"],
-      "y": 0.379187
     },
     {
       "label": "Via Silvio PELLICO",

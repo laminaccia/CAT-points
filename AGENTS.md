@@ -164,6 +164,14 @@ sorgenti stanno in `data/sorgenti/` e sono due tipi di file molto diversi.
 |----------|-----------|---------|
 | `estrazione-pdf.json` | i 161 punti estratti dal livello testo del PDF | grezza |
 | `lotto-NN.json` | i punti segnati a mano con lo strumento dell'app | curata |
+| `esclusi.json` | punti dell'estrazione dichiarati errati, con la ragione | — |
+
+**Gli errori del PDF si tolgono da `esclusi.json`, non cancellandoli
+dall'estrazione.** `estrazione-pdf.json` è la fotografia intatta di ciò che il
+livello testo conteneva: serve a poter riconfrontare, e cancellarci dentro
+renderebbe la decisione invisibile. Ogni esclusione porta con sé il motivo, e
+se un giorno non trova più il suo punto lo script lo segnala invece di
+ignorarlo in silenzio.
 
 L'estrazione copre tutta la mappa, ma le etichette sono come le ha lasciate il
 PDF: abbreviate («c/da FRANCO», «C.LE AMARI»), troncate sugli a capo («Via Sac.
