@@ -26,11 +26,25 @@ button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; 
 .map-viewport img { display: block; max-width: none; outline: 1px solid rgba(255,255,255,.32); box-shadow: 0 18px 54px rgba(0,0,0,.42); image-rendering: auto; user-select: none; -webkit-user-drag: none; pointer-events: none; }
 .history-map-layer { position: absolute; z-index: 2; left: 0; top: 0; width: 0; height: 0; overflow: visible; pointer-events: none; }
 .history-map-connections { position: absolute; z-index: 1; left: 0; top: 0; overflow: visible; pointer-events: none; }
-.history-map-connection-underlay, .history-map-connection-line { fill: none; stroke-linecap: round; pointer-events: none; }
+.history-map-connection-underlay, .history-map-connection-line, .history-map-connection-hit { fill: none; stroke-linecap: round; pointer-events: none; }
 .history-map-connection-underlay { stroke: rgba(12,15,20,.82); }
 .history-map-connection-line { stroke: var(--accent-2); }
+.history-map-connection-underlay.is-active { stroke: rgba(12,15,20,.96); }
+.history-map-connection-line.is-active { stroke: #fff1b4; filter: drop-shadow(0 0 5px rgba(245,219,139,.78)); }
+.history-map-connection-hit { stroke: transparent; pointer-events: stroke; cursor: pointer; }
+.history-map-connection-hit:focus-visible { outline: none; stroke: rgba(245,219,139,.2); }
+.history-map-connection-handle { fill: rgba(9,12,17,.94); stroke: var(--accent-2); stroke-width: 1.5px; vector-effect: non-scaling-stroke; pointer-events: none; }
+.history-map-connection-handle.is-active { fill: var(--accent-2); stroke: #17191f; filter: drop-shadow(0 0 4px rgba(245,219,139,.78)); }
+.history-map-connection-control { fill: transparent; pointer-events: all; cursor: pointer; }
+.history-map-connection-control:focus-visible { outline: none; fill: rgba(245,219,139,.18); }
 .history-map-points { position: absolute; z-index: 2; left: 0; top: 0; width: 0; height: 0; overflow: visible; pointer-events: none; }
-.history-map-point { position: absolute; width: 8px; height: 8px; transform: translate(-50%, -50%) scale(var(--history-map-point-scale, 1)); transform-origin: center; pointer-events: none; }
+.history-map-point { position: absolute; width: 8px; height: 8px; min-height: 0; padding: 0; transform: translate(-50%, -50%) scale(var(--history-map-point-scale, 1)); transform-origin: center; border: 0; border-radius: 50%; background: transparent; box-shadow: none; backdrop-filter: none; pointer-events: none; }
+.history-map-point::before { position: absolute; inset: -18px; border: 2px solid transparent; border-radius: 50%; content: ""; }
+.history-map-point.is-connectable { pointer-events: auto; cursor: crosshair; }
+.history-map-point.is-connectable::before { background: rgba(245,219,139,.001); }
+.history-map-point.is-connectable:hover::before, .history-map-point.is-connectable:focus-visible::before { border-color: rgba(245,219,139,.72); background: rgba(217,180,91,.12); }
+.history-map-point.is-pending::before { border-color: var(--accent-2); background: rgba(217,180,91,.18); box-shadow: 0 0 0 5px rgba(217,180,91,.12); }
+.history-map-point:focus-visible { outline: none; }
 .history-map-point-dot { position: absolute; inset: 0; box-sizing: border-box; border: 1px solid #17191f; border-radius: 50%; background: var(--accent); box-shadow: 0 2px 8px rgba(0,0,0,.45); }
 .history-map-point-caption, .history-map-point-label { position: absolute; left: 50%; transform: translateX(-50%); max-width: 150px; overflow: hidden; border: 1px solid #17191f; text-overflow: ellipsis; white-space: nowrap; text-align: center; }
 .history-map-point-caption { bottom: 18px; min-width: 18px; min-height: 18px; padding: 5px 9px; border-radius: 9px; color: var(--history-map-caption-color, #fff); background: var(--history-map-caption-background, rgba(8,11,16,.9)); box-shadow: 0 4px 12px rgba(0,0,0,.32); font-size: 11px; font-weight: 800; text-shadow: var(--history-map-caption-shadow, 0 1px 2px rgba(0,0,0,.3)); }
@@ -131,6 +145,24 @@ h1 { margin: 0; font-size: 22px; letter-spacing: .08em; }
    dentro su cinque righe. `left`+`right` con `width: fit-content` e i margini
    automatici danno lo stesso centraggio ma con tutta la riga a disposizione. */
 .status-pill { position: absolute; z-index: 5; left: 16px; right: 16px; bottom: calc(env(safe-area-inset-bottom) + 184px); width: fit-content; max-width: calc(100% - 32px); margin-inline: auto; padding: 9px 15px; border: 1px solid rgba(255,255,255,.15); border-radius: 18px; background: var(--panel); color: #e8ebf2; backdrop-filter: blur(12px); font-size: 13px; line-height: 1.35; text-align: center; text-wrap: pretty; }
+.map-connection-toolbar { position: absolute; z-index: 8; left: 16px; right: 16px; bottom: calc(env(safe-area-inset-bottom) + 184px); display: flex; align-items: center; justify-content: center; gap: 8px; width: fit-content; max-width: calc(100% - 32px); margin-inline: auto; padding: 5px; border: 1px solid rgba(245,219,139,.3); border-radius: 16px; background: rgba(9,12,17,.93); box-shadow: 0 12px 32px rgba(0,0,0,.38); backdrop-filter: blur(16px); }
+.map-connection-toolbar button { min-height: 44px; border-radius: 11px; font-size: 12px; }
+.map-connection-start { display: flex; align-items: center; justify-content: center; gap: 7px; padding: 0 13px; color: #17191f; background: var(--accent-2); }
+.map-connection-start svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+.map-connection-start.is-active { color: var(--accent-2); background: rgba(217,180,91,.12); }
+.map-connection-toolbar p { max-width: min(46vw, 260px); margin: 0; color: var(--text); font-size: 11px; line-height: 1.3; text-wrap: balance; }
+.map-connection-cancel { padding: 0 11px; color: #f3b0a6; background: rgba(226,87,68,.1); }
+body:has(.map-connection-toolbar:not(.hidden)) .status-pill { bottom: calc(env(safe-area-inset-bottom) + 248px); }
+.map-connection-editor { position: absolute; z-index: 9; left: 16px; right: 16px; bottom: calc(env(safe-area-inset-bottom) + 184px); width: min(420px, calc(100% - 32px)); margin-inline: auto; padding: 15px; border: 1px solid rgba(245,219,139,.34); border-radius: 18px; color: var(--text); background: rgba(9,12,17,.96); box-shadow: 0 18px 48px rgba(0,0,0,.5); backdrop-filter: blur(18px); }
+.map-connection-editor-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.map-connection-editor h2 { margin: 0; font-size: 17px; }
+.map-connection-editor > p { margin: 9px 0 14px; overflow: hidden; color: var(--muted); font-size: 12px; line-height: 1.4; text-overflow: ellipsis; white-space: nowrap; }
+.map-connection-curve-field { display: grid; gap: 9px; }
+.map-connection-curve-field > span { display: flex; justify-content: space-between; gap: 12px; color: var(--text); font-size: 12px; font-weight: 800; }
+.map-connection-curve-field output { color: var(--accent-2); }
+.map-connection-curve-field input { width: 100%; min-height: 28px; margin: 0; accent-color: var(--accent); }
+.map-connection-editor-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.map-connection-editor-actions button { min-height: 44px; border-radius: 11px; font-size: 12px; }
 .controls-panel { position: absolute; z-index: 6; left: 16px; right: 16px; bottom: calc(env(safe-area-inset-bottom) + 18px); }
 .control-row { display: grid; grid-template-columns: 52px 1fr 52px; align-items: center; gap: 10px; margin-top: 10px; }
 #confirmRow { grid-template-columns: 1fr 1fr; }
@@ -144,9 +176,12 @@ button { min-height: 52px; border-radius: 14px; border: 1px solid var(--line); c
 .secondary-button svg { width: 22px; height: 22px; }
 .secondary-wide { color: var(--text); background: rgba(18,24,33,.94); }
 button:active { transform: translateY(1px) scale(.97); }
+.history-map-point:hover, .history-map-point:active { border-color: transparent; background: transparent; }
+.history-map-point:active { transform: translate(-50%, -50%) scale(var(--history-map-point-scale, 1)); }
 
 @media (hover: hover) and (pointer: fine) {
   button:hover { border-color: rgba(245,219,139,.42); background-color: #1c2330; }
+  .history-map-point:hover { border-color: transparent; background-color: transparent; }
   .marker-history-import-trigger:hover { border-color: rgba(245,219,139,.42); background-color: #1c2330; }
   .marker-history-tab:not(.is-active):hover { color: var(--text); background: rgba(255,255,255,.055); }
   .marker-history-tab.is-active:hover { color: #15171b; background: var(--accent-2); }
@@ -267,6 +302,7 @@ button:active { transform: translateY(1px) scale(.97); }
 .marker-history-map-choice-copy { min-width: 0; }
 .marker-history-map-choice-copy strong, .marker-history-map-choice-copy small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .marker-history-map-choice-copy strong { color: var(--text); font-size: 12px; }
+.marker-history-map-choice-copy .marker-history-map-tag { display: block; margin-top: 2px; overflow: hidden; color: var(--accent-2); font-size: 10px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
 .marker-history-map-choice-copy small { margin-top: 3px; color: var(--muted); font-size: 9px; }
 .marker-history-map-choice.is-selected { border-color: rgba(245,219,139,.42); color: var(--text); background: rgba(217,180,91,.09); }
 .marker-history-map-item-actions { display: grid; align-content: stretch; gap: 5px; min-width: 78px; }
@@ -284,6 +320,7 @@ button:active { transform: translateY(1px) scale(.97); }
 .marker-history-connections-list { display: grid; gap: 6px; margin-top: 8px; }
 .marker-history-connection-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; min-height: 42px; padding: 6px 7px 6px 10px; border-radius: 10px; background: rgba(255,255,255,.045); }
 .marker-history-connection-item span { overflow: hidden; color: var(--text); font-size: 10px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.marker-history-connection-actions { display: flex; gap: 5px; }
 .marker-history-connection-item button, #cancelHistoryConnectionButton { min-height: 36px; padding: 0 9px; border-radius: 9px; font-size: 10px; }
 #cancelHistoryConnectionButton { width: 100%; margin-top: 8px; }
 .marker-history-list { display: grid; align-content: start; gap: 9px; min-height: 0; flex: 1 1 auto; overflow-y: auto; touch-action: pan-y; overscroll-behavior: contain; padding-right: 2px; }
@@ -353,6 +390,8 @@ button:active { transform: translateY(1px) scale(.97); }
   .marker-history-map-selection-heading { align-items: stretch; flex-direction: column; }
   .marker-history-map-bulk-actions { grid-template-columns: 1fr 1fr; }
   .marker-history-connect-button { min-width: 68px; padding: 0 7px; }
+  .map-connection-toolbar { align-items: stretch; flex-wrap: wrap; width: calc(100% - 32px); }
+  .map-connection-toolbar p { flex: 1 1 150px; align-self: center; max-width: none; }
 }
 
 @media (min-width: 760px) {
@@ -381,4 +420,7 @@ button:active { transform: translateY(1px) scale(.97); }
   .marker-history-map-selection-list { flex: 1 1 auto; }
   .marker-history-connections-panel { min-height: 0; overflow: hidden; }
   .marker-history-connections-list { max-height: calc(100% - 72px); }
+  .map-connection-toolbar { top: 170px; right: 24px; bottom: auto; left: auto; margin: 0; }
+  .map-connection-editor { top: 170px; right: 24px; bottom: auto; left: auto; width: 360px; margin: 0; }
+  body:has(.map-connection-toolbar:not(.hidden)) .status-pill { bottom: calc(env(safe-area-inset-bottom) + 184px); }
 }

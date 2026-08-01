@@ -10,14 +10,14 @@
   <title>Mappa Squadra</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=53">
+  <link rel="stylesheet" href="styles.css?v=54">
 </head>
 <body>
   <main class="app-shell">
     <section class="map-stage" id="mapStage" aria-label="Mappa interattiva">
       <div class="map-viewport" id="mapViewport">
         <img id="mapImage" src="assets/map-placeholder.jpg" alt="Mappa del gioco">
-        <div class="history-map-layer" id="historyMapLayer" aria-hidden="true">
+        <div class="history-map-layer" id="historyMapLayer">
           <svg class="history-map-connections" id="historyMapConnections"></svg>
           <div class="history-map-points" id="historyMapPoints"></div>
         </div>
@@ -92,6 +92,38 @@
         <span id="lensToggleLabel">Lente attiva</span>
       </button>
       <div class="status-pill hidden" id="statusPill" role="status" aria-live="polite"></div>
+
+      <div class="map-connection-toolbar hidden" id="mapConnectionToolbar" role="group" aria-label="Collegamenti sulla mappa">
+        <button id="startMapConnectionButton" class="map-connection-start" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="6" cy="17" r="2.5"></circle>
+            <circle cx="18" cy="7" r="2.5"></circle>
+            <path d="m8 15.5 8-7"></path>
+          </svg>
+          <span id="mapConnectionButtonLabel">Collega punti</span>
+        </button>
+        <p id="mapConnectionInstruction" class="hidden" role="status" aria-live="polite"></p>
+        <button id="cancelMapConnectionButton" class="map-connection-cancel hidden" type="button">Annulla</button>
+      </div>
+
+      <section class="map-connection-editor hidden" id="mapConnectionEditor" role="dialog" aria-modal="false" aria-labelledby="mapConnectionEditorTitle">
+        <div class="map-connection-editor-heading">
+          <div>
+            <p class="eyebrow">LINEA SULLA MAPPA</p>
+            <h2 id="mapConnectionEditorTitle">Modifica collegamento</h2>
+          </div>
+          <button id="closeMapConnectionEditorButton" class="dialog-close" type="button" aria-label="Chiudi editor linea">×</button>
+        </div>
+        <p id="mapConnectionEditorDescription"></p>
+        <label class="map-connection-curve-field" for="mapConnectionCurveInput">
+          <span>Curvatura <output id="mapConnectionCurveOutput" for="mapConnectionCurveInput">Dritta</output></span>
+          <input id="mapConnectionCurveInput" type="range" min="-100" max="100" step="5" value="0">
+        </label>
+        <div class="map-connection-editor-actions">
+          <button id="resetMapConnectionCurveButton" class="secondary-wide" type="button">Rendi dritta</button>
+          <button id="deleteMapConnectionButton" class="marker-history-delete" type="button">Elimina linea</button>
+        </div>
+      </section>
 
       <div class="controls-panel">
         <div class="control-row" id="mainControlsRow">
@@ -329,7 +361,7 @@
                   <strong>Linee tra punti</strong>
                   <span id="historyConnectionCount">0 create</span>
                 </div>
-                <p id="historyConnectionHelp">Mostra due punti, poi usa “Collega” sul primo e sul secondo.</p>
+                <p id="historyConnectionHelp">Usa “Vedi insieme” e “Collega punti” sulla mappa, oppure scegli “Collega” qui sotto.</p>
                 <div class="marker-history-connections-list" id="historyConnectionsList"></div>
                 <button id="cancelHistoryConnectionButton" class="secondary-wide hidden" type="button">Annulla primo punto</button>
               </div>
@@ -342,6 +374,6 @@
     <canvas id="exportCanvas" hidden></canvas>
   </main>
 
-  <script src="app.js?v=52" defer></script>
+  <script src="app.js?v=54" defer></script>
 </body>
 </html>

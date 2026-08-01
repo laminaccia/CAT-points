@@ -98,10 +98,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=53` e
-   `app.js?v=52`.
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=54` e
+   `app.js?v=54`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v70`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v72`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
@@ -384,7 +384,11 @@ estremo conserva soltanto `{ sourceKey, entryId }`, quindi può riferirsi anche
 a due liste diverse senza duplicarne i dati. Una linea viene disegnata solo
 quando entrambi gli estremi sono selezionati per la vista d'insieme, ma resta
 salvata se uno dei due viene temporaneamente nascosto. Rimuovere un punto o
-una lista elimina automaticamente i collegamenti rimasti senza estremi.
+una lista elimina automaticamente i collegamenti rimasti senza estremi. Nella
+vista d'insieme **Collega punti** attiva la scelta diretta dei due estremi sulla
+mappa; ogni linea ha un punto di presa centrale che apre l'editor per curvarla,
+raddrizzarla o eliminarla. Il campo `curve`, compreso tra -1 e 1, è facoltativo:
+i collegamenti salvati prima dell'editor vengono letti come linee dritte.
 
 Le cronologie condivise usano il formato `cat-points.marker-history` versione
 3 e il suffisso `*.catpoints.json`. Il pacchetto non è un JSON anonimo:
@@ -442,7 +446,8 @@ proprietario originale e aggiunge il partecipante corrente alla catena.
   l'ultima scelta sul dispositivo.
 - **Mappa e linee** offre selezione singola e collettiva per la lista corrente,
   mantiene visibile il totale globale e rende immediatamente riconoscibili i
-  punti disponibili per un collegamento.
+  punti disponibili per un collegamento. Se un punto ha sia etichetta sia testo,
+  li mostra entrambi come fa la scheda **Punti**.
 - La sorgente **Selezionati** riunisce i punti scelti da tutte le liste, mostra
   sempre il rispettivo proprietario e permette di riordinarli e collegarli
   senza cambiare lista; ordine, attribuzione e collegamenti sopravvivono al
@@ -452,7 +457,8 @@ proprietario originale e aggiunge il partecipante corrente alla catena.
   riattivarlo senza uscire dalla vista.
 - Due punti visibili, anche di liste diverse, possono essere collegati. Le
   linee persistono sul dispositivo, vengono mostrate soltanto con entrambi gli
-  estremi visibili e possono essere rimosse singolarmente.
+  estremi visibili, si possono selezionare direttamente sulla mappa e possono
+  essere curvate, raddrizzate o rimosse singolarmente.
 - Da 900 px la mappa occupa l'intera viewport, i controlli restano centrati e
   la cronologia sfrutta due colonne; sotto tale soglia le funzioni restano
   complete, toccabili e prive di sovrapposizioni.

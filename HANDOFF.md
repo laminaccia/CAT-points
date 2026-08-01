@@ -5,6 +5,33 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-08-01 — Collegamenti creati e modificati direttamente sulla mappa
+
+*Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,
+`app.js`, `service-worker.js`, `README.md`, `AGENTS.md`.*
+
+La vista d'insieme mostra ora **Collega punti**: attiva una modalità esplicita
+in cui i punti visibili diventano bersagli tattili da 44 px e il primo estremo
+resta evidenziato fino alla scelta del secondo. Il flusso riusa gli stessi
+collegamenti del pannello cronologia, quindi funziona anche tra liste diverse e
+non duplica coppie già presenti.
+
+Le linee sono passate da segmenti SVG a tracciati quadratici. Ogni collegamento
+salva un campo facoltativo `curve` tra -1 e 1; le vecchie voci senza campo
+restano dritte. Un punto di presa centrale, visibile e toccabile, apre l'editor
+per regolare la curvatura in tempo reale, tornare alla linea dritta o eliminarla.
+Lo stesso editor si apre con **Modifica** nel riepilogo **Linee tra punti**.
+
+Accolta anche la correzione emersa durante il collaudo: in **Mappa e linee**,
+quando un punto ha etichetta e testo, il testo/tag compare sotto l'etichetta
+come nella scheda **Punti**, invece di sparire.
+
+Collaudo locale con due punti personali e due importati: creazione diretta,
+curva al 60%, persistenza dopo ricarica, riapertura dal punto di presa ed
+eliminazione. Verificati 390×844 e 1280×900 senza overflow; console senza
+errori. Versioni pubblicabili: `styles.css?v=54`, `app.js?v=54`, cache
+`mappa-squadra-v72`.
+
 ## 2026-08-01 — Lista trasversale dei selezionati e copie coordinate riallineate
 
 *Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,
