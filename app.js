@@ -16,6 +16,7 @@
   const crosshairCoordinates = document.getElementById('crosshairCoordinates');
   const geographicCoordinates = document.getElementById('geographicCoordinates');
   const copyCoordinatesButton = document.getElementById('copyCoordinatesButton');
+  const copyGeographicButton = document.getElementById('copyGeographicButton');
   const addStreetPointButton = document.getElementById('addStreetPointButton');
   const openStreetPointListButton = document.getElementById('openStreetPointListButton');
   const streetPointCount = document.getElementById('streetPointCount');
@@ -54,6 +55,8 @@
   const selectedHistoryPointCount = document.getElementById('selectedHistoryPointCount');
   const showSelectedHistoryPointsButton = document.getElementById('showSelectedHistoryPointsButton');
   const clearSelectedHistoryPointsButton = document.getElementById('clearSelectedHistoryPointsButton');
+  const toggleHistoryPointsVisibilityButton = document.getElementById('toggleHistoryPointsVisibilityButton');
+  const historyVisibilityState = document.getElementById('historyVisibilityState');
   const currentHistorySourceSelectionCount = document.getElementById('currentHistorySourceSelectionCount');
   const selectAllCurrentHistoryPointsButton = document.getElementById('selectAllCurrentHistoryPointsButton');
   const clearCurrentHistoryPointsButton = document.getElementById('clearCurrentHistoryPointsButton');
@@ -168,6 +171,13 @@
   let markerHistoryStore = {};
   let markerHistorySources = {};
   let markerHistoryVisibility = {};
+  // Nascondere non è deselezionare. `markerHistoryVisibility` dice *quali*
+  // punti hai scelto; questo dice soltanto se in questo momento vanno
+  // disegnati. Prima i due concetti erano lo stesso oggetto, e «Nascondi
+  // tutti» buttava via la selezione insieme al disegno: chi voleva sgombrare
+  // la mappa per un attimo doveva poi rifare tutte le spunte.
+  let markerHistoryPointsHidden = false;
+  const markerHistoryHiddenStorageKey = 'mappa-punti-nascosti';
   let markerHistoryConnectionsStore = [];
   let pendingHistoryConnectionEndpoint = null;
   let markerHistoryViewKey = '';
@@ -299,6 +309,23 @@
   function persistMarkerHistoryVisibility() {
     try {
       localStorage.setItem(markerHistoryVisibilityStorageKey, JSON.stringify(markerHistoryVisibility));
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function readMarkerHistoryPointsHidden() {
+    try {
+      markerHistoryPointsHidden = localStorage.getItem(markerHistoryHiddenStorageKey) === '1';
+    } catch (error) {
+      markerHistoryPointsHidden = false;
+    }
+  }
+
+  function persistMarkerHistoryPointsHidden() {
+    try {
+      localStorage.setItem(markerHistoryHiddenStorageKey, markerHistoryPointsHidden ? '1' : '0');
       return true;
     } catch (error) {
       return false;
@@ -480,6 +507,30 @@
     selectedHistoryPointCount.textContent = String(count);
     showSelectedHistoryPointsButton.disabled = count === 0;
     clearSelectedHistoryPointsButton.disabled = count === 0;
+    toggleHistoryPointsVisibilityButton.disabled = count === 0;
+    toggleHistoryPointsVisibilityButton.textContent = markerHistoryPointsHidden
+      ? 'Mostra sulla mappa'
+      : 'Nascondi sulla mappa';
+    toggleHistoryPointsVisibilityButton.setAttribute('aria-pressed', String(markerHistoryPointsHidden));
+    // La riga dice sempre in che stato sei: quanti ne hai scelti e se in
+    // questo momento si vedono. Senza, «0 punti» e «punti nascosti» sarebbero
+    // indistinguibili guardando la mappa.
+    historyVisibilityState.textContent = count === 0
+      ? 'Da tutte le liste. Scegli i punti qui sotto.'
+      : markerHistoryPointsHidden
+        ? 'Da tutte le liste. Ora nascosti: la selezione resta.'
+        : 'Da tutte le liste, disegnati sulla mappa.';
+  }
+
+  function toggleMarkerHistoryPointsVisibility() {
+    markerHistoryPointsHidden = !markerHistoryPointsHidden;
+    const persisted = persistMarkerHistoryPointsHidden();
+    updateMarkerHistoryMapSummary();
+    renderHistoryMapPoints();
+    const azione = markerHistoryPointsHidden
+      ? 'Punti nascosti dalla mappa: la selezione resta'
+      : 'Punti di nuovo visibili sulla mappa';
+    setStatus(persisted ? azione : `${azione} solo per questa sessione`);
   }
 
   function setMarkerHistoryVisibility(sourceKey, entryId, visible, announce = true) {
@@ -520,7 +571,7 @@
     updateMarkerHistoryMapSummary();
     renderHistoryMapPoints();
     renderMarkerHistory();
-    setStatus(persisted ? 'Tutti i punti nascosti dalla mappa' : 'Punti nascosti solo per questa sessione');
+    setStatus(persisted ? 'Selezione svuotata' : 'Selezione svuotata solo per questa sessione');
   }
 
   function renderMarkerHistoryConnectionsPanel() {
@@ -608,6 +659,14 @@
   }
 
   function showSelectedMarkerHistoryPoints() {
+    // «Vedi insieme» promette di farteli vedere: se erano nascosti li
+    // riaccende, invece di restare inerte e lasciarti cercare il perché.
+    if (markerHistoryPointsHidden) {
+      markerHistoryPointsHidden = false;
+      persistMarkerHistoryPointsHidden();
+      updateMarkerHistoryMapSummary();
+      renderHistoryMapPoints();
+    }
     const selectedEntries = getSelectedMarkerHistoryEntries()
       .map(({ entry }) => ({ x: Number(entry.x), y: Number(entry.y) }))
       .filter(({ x, y }) => Number.isFinite(x) && Number.isFinite(y));
@@ -1038,7 +1097,19 @@
       meta.textContent = `Creato ${formatMarkerHistoryTime(entry.createdAt)} · x ${normalizedCoordinates.x.toFixed(4)} · y ${normalizedCoordinates.y.toFixed(4)}`
         + (realCoordinates ? ` · ${realCoordinates.latitude.toFixed(5)}°, ${realCoordinates.longitude.toFixed(5)}° ≈` : '');
       copy.prepend(title);
+      // Dove si trova, prima delle cifre: il nome di un luogo si riconosce a
+      // colpo d'occhio, una coppia di coordinate va letta.
+      const luogo = creaRigaLuogo(normalizedCoordinates);
+      if (luogo) copy.append(luogo);
       copy.append(meta);
+      // Un punto ritoccato dopo la creazione lo dice, altrimenti chi lo riceve
+      // non sa se sta guardando la prima versione o l'ultima.
+      if (entry.updatedAt && entry.updatedAt !== entry.createdAt) {
+        const modificato = document.createElement('small');
+        modificato.className = 'marker-history-updated';
+        modificato.textContent = `Modificato ${formatMarkerHistoryTime(entry.updatedAt)}`;
+        copy.append(modificato);
+      }
       item.append(copy);
 
       if (!isImported) {
@@ -1622,6 +1693,78 @@
     };
   }
 
+  /** Metri fra due punti della mappa, passando dalle coordinate geografiche.
+   *  Equirettangolare: su due chilometri scarsi l'errore è trascurabile e
+   *  serve solo a dire «sei addosso» oppure «sei a un isolato». */
+  function distanzaInMetri(a, b) {
+    const primo = getGeographicCoordinates(a);
+    const secondo = getGeographicCoordinates(b);
+    if (!primo || !secondo) return null;
+    const gradiPerRadiante = Math.PI / 180;
+    const latitudineMedia = (primo.latitude + secondo.latitude) / 2 * gradiPerRadiante;
+    const deltaLat = (secondo.latitude - primo.latitude) * 111320;
+    const deltaLon = (secondo.longitude - primo.longitude) * 111320 * Math.cos(latitudineMedia);
+    return Math.round(Math.hypot(deltaLat, deltaLon));
+  }
+
+  // Oltre questa distanza dire «sei in via tale» sarebbe una bugia: sulla
+  // scala di questa mappa vale una quarantina di metri, cioè un isolato.
+  const raggioLuogoVicino = 0.02;
+
+  /** Il luogo dell'indice più vicino a un punto, se ce n'è uno abbastanza
+   *  vicino da poterlo nominare senza inventare. */
+  function luogoPiuVicino(coordinate) {
+    if (!Number.isFinite(coordinate?.x) || !Number.isFinite(coordinate?.y)) return null;
+    let migliore = null;
+    let minima = Infinity;
+    state.streetIndex.forEach((street) => {
+      const distanza = Math.hypot(street.x - coordinate.x, street.y - coordinate.y);
+      if (distanza < minima) {
+        minima = distanza;
+        migliore = street;
+      }
+    });
+    if (!migliore || minima > raggioLuogoVicino) return null;
+    return { street: migliore, metri: distanzaInMetri(coordinate, migliore) };
+  }
+
+  /** La riga «dove sei» di un punto: il luogo e come lo chiamano.
+   *
+   *  È l'informazione che manca quando qualcuno ti condivide «Punto 3»: le
+   *  coordinate dicono dove, ma non *cosa*. Gli alias vengono dall'indice
+   *  curato, quindi comprendono i soprannomi dialettali — chi legge «Piazza
+   *  Dottor Nicolò MAZZARA · anche Chianipodda» sa subito di che parla. */
+  function creaRigaLuogo(coordinate) {
+    const vicino = luogoPiuVicino(coordinate);
+    if (!vicino) return null;
+    const riga = document.createElement('div');
+    riga.className = 'marker-history-place';
+
+    const nome = document.createElement('strong');
+    nome.textContent = vicino.street.label;
+    riga.append(nome);
+
+    const dettaglio = document.createElement('span');
+    const quanto = vicino.metri === null ? '' : vicino.metri <= 8 ? 'qui' : `a ~${vicino.metri} m`;
+    // Nell'indice i tag servono a farsi trovare, quindi contengono anche i
+    // pezzi del nome stesso: «Via Brandis», «Arciprete», «BRANDIS». Ripeterli
+    // qui sarebbe rumore — chi legge ha il nome intero due righe sopra. Restano
+    // i soprannomi veri, quelli che il nome non contiene: *Chianipodda*,
+    // *U Signuri*, *l'acquanova*. Sono l'unica cosa che l'etichetta non dice.
+    const nomeNormalizzato = normalizeText(vicino.street.label);
+    const alias = (vicino.street.tags || [])
+      .filter((tag) => {
+        const t = normalizeText(tag);
+        return t && !nomeNormalizzato.includes(t);
+      })
+      .slice(0, 6);
+    dettaglio.textContent = alias.length
+      ? `${quanto} · anche: ${alias.join(', ')}`
+      : quanto;
+    riga.append(dettaglio);
+    return riga;
+  }
+
   function updateCrosshairCoordinates() {
     const coordinates = getCrosshairCoordinates();
     const realCoordinates = getGeographicCoordinates(coordinates);
@@ -1633,6 +1776,7 @@
       ? `Lat ${realCoordinates.latitude.toFixed(5)}° · Lon ${realCoordinates.longitude.toFixed(5)}° ≈`
       : 'Lat — · Lon —';
     copyCoordinatesButton.disabled = !coordinates;
+    copyGeographicButton.disabled = !realCoordinates;
   }
 
   function coordinateJsonLines() {
@@ -1673,8 +1817,20 @@
     return copyTextFallback(text);
   }
 
-  async function copyCoordinateJson() {
-    const text = coordinateJsonLines();
+  /** Latitudine e longitudine in gradi decimali, separate da virgola.
+   *
+   *  È il formato che Google Maps, Apple Maps, OpenStreetMap e Waze accettano
+   *  incollato nella barra di ricerca: chi riceve il punto lo apre e ci arriva.
+   *  Niente simbolo di grado — non serve a nessuno di loro e c'è chi lo
+   *  rifiuta. Cinque decimali valgono circa un metro, ben oltre la precisione
+   *  di una trasformazione stimata su sei riferimenti. */
+  function geographicCoordinateText() {
+    const realCoordinates = getGeographicCoordinates();
+    if (!realCoordinates) return '';
+    return `${realCoordinates.latitude.toFixed(5)}, ${realCoordinates.longitude.toFixed(5)}`;
+  }
+
+  async function copiaNegliAppunti(text, bottone, etichetta, conferma) {
     if (!text) return;
     const copied = await copyPlainText(text);
     if (!copied) {
@@ -1682,11 +1838,29 @@
       setStatus('Seleziona e copia le coordinate mostrate');
       return;
     }
-    copyCoordinatesButton.textContent = 'Copiato';
-    setStatus('Coordinate x/y copiate per streets.json');
+    bottone.textContent = 'Copiato';
+    setStatus(conferma);
     window.setTimeout(() => {
-      copyCoordinatesButton.textContent = 'Copia x/y';
+      bottone.textContent = etichetta;
     }, 1400);
+  }
+
+  async function copyGeographicCoordinates() {
+    await copiaNegliAppunti(
+      geographicCoordinateText(),
+      copyGeographicButton,
+      'Copia per Maps',
+      'Posizione copiata: incollala su Maps per aprirla'
+    );
+  }
+
+  async function copyCoordinateJson() {
+    await copiaNegliAppunti(
+      coordinateJsonLines(),
+      copyCoordinatesButton,
+      'Copia x/y',
+      'Coordinate x/y copiate per streets.json'
+    );
   }
 
   function updateManualStreetPointCount() {
@@ -2012,6 +2186,9 @@
 
   function renderHistoryMapConnectionLines() {
     historyMapConnections.replaceChildren();
+    // Le linee spariscono con i punti che uniscono: restare a mezz'aria su una
+    // mappa sgombra le farebbe sembrare un errore di disegno.
+    if (markerHistoryPointsHidden) return;
     if (!image.naturalWidth || !image.naturalHeight) return;
     historyMapConnections.setAttribute('width', String(image.naturalWidth));
     historyMapConnections.setAttribute('height', String(image.naturalHeight));
@@ -2049,6 +2226,9 @@
   function renderHistoryMapPoints() {
     historyMapPoints.replaceChildren();
     renderHistoryMapConnectionLines();
+    // Nascosti resta nascosti, ma la selezione qui sopra è intatta: basta
+    // riaccendere per rivedere gli stessi punti, senza rifare le spunte.
+    if (markerHistoryPointsHidden) return;
     if (!image.naturalWidth || !image.naturalHeight) return;
     getSelectedMarkerHistoryEntries().forEach(({ entry, sourceKey, ownerName }) => {
       if (state.markerPlaced
@@ -2418,6 +2598,7 @@
     });
   });
   showSelectedHistoryPointsButton.addEventListener('click', showSelectedMarkerHistoryPoints);
+  toggleHistoryPointsVisibilityButton.addEventListener('click', toggleMarkerHistoryPointsVisibility);
   clearSelectedHistoryPointsButton.addEventListener('click', clearSelectedMarkerHistoryPoints);
   selectAllCurrentHistoryPointsButton.addEventListener('click', () => setCurrentMarkerHistoryVisibility(true));
   clearCurrentHistoryPointsButton.addEventListener('click', () => setCurrentMarkerHistoryVisibility(false));
@@ -2468,6 +2649,7 @@
   document.getElementById('cancelMarkerButtonSecondary').addEventListener('click', cancelMarkerDialog);
   document.getElementById('confirmMarkerButton').addEventListener('click', placeMarker);
   copyCoordinatesButton.addEventListener('click', copyCoordinateJson);
+  copyGeographicButton.addEventListener('click', copyGeographicCoordinates);
   addStreetPointButton.addEventListener('click', openStreetPointDialog);
   openStreetPointListButton.addEventListener('click', openManualStreetPointList);
   document.getElementById('closeStreetPointDialogButton').addEventListener('click', closeStreetPointDialog);
@@ -2919,6 +3101,7 @@
   loadMarkerHistoryStore();
   loadMarkerHistorySources();
   loadMarkerHistoryVisibility();
+  readMarkerHistoryPointsHidden();
   loadMarkerHistoryConnections();
   loadOverviewCrosshairPreference();
   loadMarkerHistoryTabPreference();

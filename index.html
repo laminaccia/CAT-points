@@ -10,7 +10,7 @@
   <title>Mappa Squadra</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=46">
+  <link rel="stylesheet" href="styles.css?v=51">
 </head>
 <body>
   <main class="app-shell">
@@ -76,7 +76,8 @@
         <span class="coordinate-label" id="coordinateLabel">Coordinate mirino</span>
         <output id="crosshairCoordinates" aria-label="Coordinate normalizzate del mirino">x — · y —</output>
         <output class="geographic-coordinates" id="geographicCoordinates" aria-label="Coordinate geografiche stimate del mirino">Lat — · Lon —</output>
-        <button id="copyCoordinatesButton" type="button">Copia x/y</button>
+        <button id="copyGeographicButton" type="button" aria-describedby="geographicCoordinates">Copia per Maps</button>
+        <button id="copyCoordinatesButton" class="coordinate-secondary-copy" type="button" aria-describedby="crosshairCoordinates">Copia x/y</button>
         <div class="coordinate-actions">
           <button id="addStreetPointButton" type="button">＋ Aggiungi punto</button>
           <button id="openStreetPointListButton" type="button">Lista (<span id="streetPointCount">0</span>)</button>
@@ -297,12 +298,13 @@
             <div class="marker-history-map-workspace">
               <div class="marker-history-map-summary">
                 <div>
-                  <strong><span id="selectedHistoryPointCount">0</span> visibili sulla mappa</strong>
-                  <small>Il totale comprende tutte le liste.</small>
+                  <strong><span id="selectedHistoryPointCount">0</span> punti selezionati</strong>
+                  <small id="historyVisibilityState">Da tutte le liste, disegnati sulla mappa.</small>
                 </div>
                 <div class="marker-history-map-summary-actions">
                   <button id="showSelectedHistoryPointsButton" class="primary-button" type="button">Vedi insieme</button>
-                  <button id="clearSelectedHistoryPointsButton" class="secondary-wide" type="button">Nascondi tutti</button>
+                  <button id="toggleHistoryPointsVisibilityButton" class="secondary-wide" type="button" aria-pressed="false">Nascondi sulla mappa</button>
+                  <button id="clearSelectedHistoryPointsButton" class="marker-history-clear-selection" type="button">Svuota la selezione</button>
                 </div>
                 <label class="overview-crosshair-toggle" for="overviewCrosshairToggle">
                   <input id="overviewCrosshairToggle" type="checkbox">
@@ -340,6 +342,6 @@
     <canvas id="exportCanvas" hidden></canvas>
   </main>
 
-  <script src="app.js?v=44" defer></script>
+  <script src="app.js?v=48" defer></script>
 </body>
 </html>

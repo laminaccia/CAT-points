@@ -5,6 +5,119 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-08-01 — Coordinate per Maps, scheda punto completa, selezione ≠ visibilità
+
+*Agente: Claude. Toccati `index.html`, `styles.css`, `app.js`.*
+
+Quattro richieste dell'utente. **Tre fatte e verificate, la quarta no** — vedi
+in fondo, non è stata iniziata per non lasciarla a metà.
+
+### 1. «Copia per Maps» invece delle sole x/y
+
+Il pulsante copiava `"x": 0.61, "y": 0.49`, utile solo a chi costruisce
+`streets.json`. Ora ci sono **due copie con due destinazioni dichiarate**:
+
+* **Copia per Maps** → `37.91359, 12.86173`, gradi decimali separati da
+  virgola. È il formato che Google Maps, Apple Maps, OSM e Waze accettano
+  incollato nella barra di ricerca. Niente simbolo di grado: non serve e c'è
+  chi lo rifiuta. Cinque decimali ≈ un metro, ben oltre la precisione di una
+  trasformazione stimata su sei riferimenti.
+* **Copia x/y** → invariato, perché l'indice delle vie non è finito e quello
+  strumento serve ancora.
+
+Sfrutta `getGeographicCoordinates()` che Codex aveva già calibrato.
+
+### 2. La scheda di un punto dice dove si trova
+
+Scoperta che ha deciso l'interpretazione: **i punti salvati non hanno tag** —
+né i locali né gli importati; il formato porta solo `id, x, y, colors, text,
+label, createdAt, updatedAt`. Gli unici tag del sistema sono quelli
+dell'indice delle vie. Quindi «vedere anche i tag» è stato letto come: *dire
+su quale luogo cade il punto e come lo chiamano*.
+
+Ogni scheda ora porta una riga in più: il luogo dell'indice più vicino (entro
+~40 m, oltre sarebbe una bugia), la distanza, e i soprannomi. Vale sia per i
+punti locali sia per quelli delle liste importate — stesso codice.
+
+Il filtro sugli alias conta: nell'indice i tag servono a *farsi trovare*, quindi
+contengono anche i pezzi del nome stesso («Via Brandis», «Arciprete», «BRANDIS»).
+Ripeterli sotto un nome già scritto due righe sopra è rumore. Restano i
+soprannomi veri, quelli che il nome non contiene — ed è lì che escono
+**Chianipodda, Chianu di Podda, Piano Perollo** per Piazza Dottor Nicolò
+MAZZARA. Sono l'unica cosa che l'etichetta non dice già.
+
+Aggiunta anche la riga «Modificato», che compare solo quando `updatedAt`
+differisce da `createdAt`: chi riceve un punto sa se guarda la prima versione
+o l'ultima.
+
+### 3 e 4. Nascondere non cancella più la selezione
+
+Causa del difetto segnalato: **`markerHistoryVisibility` faceva da selezione
+*e* da visibilità**. Erano lo stesso oggetto, quindi «Nascondi tutti» buttava
+via le spunte insieme al disegno, e chi voleva sgombrare la mappa per un attimo
+doveva poi rifare tutto.
+
+Separati. `markerHistoryVisibility` resta *quali* punti hai scelto; il nuovo
+`markerHistoryPointsHidden` (persistito in `mappa-punti-nascosti`) dice solo se
+in questo momento vanno disegnati. Di conseguenza l'interfaccia distingue i due
+verbi, che prima erano confusi in un pulsante solo:
+
+* **Nascondi sulla mappa / Mostra sulla mappa** — interruttore, non tocca la
+  selezione. Le linee spariscono coi punti che uniscono.
+* **Svuota la selezione** — l'azione distruttiva, ora chiamata col suo nome,
+  su una riga a parte e in tono minore. Prima stava accanto alle altre ed era
+  già un incidente.
+* **Vedi insieme** riaccende i punti se erano nascosti, invece di restare
+  inerte: il pulsante promette di mostrarli.
+
+La riga di stato dice sempre dove sei — «Ora nascosti: la selezione resta» —
+perché altrimenti «0 punti» e «punti nascosti» sono indistinguibili guardando
+la mappa.
+
+### Un difetto d'impaginazione trovato mentre verificavo
+
+Con tre azioni la colonna dei pulsanti non lasciava più larghezza al testo: a
+375px «3 punti selezionati» andava a capo **una parola per riga** e la
+descrizione finiva sotto i pulsanti. Il riquadro ora è impilato di norma e si
+affianca solo sopra i 480px. La regola dedicata sotto i 350px non serve più.
+
+### Verificato
+
+Da cache e service worker azzerati, a 375×812, con quattro punti di prova:
+
+* copia geografica: il gestore produce `37.91359, 12.86173` (intercettato il
+  ripiego su `prompt`, perché un click sintetico non è "fidato" per la
+  clipboard — con un dito vero passa dalla stessa `copyPlainText` che l'app usa
+  altrove);
+* nascondi/mostra: selezione `["p1","p2","p3"]` **intatta** in memoria, punti
+  disegnati 3 → 0 → 3, etichetta e `aria-pressed` che si invertono;
+* schede: ogni punto nomina il suo luogo, gli alias dialettali compaiono dove
+  esistono, «Modificato» solo dove serve;
+* aree tattili 44px su entrambi i pulsanti di copia;
+* detector Impeccable senza rilievi, console pulita.
+
+`styles.css?v=51`, `app.js?v=48`, `CACHE` a `mappa-squadra-v65`.
+
+### Non fatto: la lista «Selezionati» (richiesta 3)
+
+Una lista trasversale che raccolga i punti scelti da *tutte* le liste e
+permetta di ordinarli e collegarli senza cambiare lista. **Non l'ho iniziata**:
+richiede di rendere `renderMarkerHistoryMapList()` capace di lavorare su una
+sorgente sintetica in cui ogni voce porta la *propria* `sourceKey` — oggi i
+gestori la prendono dalla sorgente, non dalla voce — più un ordinamento
+trasversale da memorizzare a parte, perché le voci vivono in array separati per
+lista. Metterne dentro metà avrebbe lasciato un'app pubblicata con una lista che
+ordina o collega la cosa sbagliata.
+
+Traccia per chi la riprende: aggiungere una voce «Selezionati» a
+`markerHistorySourceSelect`, far restituire a `getVisibleMarkerHistorySource()`
+una sorgente aggregata con `entries` arricchite di `sourceKey` e `ownerName`, e
+un array `mappa-ordine-selezione` di chiavi `sourceKey::entryId` per l'ordine.
+Le connessioni sono già pronte: `normalizeHistoryConnectionEndpoint` lavora per
+`{sourceKey, entryId}`, quindi collegare fra liste diverse funziona già.
+
+---
+
 ## 2026-08-01 — Verificati i due commit locali prima della pubblicazione
 
 *Agente: Codex. Verificati i commit `ea2b33e` e `6bfd364`; nessuna modifica al

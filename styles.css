@@ -106,7 +106,11 @@ h1 { margin: 0; font-size: 22px; letter-spacing: .08em; }
 .coordinate-label { color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .coordinate-panel output { grid-column: 1; font: 700 12px/1.2 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: nowrap; }
 .coordinate-panel .geographic-coordinates { color: var(--accent-2); font-size: 10px; font-weight: 650; }
-.coordinate-panel button { grid-column: 2; grid-row: 1 / 4; min-height: 44px; padding: 0 10px; border-radius: 9px; border-color: rgba(217,180,91,.5); color: #12151c; background: var(--accent-2); font-size: 11px; }
+/* Due copie, due destinazioni: la geografica si incolla su Maps, la
+   normalizzata serve a chi costruisce streets.json. Ognuna dice cosa fa —
+   un solo pulsante «Copia» costringerebbe a ricordare quale delle due esce. */
+.coordinate-panel button { grid-column: 2; grid-row: 1 / 3; min-height: 44px; padding: 0 10px; border-radius: 9px; border-color: rgba(217,180,91,.5); color: #12151c; background: var(--accent-2); font-size: 11px; }
+.coordinate-panel button.coordinate-secondary-copy { grid-row: 3; min-height: 44px; border-color: rgba(255,255,255,.16); color: var(--muted); background: rgba(255,255,255,.07); font-size: 10px; font-weight: 700; }
 .coordinate-actions { grid-column: 1 / -1; display: grid; grid-template-columns: 1.35fr 1fr; gap: 6px; margin-top: 5px; }
 .coordinate-actions button { grid-column: auto; grid-row: auto; min-height: 44px; padding: 0 9px; border-color: rgba(255,255,255,.14); color: var(--text); background: rgba(255,255,255,.08); }
 .hidden { display: none !important; }
@@ -223,12 +227,25 @@ button:active { transform: translateY(1px) scale(.97); }
 .marker-history-points-panel { display: flex; flex-direction: column; }
 .marker-history-map-panel { overflow: hidden; touch-action: pan-y; overscroll-behavior: contain; }
 .marker-history-map-workspace { display: grid; grid-template-areas: "summary" "selection" "connections"; gap: 10px; min-height: 100%; overflow-y: auto; touch-action: pan-y; overscroll-behavior: contain; padding-right: 2px; }
-.marker-history-map-summary { grid-area: summary; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 11px; border: 1px solid rgba(245,219,139,.2); border-radius: 13px; background: rgba(217,180,91,.07); }
+/* Impilato, non affiancato. Con tre azioni la colonna dei pulsanti non lascia
+   più larghezza al testo: a 375px «3 punti selezionati» andava a capo una
+   parola per riga e la descrizione finiva sotto i pulsanti. Le due parti si
+   affiancano solo dove c'è spazio vero. */
+.marker-history-map-summary { grid-area: summary; display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; gap: 10px; padding: 11px; border: 1px solid rgba(245,219,139,.2); border-radius: 13px; background: rgba(217,180,91,.07); }
+@media (min-width: 480px) {
+  .marker-history-map-summary { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+}
 .marker-history-map-summary strong, .marker-history-map-summary small { display: block; }
 .marker-history-map-summary strong { color: var(--text); font-size: 12px; }
 .marker-history-map-summary strong span { color: var(--accent-2); }
 .marker-history-map-summary small { margin-top: 2px; color: var(--muted); font-size: 10px; line-height: 1.3; }
+/* Le due azioni che si usano di continuo stanno affiancate; svuotare la
+   selezione è un'altra cosa — si fa di rado e non si torna indietro — quindi
+   sta su una riga sua, in tono minore, lontana dal pollice che nasconde e
+   mostra. Metterla accanto alle altre due l'aveva già resa un incidente. */
 .marker-history-map-summary-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.marker-history-map-summary-actions .marker-history-clear-selection { grid-column: 1 / -1; min-height: 36px; border-color: transparent; color: var(--muted); background: transparent; font-size: 11px; text-decoration: underline; text-underline-offset: 3px; }
+.marker-history-map-summary-actions .marker-history-clear-selection:not(:disabled):hover { color: #f3b0a6; }
 .marker-history-map-summary button { min-height: 44px; padding: 0 9px; border-radius: 10px; font-size: 11px; white-space: nowrap; }
 .marker-history-map-summary button:disabled { cursor: default; opacity: .4; transform: none; }
 .overview-crosshair-toggle { grid-column: 1 / -1; display: flex; align-items: center; gap: 9px; min-height: 38px; padding-top: 7px; border-top: 1px solid rgba(245,219,139,.14); color: var(--text); cursor: pointer; font-size: 11px; font-weight: 700; }
@@ -273,6 +290,13 @@ button:active { transform: translateY(1px) scale(.97); }
 .history-marker-swatch.no-color { background: transparent; }
 .marker-history-copy { min-width: 0; }
 .marker-history-copy strong { display: block; overflow: hidden; color: var(--text); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+/* Dove cade il punto, secondo l'indice delle vie. Il nome va per intero, a
+   capo se serve: è la riga che risponde alla domanda «dov'è?», troncarla la
+   renderebbe inutile. Gli alias sotto includono i soprannomi dialettali. */
+.marker-history-place { margin-top: 5px; padding: 5px 8px; border-left: 1px solid rgba(245,219,139,.45); border-radius: 0 8px 8px 0; background: rgba(245,219,139,.06); }
+.marker-history-place strong { display: block; overflow: visible; color: var(--accent-2); font-size: 11px; font-weight: 800; white-space: normal; text-overflow: clip; }
+.marker-history-place span { display: block; margin-top: 1px; color: var(--muted); font-size: 10px; line-height: 1.35; }
+.marker-history-updated { display: block; margin-top: 2px; color: var(--muted); font-size: 10px; }
 .marker-history-copy span { display: block; margin-top: 3px; overflow: hidden; color: var(--accent-2); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 .marker-history-copy small { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; line-height: 1.35; }
 .marker-history-order { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) 58px 58px; align-items: center; gap: 8px; }
@@ -320,7 +344,7 @@ button:active { transform: translateY(1px) scale(.97); }
   .color-name-form button { padding: 0 7px; }
   .color-format-examples { margin-left: 48px; }
   .color-name-feedback { margin-left: 48px; }
-  .marker-history-map-summary { grid-template-columns: 1fr; }
+  /* impilato è già il comportamento predefinito */
   .marker-history-map-summary-actions { width: 100%; }
   .marker-history-map-selection-heading { align-items: stretch; flex-direction: column; }
   .marker-history-map-bulk-actions { grid-template-columns: 1fr 1fr; }
