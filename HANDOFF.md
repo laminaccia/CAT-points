@@ -5,6 +5,24 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-08-01 — Verificati i due commit locali prima della pubblicazione
+
+*Agente: Codex. Verificati i commit `ea2b33e` e `6bfd364`; nessuna modifica al
+codice applicativo necessaria.*
+
+Controllati sintassi Python e JavaScript, validità dei tre JSON coinvolti,
+riproducibilità di `assets/streets.json` tramite `tools/merge-streets.py`, 421
+coordinate nell'intervallo previsto, presenza dei tag e rimozione mirata delle
+due esclusioni. Il dry-run conferma due esclusioni riconosciute e nessuna regola
+orfana; rigenerare l'indice non produce differenze.
+
+Provata inoltre l'app locale a 390×844 e 1440×900: la pillola con il nome
+completo va a capo, resta entro lo schermo e mantiene 8 px di distanza dal
+pulsante della lente. La ricerca di `gallo` mostra quattro ricorrenze distinte
+con i nuovi nomi completi. Console pulita e detector Impeccable senza rilievi.
+
+---
+
 ## 2026-07-29 — Tolti due errori del PDF, con la ragione scritta accanto
 
 *Agente: Claude. Toccati `assets/streets.json` (rigenerato),
