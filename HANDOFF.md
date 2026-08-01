@@ -5,6 +5,31 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-08-01 — Passaggio con Impeccable 4.0.4 e una trappola di stato chiusa
+
+*Agente: Claude. Toccato `app.js`.*
+
+Aggiornata la skill a 4.0.4 e ripassati i file cambiati. **Il rilevatore
+meccanico non trova nulla**, e i contrasti misurati compositando davvero i
+colori semitrasparenti sul fondo stanno fra 6,5 e 10,5 contro una soglia di
+4,5: il nome del luogo 10,53, gli alias 10,53, «Modificato» 6,59, la riga di
+stato 6,51, «Svuota la selezione» 6,51, «Copia x/y» 6,70.
+
+Il controllo che è servito davvero non è automatico ma sugli **stati limite**,
+e ha trovato una trappola vera introdotta ieri: la sequenza **nascondi →
+svuota la selezione → riseleziona un punto** lasciava la mappa vuota. Lo stato
+«nascosto» sopravviveva a una selezione che non esisteva più e restava in
+agguato per quella dopo: sceglievi un punto e non compariva niente.
+
+Risolta alla radice: **svuotare la selezione azzera anche «nascosto»**.
+Nascondere serve a sgombrare una selezione che esiste, non a mettere un filtro
+permanente. Verificato che l'altro comportamento regge ancora: nascondere
+continua a non toccare le spunte.
+
+`app.js?v=49`, `CACHE` a `mappa-squadra-v66`.
+
+---
+
 ## 2026-08-01 — Coordinate per Maps, scheda punto completa, selezione ≠ visibilità
 
 *Agente: Claude. Toccati `index.html`, `styles.css`, `app.js`.*

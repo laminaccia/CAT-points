@@ -567,6 +567,12 @@
   function clearSelectedMarkerHistoryPoints() {
     markerHistoryVisibility = {};
     pendingHistoryConnectionEndpoint = null;
+    // Svuotata la selezione, «nascosto» non si riferisce più a niente: se
+    // restasse acceso resterebbe in agguato per la scelta successiva, e chi
+    // riseleziona un punto non lo vedrebbe comparire. Nascondere serve a
+    // sgombrare una selezione che esiste, non a mettere un filtro permanente.
+    markerHistoryPointsHidden = false;
+    persistMarkerHistoryPointsHidden();
     const persisted = persistMarkerHistoryVisibility();
     updateMarkerHistoryMapSummary();
     renderHistoryMapPoints();
