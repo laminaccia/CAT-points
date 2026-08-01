@@ -116,7 +116,17 @@ h1 { margin: 0; font-size: 22px; letter-spacing: .08em; }
 .lens-toggle-button[aria-pressed="false"] { color: var(--muted); border-color: rgba(255,255,255,.12); background: rgba(9,12,17,.82); }
 .lens-toggle-button[aria-pressed="false"] svg { stroke: var(--muted); }
 .lens-toggle-button:active { transform: translateX(-50%) translateY(1px) scale(.98); }
-.status-pill { position: absolute; z-index: 5; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 184px); transform: translateX(-50%); max-width: calc(100% - 32px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 9px 13px; border: 1px solid rgba(255,255,255,.15); border-radius: 999px; background: var(--panel); color: #e8ebf2; backdrop-filter: blur(12px); font-size: 13px; }
+/* Va a capo invece di troncare. Le etichette delle vie portano il nome per
+   esteso — «Mappa centrata su Chiesa dell'Immacolata CONCEZIONE» — e con i
+   puntini di sospensione a sparire era proprio il nome, cioè l'unica cosa che
+   il messaggio doveva dire. Il raggio pieno diventa fisso perché su due righe
+   una pillola completamente stondata si deforma. */
+/* Ancorata ai due lati invece che a `left: 50%` con la traslazione. Con un
+   solo ancoraggio la larghezza disponibile per il calcolo è la metà destra
+   dello schermo — 188px su un telefono — e il testo lungo ci si spezzava
+   dentro su cinque righe. `left`+`right` con `width: fit-content` e i margini
+   automatici danno lo stesso centraggio ma con tutta la riga a disposizione. */
+.status-pill { position: absolute; z-index: 5; left: 16px; right: 16px; bottom: calc(env(safe-area-inset-bottom) + 184px); width: fit-content; max-width: calc(100% - 32px); margin-inline: auto; padding: 9px 15px; border: 1px solid rgba(255,255,255,.15); border-radius: 18px; background: var(--panel); color: #e8ebf2; backdrop-filter: blur(12px); font-size: 13px; line-height: 1.35; text-align: center; text-wrap: pretty; }
 .controls-panel { position: absolute; z-index: 6; left: 16px; right: 16px; bottom: calc(env(safe-area-inset-bottom) + 18px); }
 .control-row { display: grid; grid-template-columns: 52px 1fr 52px; align-items: center; gap: 10px; margin-top: 10px; }
 #confirmRow { grid-template-columns: 1fr 1fr; }

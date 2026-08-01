@@ -91,6 +91,7 @@ TIPI = {
     "QUARTIERE", "ARCO", "PARCO", "BOSCO", "COLLE", "CASTELLO", "TEATRO",
     "MUSEO", "SCUOLA", "CENTRO", "NUCLEO", "PINETA", "BELVEDERE", "MURA",
     "DEPURATORE", "PARCHEGGIO", "ORFANOTROFIO", "CONVENTO", "SANTUARIO",
+    "CIRCONVALLAZIONE", "CAMPO", "CIMITERO", "CASERMA", "PIAZZALE", "LARGHI",
 }
 
 
@@ -127,15 +128,188 @@ def tag_utile(tag):
     return any(parola not in PAROLE_GENERICHE for parola in n.split(" "))
 
 
+# Titoli e qualifiche sciolti per esteso. L'utente li vuole completi: servono a
+# distinguere le tante vie che condividono il cognome — a Calatafimi ci sono
+# quattro Gallo e tre Simone, e «Capitano» o «Sergente» sono ciò che li separa.
+TITOLI = {
+    "AVV": "Avvocato", "AVVOCATO": "Avvocato",
+    "CAV": "Cavaliere", "CAVALIERE": "Cavaliere",
+    "CAP": "Capitano", "CAPITANO": "Capitano",
+    "SAC": "Sacerdote", "SACERDOTE": "Sacerdote",
+    "MONS": "Monsignor", "MONSIGNOR": "Monsignor",
+    "ARC": "Arciprete", "ARCIPRETE": "Arciprete",
+    "MAGG": "Maggiore", "MAGGIORE": "Maggiore",
+    "PROF": "Professore", "PROFESSORE": "Professore",
+    "TEN": "Tenente", "TENENTE": "Tenente",
+    "SEN": "Senatore", "SENATORE": "Senatore",
+    "SERG": "Sergente", "SERGENTE": "Sergente",
+    "NOTAR": "Notaio", "NOTARO": "Notaio", "NOTAIO": "Notaio",
+    "DOTT": "Dottor", "DOTTOR": "Dottor", "DOTTORE": "Dottor",
+    "PARROCO": "Parroco", "CANONICO": "Canonico", "PADRE": "Padre",
+    "VITT": "Vittorio",
+}
+
+# Restano minuscole: sono legature, non nomi. Se una di queste finisse in
+# maiuscolo l'occhio la scambierebbe per la parte importante.
+LEGATURE = {
+    "DI", "DEL", "DELLO", "DELLA", "DEI", "DEGLI", "DELLE", "DA", "DE",
+    "A", "AD", "E", "ED", "IL", "LO", "LA", "I", "GLI", "LE", "PER", "SU",
+    "CON", "DALL", "DELL", "ALL", "L", "D",
+}
+
+# Particelle che fanno parte del cognome quando l'autore le ha scritte con
+# l'iniziale maiuscola: «Li Bassi», «De Amicis», «Di Blasi». La stessa parola
+# minuscola è invece una legatura — «Chiesa di San Giuliano». La distinzione
+# la fa la grafia di partenza, che è anche la convenzione italiana.
+PARTICELLE_COGNOME = {"LI", "LA", "LE", "LO", "DE", "DI", "DA", "DEL", "DELLA", "VAN", "VON"}
+
+ROMANI = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XV", "XX"}
+ACRONIMI = {"SS", "SP", "SS113", "SS188", "SP12", "SP33"}
+EPITETI = {"PAPA", "MARTIRE", "VESCOVO", "ABATE", "CONFESSORE"}
+
+
+def sistema_maiuscole(token):
+    """Grafia uniforme di un token, senza rovinare quella voluta.
+
+    L'estrazione dal PDF urla in maiuscolo («PIAZZA CANNOLICCHIO»), i lotti
+    manuali no: vanno riportati alla stessa forma. Ma un token con maiuscole
+    interne — «PalaSegesta», «D'Azeglio» — è scritto così apposta e si tocca.
+    """
+    if not token:
+        return token
+    nudo = token.strip(".")
+    if nudo.upper() in ROMANI or nudo.upper() in ACRONIMI or nudo.isdigit():
+        return nudo.upper() if nudo.upper() in ROMANI or nudo.upper() in ACRONIMI else nudo
+    # Maiuscole interne volute: si lascia com'è (ma solo se non è tutto maiuscolo).
+    if token != token.upper() and any(c.isupper() for c in token[1:]):
+        return token
+    pezzi = re.split(r"([''])", token.lower())
+    return "".join(p if p in "''" else p[:1].upper() + p[1:] if p else p for p in pezzi)
+
+
+def espandi_titolo(token):
+    return TITOLI.get(token.strip(".").upper())
+
+
+def formatta_label(grezza):
+    """L'etichetta come la vuole l'utente: completa, sciolta, col cognome in
+    risalto.
+
+    Completa perché «la completezza di informazione è fondamentale»: niente
+    accorciamenti, i nomi di battesimo restano. Sciolta perché «Via Arc. F.
+    Avila» non si legge e non si detta. Col cognome MAIUSCOLO perché è quello
+    che l'occhio cerca scorrendo la lista dei risultati — dà «contesto alla
+    ricerca e immediatezza di risultato».
+    """
+    testo = ripulisci_testo(grezza)
+    # Abbreviazioni dell'estrazione automatica, prima di spezzare in token.
+    testo = re.sub(r"^[Cc]\s*[./]\s*[Ll][Ee]\b\.?", "Cortile", testo)
+    testo = re.sub(r"^[Cc]\s*[./]\s*[Dd][Aa]\b\.?", "Contrada", testo)
+
+    # Un'eventuale coda fra parentesi resta fuori dal ragionamento sul cognome:
+    # «(Chiesa Madre)» è una chiosa, non il nome della via.
+    coda = ""
+    aperta = testo.find("(")
+    if aperta > 0:
+        coda = " " + testo[aperta:].strip()
+        testo = testo[:aperta].strip()
+
+    token = testo.split(" ")
+    if len(token) < 2:
+        return (sistema_maiuscole(testo) + coda).strip()
+
+    formattati, maiuscolo_originale = [], []
+    for t in token:
+        esteso = espandi_titolo(t)
+        maiuscolo_originale.append(t[:1].isupper())
+        formattati.append(esteso if esteso else sistema_maiuscole(t))
+
+    # Dove comincia il cognome, partendo dal fondo.
+    fine = len(formattati) - 1
+    ultimo = fine
+    # Un ordinale o un epiteto in coda appartengono al nome che li precede:
+    # «Federico II», «San Silvestro Papa». La differenza è che l'ordinale fa
+    # parte del nome e va evidenziato con lui — FEDERICO II — mentre l'epiteto
+    # è un seguito e resta fuori: «San SILVESTRO Papa».
+    if formattati[fine].upper() in EPITETI and fine > 1:
+        fine -= 1
+        ultimo = fine
+    elif formattati[fine].upper() in ROMANI and fine > 1:
+        fine -= 1
+    inizio = fine
+    while inizio > 1 and formattati[inizio - 1].upper() in PARTICELLE_COGNOME \
+            and maiuscolo_originale[inizio - 1]:
+        inizio -= 1
+
+    # Dentro il cognome va in maiuscolo tutto, particelle comprese: «DI BLASI»
+    # spezzato in «Di BLASI» si leggerebbe come due cose diverse.
+    for i in range(inizio, ultimo + 1):
+        formattati[i] = formattati[i].upper()
+
+    # Le legature che non fanno parte del cognome restano minuscole.
+    for i in range(1, inizio):
+        if formattati[i].upper() in LEGATURE:
+            formattati[i] = formattati[i].lower()
+
+    return (" ".join(formattati) + coda).strip()
+
+
+def formatta_tag(grezzo):
+    """Stessa grafia uniforme dell'etichetta, senza il maiuscolo di risalto:
+    i tag non si vedono da nessuna parte, servono solo a farsi trovare."""
+    testo = ripulisci_testo(grezzo)
+    testo = re.sub(r"^[Cc]\s*[./]\s*[Ll][Ee]\b\.?", "Cortile", testo)
+    testo = re.sub(r"^[Cc]\s*[./]\s*[Dd][Aa]\b\.?", "Contrada", testo)
+    fuori = []
+    for i, t in enumerate(testo.split(" ")):
+        esteso = espandi_titolo(t)
+        if esteso:
+            fuori.append(esteso)
+        elif i and t.upper() in LEGATURE:
+            fuori.append(t.lower())
+        else:
+            fuori.append(sistema_maiuscole(t))
+    return " ".join(fuori).strip()
+
+
+def parte_distintiva(label):
+    """L'etichetta senza la parola che dice *che cosa* è: «Via Michele BARONE»
+    → «Michele BARONE». È la forma con cui la gente cerca."""
+    token = label.split(" ")
+    if len(token) > 1 and tipo(label):
+        return " ".join(token[1:])
+    return ""
+
+
+def cognome(label):
+    """I token in maiuscolo dell'etichetta: il cognome messo in risalto."""
+    token = [t for t in re.sub(r"\(.*?\)", "", label).split(" ") if t]
+    forti = [t for t in token if t.isupper() and len(t) > 1 and t.upper() not in ACRONIMI]
+    return " ".join(forti)
+
+
 def normalizza_voce(voce):
-    """Una voce ripulita: etichetta in ordine, tag deduplicati, 6 decimali."""
-    label = ripulisci_testo(voce["label"])
+    """Una voce uniformata: etichetta formattata, tag standardizzati, 6 decimali."""
+    label = formatta_label(voce["label"])
+    tipo_label = tipo(label)
+
+    # Copertura garantita: ogni voce si trova col nome intero, senza la parola
+    # generica iniziale, e col solo cognome. Prima era a caso — certe voci
+    # avevano il cognome sciolto fra i tag, altre no, e la ricerca sembrava
+    # capricciosa senza motivo.
+    candidati = [label] + [formatta_tag(str(t)) for t in (voce.get("tags") or [])]
+    candidati += [parte_distintiva(label), cognome(label)]
+
     tags, visti = [], set()
-    # L'etichetta è sempre il primo tag: è la corrispondenza più forte che il
-    # motore possa trovare (punteggio 1200 sull'uguaglianza esatta).
-    for tag in [label] + list(voce.get("tags") or []):
-        tag = ripulisci_testo(str(tag))
+    for tag in candidati:
         if not tag or not tag_utile(tag):
+            continue
+        # Ridondanza: un tag che ripete soltanto la parola generica iniziale
+        # («Cortile» su «Cortile Fanfulla») non aggiunge niente, perché
+        # l'etichetta intera è già una corrispondenza per prefisso.
+        # L'etichetta però non si scarta mai, nemmeno quando è *solo* quella
+        # parola: «Museo» si chiama così e resterebbe senza un tag al mondo.
+        if tag != label and tipo_label and normalizza(tag) == tipo_label:
             continue
         chiave = normalizza(tag)
         if chiave in visti:
@@ -377,9 +551,14 @@ def main():
     for lotto in lotti:
         for voce in json.loads(lotto.read_text(encoding="utf-8"))["streets"]:
             voce = normalizza_voce(voce)
+            # Stesso nome *e* stesso spillo: è una voce inserita due volte per
+            # sbaglio. Stesso nome ma punti distanti sono invece due tratti
+            # della stessa via, e vanno tenuti entrambi — «Via Stefano
+            # VIRGILIO» compare legittimamente in due punti.
             gemella = next(
                 (m for m in manuali
-                 if normalizza(m["label"]) == normalizza(voce["label"])), None
+                 if normalizza(m["label"]) == normalizza(voce["label"])
+                 and distanza(m, voce) < SOGLIA_STESSO_PIN), None
             )
             if gemella:
                 doppi_fra_lotti.append((voce, gemella, distanza(voce, gemella)))

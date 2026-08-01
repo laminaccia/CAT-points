@@ -5,6 +5,126 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-07-29 — Secondo lotto; etichette col cognome in risalto
+
+*Agente: Claude. Toccati `assets/streets.json` (rigenerato), `tools/merge-streets.py`,
+`styles.css`. Nessun file di Codex riscritto.*
+
+### Prima di tutto: il repository si era mosso sotto i piedi
+
+Riprendendo il lavoro la cronologia git non era più quella lasciata al commit
+`91d1e8c`: sopra c'erano **26 commit di Codex** (lente, vista d'insieme,
+cronologia marker, liste condivise CAT-points) e il progetto era stato
+**pubblicato** (`d66fc81`). Nessun lavoro perso, ma la copia in memoria di
+`styles.css`, `app.js` e `index.html` era vecchia di ore.
+
+Verificato prima di scrivere una riga:
+
+* `assets/streets.json` **non toccato da Codex** → la rigenerazione non pesta
+  niente;
+* la loro unica modifica a `tools/merge-streets.py` era un commento (mappa da
+  7559 a 8192 px) e **sopravvive** nella copia attuale;
+* la **mappa è stata sostituita** — 8192×5787 contro 7559×5339. Le proporzioni
+  però coincidono (1.4156 contro 1.4158): stesso inquadramento, solo più
+  risoluzione, quindi **le coordinate normalizzate restano valide**. Se un
+  domani la mappa venisse *ritagliata* diversamente, tutto l'indice andrebbe
+  rifatto: vale la pena controllare le proporzioni a ogni sostituzione.
+
+Le regole di §8 hanno funzionato in entrambe le direzioni: Codex ha tenuto
+`HANDOFF.md` (+489 righe) e `AGENTS.md` (+192).
+
+### Il lotto 2
+
+121 punti, la parte destra della mappa e i buchi rimasti. Con questi le voci
+con etichetta ancora grezza scendono **da 68 a 33**, e si chiudono da sole
+diverse voci «da decidere» del giro precedente: `Dottor Biagio Gallo` era una
+persona vera e ora ha la sua via, `Via Gaetano Cangemi` pure.
+
+Totale: **423 voci**. Corretto anche un doppione dentro il lotto — `Cortile
+Giuseppe PATANIA` inserito due volte a 0.0004 di distanza. La regola sui
+doppioni ora distingue: stesso nome *e* stesso spillo è un errore di
+inserimento, stesso nome ma punti lontani sono due tratti della stessa via
+(`Via Stefano VIRGILIO` compare legittimamente in due punti).
+
+### Le etichette, come le vuole l'utente
+
+Decisione: **complete, abbreviazioni sciolte, cognome in MAIUSCOLO**. Serve a
+«dare contesto alla ricerca e immediatezza di risultato» — l'occhio scorre la
+lista e trova il cognome. Niente accorciamenti: «la completezza di informazione
+è fondamentale».
+
+    Via Arc. F. Avila        →  Via Arciprete Francesco AVILA
+    C.LE AMARI               →  Cortile AMARI
+    Largo Gaetano Di Blasi   →  Largo Gaetano DI BLASI
+    Via Federico II          →  Via FEDERICO II
+
+Il valore vero si vede sui quattro Gallo, prima indistinguibili a colpo
+d'occhio: `Via Dottor Benedetto GALLO`, `Via Avvocato Giovanni GALLO`,
+`Via Avvocato Leonardo GALLO`, `Via Dottor Biagio GALLO`.
+
+Dettagli non ovvi, tutti nello script: le particelle del cognome vanno in
+maiuscolo con lui (`DI BLASI` spezzato in `Di BLASI` si leggerebbe come due
+cose), un ordinale in coda fa parte del nome (`FEDERICO II`) mentre un epiteto
+no (`San SILVESTRO Papa`), e i token con maiuscole interne volute — `PalaSegesta`,
+`D'Azeglio` — non si toccano.
+
+### I tag
+
+Standardizzati: grafia uniforme, e soprattutto **copertura garantita** — ogni
+voce è ora cercabile col nome intero, senza la parola generica iniziale, e col
+solo cognome. Prima era a caso: certe voci avevano il cognome sciolto fra i
+tag, altre no, e la ricerca sembrava capricciosa senza motivo.
+
+Tolte le ridondanze: un tag che ripete solo la parola generica («Cortile» su
+«Cortile FANFULLA») non aggiunge niente, perché l'etichetta intera è già una
+corrispondenza per prefisso. **I tag non si vedono da nessuna parte** — la
+lista dei risultati mostra solo `label` — quindi la loro grafia è questione di
+ordine nel file, non di interfaccia.
+
+### La pillola di stato troncava i nomi
+
+Con i nomi per esteso, `Mappa centrata su Chiesa dell'Immacolata CONCEZIONE`
+finiva nei puntini di sospensione: spariva proprio il nome, l'unica cosa che il
+messaggio doveva dire. Tolto il troncamento.
+
+Non è bastato: il testo andava a capo dentro **188px su cinque righe**. Il
+motivo è che con `left: 50%` più `transform: translateX(-50%)` la larghezza
+disponibile per il calcolo è solo la metà destra dello schermo — la traslazione
+ricentra dopo, a larghezza già decisa. Prima non si vedeva perché `nowrap`
+ignorava il vincolo. Ancorata ai due lati con `width: fit-content` e margini
+automatici: stesso centraggio, tutta la riga a disposizione, **tre righe invece
+di cinque**.
+
+### Verificato
+
+Da cache e service worker azzerati, a 375×812: 423 voci, `mappa-squadra-v58`,
+console pulita. Ricerche: `brandis` → tre tratti tutti con lo stesso nome
+curato, `gallo` → quattro vie distinte, `patania` → una sola, `di blasi`,
+`ruisi`, `cincinnato`, `cimitero` → due, `chianipodda` → gli alias dialettali
+reggono. Pillola: testo intero, 343px, centrata, non troncata.
+
+`styles.css?v=46`, `CACHE` a `mappa-squadra-v58`. **Non ho fatto push**: ora
+c'è un remote e il sito è pubblicato, quindi la pubblicazione la decide l'utente.
+
+### Da valutare
+
+- **33 etichette ancora grezze.** Le contrade a est e sud (Affacciatura,
+  Cannizza, Franco, Granatello, Margi, Rina, S. Pietro, Mazzaforte) sono
+  campagna, forse fuori area di gioco. Ma dentro il paese restano scoperte
+  `Cortile CANOVA`, `Cortile FARINI`, `Piazza CANNOLICCHIO`, `Via CRUCIS`,
+  `Via MONTI`, `Via PASQUALE`, `Via STROZZI`, `Viale EUROPA`, `Via ACQUANUOVA`,
+  `Via A. DE GASPERI` ×3, `Strada COMUNALE` ×2 e `Via BEN.` (nome troncato dal
+  PDF, irrecuperabile senza guardare la mappa).
+- **`Via PALERMO` a (0.116, 0.073)**, angolo in alto a sinistra, lontanissima
+  dalla Via Palermo vera: quasi certamente un cartello stradale letto dal PDF,
+  non una via del paese. Da cancellare?
+- `Via ACQUANUOVA` ~ `Via ACQUANOVA`, 96% simili a 0.018 di distanza: stessa
+  via scritta in due modi, probabilmente da fondere.
+- `Via Padre PIO` accanto a `Villa Padre PIO` (0.0078), tenute separate dal
+  controllo sul tipo.
+
+---
+
 ## 2026-07-30 — Interruttore persistente per la lente
 
 *Agente: Codex con skill Impeccable. Toccati `app.js`, `styles.css`,

@@ -181,6 +181,40 @@ L'estrazione dal PDF contiene errori che l'utente ha corretto a mano, quindi
 dove i due si contraddicono la versione curata è quella buona. L'estrazione
 sopravvive solo dove *aggiunge* un posto che i lotti non coprono ancora.
 
+### Come si scrivono etichette e tag — deciso con l'utente il 2026-07-29
+
+L'etichetta è **l'unica cosa che si vede**: la lista dei risultati mostra
+`label` e nient'altro. I tag non compaiono da nessuna parte, servono soltanto a
+farsi trovare.
+
+Le etichette sono **complete, con le abbreviazioni sciolte e il cognome in
+MAIUSCOLO**:
+
+    Via Arc. F. Avila        →  Via Arciprete Francesco AVILA
+    C.LE AMARI               →  Cortile AMARI
+    Largo Gaetano Di Blasi   →  Largo Gaetano DI BLASI
+
+Il maiuscolo serve a «dare contesto alla ricerca e immediatezza di risultato»:
+l'occhio scorre la lista e aggancia il cognome. Niente accorciamenti — «la
+completezza di informazione è fondamentale» — perché sono i nomi di battesimo a
+distinguere le quattro vie Gallo e le tre Simone del paese.
+
+I tag garantiscono la **copertura**: ogni voce è cercabile col nome intero,
+senza la parola generica iniziale, e col solo cognome. Non si tengono i tag che
+ripetono solo la parola generica (`Cortile` su `Cortile FANFULLA`): l'etichetta
+intera è già una corrispondenza per prefisso.
+
+Tutto questo lo applica `tools/merge-streets.py` alle sorgenti, **entrambe** —
+anche l'estrazione dal PDF, così le due si somigliano. Non riscrivere le
+etichette a mano nell'indice: sparirebbero alla ricostruzione.
+
+### Se si sostituisce la mappa: controllare le proporzioni
+
+Le coordinate dell'indice sono normalizzate, quindi sopravvivono a un cambio di
+risoluzione ma **non a un ritaglio diverso**. Quando la mappa è passata da
+7559×5339 a 8192×5787 le proporzioni sono rimaste 1.4156: stesso inquadramento,
+indice valido. Con proporzioni diverse andrebbero rifatti tutti i punti.
+
 ### Aggiungere un lotto
 
 1. Nell'app: **Aggiungi punto** per ogni luogo, poi **Scarica JSON**.
