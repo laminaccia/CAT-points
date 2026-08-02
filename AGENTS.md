@@ -98,10 +98,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=54` e
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=58` e
    `app.js?v=54`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v72`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v76`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
@@ -377,7 +377,22 @@ singola, **Mostra tutti**, **Nessuno**, conteggio locale/globale e collegamenti.
 Su desktop il dialog diventa un workspace a due colonne e la mappa usa tutta
 la viewport, mentre i controlli principali restano centrati entro 760 px. Su
 mobile il pannello è alto al massimo 720 px e ogni scheda gestisce il proprio
-scorrimento verticale.
+scorrimento verticale. Su mobile la scheda **Punti** scorre come un unico
+contenuto, footer compreso: fissare il footer può ridurre la lista a zero pixel
+sui viewport bassi. Da desktop la lista torna ad avere lo scorrimento interno,
+così le azioni restano visibili nel workspace più ampio.
+
+Quando gli strumenti coordinate sono visibili su mobile, lente e messaggi
+temporanei si dispongono sopra il mirino e il pannello riduce soltanto padding
+e interlinea sui viewport bassi, senza scendere sotto i 44 px tattili. In
+landscape da 520 px ricerca e coordinate si affiancano; lente e toast occupano
+la fascia sopra i comandi. L'editor e la modalità di collegamento nascondono
+temporaneamente il pannello coordinate, che ricompare senza perdere la
+preferenza quando si chiudono. Anche i risultati della ricerca nascondono
+temporaneamente coordinate, lente e toast, così l'elenco non copre controlli
+attivi e non crea livelli interattivi concorrenti. Il messaggio di ricerca
+resta visibile per errori e nessun risultato, ma viene nascosto quando l'elenco
+stesso comunica già le corrispondenze.
 
 I collegamenti tra punti usano `mappa-marker-history-connections-v1`. Ogni
 estremo conserva soltanto `{ sourceKey, entryId }`, quindi può riferirsi anche
@@ -462,6 +477,9 @@ proprietario originale e aggiunge il partecipante corrente alla catena.
 - Da 900 px la mappa occupa l'intera viewport, i controlli restano centrati e
   la cronologia sfrutta due colonne; sotto tale soglia le funzioni restano
   complete, toccabili e prive di sovrapposizioni.
+- Nei viewport mobili portrait e landscape, coordinate, lente, toast,
+  ricerca, collegamenti e comandi non si sovrappongono negli stati in cui sono
+  contemporaneamente attivi.
 - Il controllo **Importa punti** apre tramite la sua etichetta nativa il
   selettore file del dispositivo, senza dipendere da un click JavaScript su un
   input nascosto; accetta i pacchetti `.catpoints.json` e i precedenti export

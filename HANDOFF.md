@@ -5,6 +5,33 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-08-02 — Overlay mobili e scroll cronologia corretti alla radice
+
+*Agente: Codex con skill Impeccable. Toccati `styles.css`, `index.html`,
+`service-worker.js`, `AGENTS.md`.*
+
+Coordinate, lente, toast, ricerca e comandi non usano più ancoraggi mobili
+indipendenti. In portrait lente e messaggi stanno sopra il mirino; sui viewport
+bassi il pannello coordinate conserva le righe tattili da 44 px riducendo solo
+padding e interlinea. In landscape da 520 px ricerca e coordinate si
+affiancano ai lati del mirino, compreso l'iPhone compatto da 568×320. Durante
+ricerca e modifica dei collegamenti gli strumenti concorrenti vengono nascosti
+senza cambiare le preferenze salvate.
+
+La cronologia aveva due cause distinte. In **Punti** il footer fisso era più
+alto dello spazio residuo e riduceva la lista a 0 px: su mobile ora scorre
+l'intera scheda, footer compreso, mentre da desktop resta lo scroll interno
+della lista. In **Mappa e linee** il workspace cresceva all'altezza dei suoi
+contenuti dentro un genitore che li tagliava; ora occupa l'altezza disponibile
+e gestisce correttamente il proprio overflow.
+
+Collaudo con una lista importata di otto punti: a 320×568 la scheda **Punti**
+ha 216 px visibili su 1852 px e accetta lo scroll; **Mappa e linee** ha 216 px
+visibili su 916 px e scorre indipendentemente. Su desktop 1200×800 la lista
+resta in due colonne con footer visibile. Verificati senza sovrapposizioni
+320×568, 375×667, 390×844, 568×320, 667×375 e 844×390. Versioni pubblicabili:
+`styles.css?v=58`, `app.js?v=54`, cache `mappa-squadra-v76`.
+
 ## 2026-08-01 — Collegamenti creati e modificati direttamente sulla mappa
 
 *Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,
