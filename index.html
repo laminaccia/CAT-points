@@ -10,7 +10,7 @@
   <title>Mappa Squadra</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=58">
+  <link rel="stylesheet" href="styles.css?v=59">
 </head>
 <body>
   <main class="app-shell">
@@ -30,6 +30,13 @@
         </div>
         <div class="topbar-actions">
           <button id="toggleCoordinatesButton" class="icon-button icon-button--label" type="button" aria-pressed="false" aria-controls="coordinatePanel" aria-label="Mostra gli strumenti coordinate">x/y</button>
+          <button id="lensToggleButton" class="icon-button lens-toggle-button" type="button" aria-pressed="true" aria-label="Disattiva lente di ingrandimento" title="Lente">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="10.5" cy="10.5" r="5.5"></circle>
+              <path d="m15 15 4.5 4.5"></path>
+            </svg>
+            <span class="sr-only" id="lensToggleLabel">Lente attiva</span>
+          </button>
           <button id="resetButton" class="icon-button" type="button" aria-label="Torna alla vista iniziale" title="Home">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M4 10.5 12 4l8 6.5"></path>
@@ -84,13 +91,6 @@
         </div>
       </div>
 
-      <button id="lensToggleButton" class="lens-toggle-button" type="button" aria-pressed="true" aria-label="Disattiva lente di ingrandimento">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="10.5" cy="10.5" r="5.5"></circle>
-          <path d="m15 15 4.5 4.5"></path>
-        </svg>
-        <span id="lensToggleLabel">Lente attiva</span>
-      </button>
       <div class="status-pill hidden" id="statusPill" role="status" aria-live="polite"></div>
 
       <div class="map-connection-toolbar hidden" id="mapConnectionToolbar" role="group" aria-label="Collegamenti sulla mappa">

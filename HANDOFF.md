@@ -5,6 +5,23 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-08-02 — Interruttore lente accanto alle coordinate
+
+*Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,
+`service-worker.js`, `README.md`, `AGENTS.md`.*
+
+Il comando della lente non è più una pillola sovrapposta alla mappa: è ora un
+pulsante circolare nella barra superiore, tra **x/y** e Home. Lo stato continua
+a usare `aria-pressed`, il nome accessibile dinamico e la preferenza locale già
+esistente; il testo visivo è nascosto perché l'icona della lente identifica il
+comando senza sottrarre spazio alla mappa.
+
+Per i telefoni da 320 px i tre pulsanti passano a 44 px e mantengono 6 px di
+distanza. Il nome del partecipante si tronca con ellissi invece di invadere i
+comandi. Verificati 320×568, 390×844 e 1200×800 senza sovrapposizioni; provati
+anche spegnimento e riattivazione effettivi della lente. Versioni pubblicabili:
+`styles.css?v=59`, `app.js?v=54`, cache `mappa-squadra-v77`.
+
 ## 2026-08-02 — Overlay mobili e scroll cronologia corretti alla radice
 
 *Agente: Codex con skill Impeccable. Toccati `styles.css`, `index.html`,

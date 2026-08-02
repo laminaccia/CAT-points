@@ -98,10 +98,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=58` e
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=59` e
    `app.js?v=54`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v76`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v77`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
@@ -362,13 +362,14 @@ anche la chiave rimasta senza sorgente. I collegamenti continuano a usare gli
 estremi originali `{ sourceKey, entryId }`, quindi dalla lista aggregata si
 possono collegare direttamente punti appartenenti a liste diverse.
 
-La lente del mirino ha un interruttore indipendente nella posizione del vecchio
-messaggio «Sposta la mappa sotto il mirino». La scelta usa
+La lente del mirino ha un interruttore circolare indipendente nella barra
+superiore, accanto al pulsante `x/y`. La scelta usa
 `mappa-crosshair-lens-v1`, è attiva al primo accesso e resta sul dispositivo.
 Quando è spenta il canvas viene svuotato e diventa trasparente: cerchio e punto
 centrale restano visibili, ma la carta non viene ingrandita. `#statusPill`
-continua a mostrare gli avvisi sopra il pulsante e li nasconde dopo 2,8 secondi;
-il messaggio di istruzione predefinito non viene più visualizzato.
+continua a mostrare gli avvisi temporanei nell'area della mappa e li nasconde
+dopo 2,8 secondi; il messaggio di istruzione predefinito non viene più
+visualizzato.
 
 Il dialog cronologia separa le attività in **Punti** e **Mappa e linee**; la
 scheda attiva usa `mappa-marker-history-tab-v1`. La prima contiene gestione,
@@ -382,17 +383,16 @@ contenuto, footer compreso: fissare il footer può ridurre la lista a zero pixel
 sui viewport bassi. Da desktop la lista torna ad avere lo scorrimento interno,
 così le azioni restano visibili nel workspace più ampio.
 
-Quando gli strumenti coordinate sono visibili su mobile, lente e messaggi
-temporanei si dispongono sopra il mirino e il pannello riduce soltanto padding
-e interlinea sui viewport bassi, senza scendere sotto i 44 px tattili. In
-landscape da 520 px ricerca e coordinate si affiancano; lente e toast occupano
-la fascia sopra i comandi. L'editor e la modalità di collegamento nascondono
-temporaneamente il pannello coordinate, che ricompare senza perdere la
-preferenza quando si chiudono. Anche i risultati della ricerca nascondono
-temporaneamente coordinate, lente e toast, così l'elenco non copre controlli
-attivi e non crea livelli interattivi concorrenti. Il messaggio di ricerca
-resta visibile per errori e nessun risultato, ma viene nascosto quando l'elenco
-stesso comunica già le corrispondenze.
+Quando gli strumenti coordinate sono visibili su mobile, i messaggi temporanei
+si dispongono sopra il mirino e il pannello riduce soltanto padding e interlinea
+sui viewport bassi, senza scendere sotto i 44 px tattili. In landscape da 520
+px ricerca e coordinate si affiancano. L'editor e la modalità di collegamento
+nascondono temporaneamente il pannello coordinate, che ricompare senza perdere
+la preferenza quando si chiudono. Anche i risultati della ricerca nascondono
+temporaneamente coordinate e toast, così l'elenco non copre controlli attivi e
+non crea livelli interattivi concorrenti. Il messaggio di ricerca resta
+visibile per errori e nessun risultato, ma viene nascosto quando l'elenco stesso
+comunica già le corrispondenze.
 
 I collegamenti tra punti usano `mappa-marker-history-connections-v1`. Ogni
 estremo conserva soltanto `{ sourceKey, entryId }`, quindi può riferirsi anche
