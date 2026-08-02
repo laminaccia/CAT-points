@@ -12,6 +12,12 @@
       "x": 0.115774,
       "y": 0.073224,
       "motivo": "Angolo in alto a sinistra della mappa, a 0.78 dalla Via Palermo del paese: è l'indicazione stradale per Palermo letta dal livello testo del PDF, non una via di Calatafimi. Le altre due occorrenze, accanto alla via vera, restano. Deciso con l'utente il 2026-07-29."
+    },
+    {
+      "label": "Via Silvio Pellico",
+      "x": 0.52962,
+      "y": 0.202832,
+      "motivo": "Occorrenza ridondante di Via Silvio Pellico. Rimossa su indicazione dell'utente il 2026-08-02; le altre occorrenze corrette della via restano nell'indice."
     }
   ]
 }

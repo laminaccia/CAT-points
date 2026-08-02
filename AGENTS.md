@@ -101,7 +101,7 @@ Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=59` e
    `app.js?v=54`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v77`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v78`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker

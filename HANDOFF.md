@@ -5,6 +5,22 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-08-02 — Rimossa un'occorrenza ridondante di Via Silvio Pellico
+
+*Agente: Codex. Toccati `data/sorgenti/esclusi.json`,
+`assets/streets.json`, `service-worker.js`, `AGENTS.md`.*
+
+Il punto PDF `x=0.529620`, `y=0.202832` è stato dichiarato ridondante
+dall'utente. La rimozione non è rimasta una modifica manuale del file generato:
+è registrata con motivazione in `esclusi.json`, mentre
+`estrazione-pdf.json` conserva correttamente la fotografia originale.
+
+`tools/merge-streets.py` ha ricostruito l'indice da zero: 420 voci finali e
+nessuna ricomparsa del punto escluso; le altre occorrenze di Via Silvio Pellico
+restano. Prima dell'intervento è stato verificato che locale e `origin/main`
+coincidessero sul commit `dd592ba`. Cache pubblicabile:
+`mappa-squadra-v78`.
+
 ## 2026-08-02 — Interruttore lente accanto alle coordinate
 
 *Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,
