@@ -1,8 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title description">
   <title id="title">CAT Points</title>
-  <desc id="description">Un punto dorato con il Tempio di Segesta</desc>
+  <desc id="description">Il Tempio di Segesta dorato su fondo nero</desc>
   <rect width="512" height="512" fill="#090b10"/>
-  <path fill="#ddb85d" d="M256 54c-105 0-190 85-190 190 0 132 151 233 180 251a19 19 0 0 0 20 0c29-18 180-119 180-251 0-105-85-190-190-190Z"/>
-  <path fill="#090b10" d="M256 111 132 187h248L256 111Zm-129 88v25h258v-25H127Zm21 37v103h27V236h-27Zm47 0v103h27V236h-27Zm47 0v103h27V236h-27Zm47 0v103h27V236h-27Zm47 0v103h27V236h-27Zm-219 115v28h278v-28H117Z"/>
-  <circle cx="256" cy="426" r="13" fill="#f5db8b"/>
+  <path fill="#ddb85d" d="M256 91 92 191h328L256 91ZM84 208v32h344v-32H84Zm29 51v132h28V259h-28Zm52 0v132h28V259h-28Zm52 0v132h28V259h-28Zm52 0v132h28V259h-28Zm52 0v132h28V259h-28Zm52 0v132h28V259h-28ZM72 410v36h368v-36H72Z"/>
+  <circle cx="256" cy="466" r="10" fill="#f5db8b"/>
 </svg>
