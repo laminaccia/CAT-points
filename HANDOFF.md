@@ -5,6 +5,27 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-08-04 — Anteprima locale della posizione del dispositivo
+
+*Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,
+`app.js`, `service-worker.js`, `README.md`, `AGENTS.md`.*
+
+È stato aggiunto **Localizzami** come quarto comando circolare della barra
+superiore. Parte soltanto dopo un tocco esplicito, mostra un punto blu distinto
+dai punti oro della caccia e usa l'inversa della calibrazione geografica già
+presente per collocarlo sulla scansione. Il primo rilevamento valido centra la
+mappa; i successivi aggiornano soltanto il punto. Un secondo tocco interrompe
+`watchPosition()` e rimuove l'indicatore.
+
+La posizione non viene salvata, esportata, condivisa o inserita nel PNG. Sono
+gestiti HTTPS mancante, browser incompatibile, permesso negato, timeout,
+posizione indisponibile e stima fuori dalla carta. Verificati assenza di errori
+JavaScript, conversione affine inversa, stato di permesso negato e layout a
+320×568, 390×844 e 1200×800 senza sovrapposizioni. Il controllo Impeccable non
+ha rilevato regressioni. Versioni pronte per l'anteprima:
+`styles.css?v=60`, `app.js?v=55`, cache `mappa-squadra-v79`. Il commit resta
+locale e non va pubblicato finché l'utente non approva l'anteprima.
+
 ## 2026-08-02 — Rimossa un'occorrenza ridondante di Via Silvio Pellico
 
 *Agente: Codex. Toccati `data/sorgenti/esclusi.json`,

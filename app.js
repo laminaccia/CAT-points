@@ -5,6 +5,7 @@
   const historyMapLayer = document.getElementById('historyMapLayer');
   const historyMapConnections = document.getElementById('historyMapConnections');
   const historyMapPoints = document.getElementById('historyMapPoints');
+  const userLocation = document.getElementById('userLocation');
   const marker = document.getElementById('marker');
   const markerLabel = document.getElementById('markerLabel');
   const markerHistoryLabelVisual = document.getElementById('markerHistoryLabelVisual');
@@ -34,6 +35,8 @@
   const statusPill = document.getElementById('statusPill');
   const lensToggleButton = document.getElementById('lensToggleButton');
   const lensToggleLabel = document.getElementById('lensToggleLabel');
+  const locationToggleButton = document.getElementById('locationToggleButton');
+  const locationToggleLabel = document.getElementById('locationToggleLabel');
   const mapConnectionToolbar = document.getElementById('mapConnectionToolbar');
   const startMapConnectionButton = document.getElementById('startMapConnectionButton');
   const mapConnectionButtonLabel = document.getElementById('mapConnectionButtonLabel');
@@ -211,6 +214,9 @@
   let customColorTarget = 'primary';
   let crosshairLensFrame = 0;
   let statusPillTimer = 0;
+  let userLocationWatchId = null;
+  let userLocationHasCentered = false;
+  let userLocationNotice = '';
   const crosshairLensDiameter = 64;
   const crosshairLensMagnification = 2.35;
 
@@ -233,6 +239,9 @@
     markerHistoryTab: 'points',
     markerColors: [defaultMarkerColor],
     markerText: '',
+    userLocationTracking: false,
+    userLocationCoordinates: null,
+    userLocationAccuracy: null,
     streetIndex: [],
     manualStreetPoints: [],
     playerName: '',
@@ -277,7 +286,7 @@
       markerHistoryStore = savedStore && typeof savedStore === 'object' && !Array.isArray(savedStore)
         ? savedStore
         : {};
-    } catch (error) {
+    } catch {
       markerHistoryStore = {};
     }
   }
@@ -1905,6 +1914,7 @@
   function render() {
     viewport.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.scale})`;
     updateHistoryMapOverlayScale();
+    renderUserLocation();
     updateCrosshairCoordinates();
     scheduleCrosshairLensRender();
   }
@@ -2009,6 +2019,138 @@
       latitude: latitudeOrigin + latitudeX * coordinates.x + latitudeY * coordinates.y,
       longitude: longitudeOrigin + longitudeX * coordinates.x + longitudeY * coordinates.y
     };
+  }
+
+  function getMapCoordinatesFromGeographic(latitude, longitude) {
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+    const [latitudeOrigin, latitudeX, latitudeY] = geographicCalibration.latitude;
+    const [longitudeOrigin, longitudeX, longitudeY] = geographicCalibration.longitude;
+    const determinant = latitudeX * longitudeY - latitudeY * longitudeX;
+    if (Math.abs(determinant) < Number.EPSILON) return null;
+    const latitudeDelta = latitude - latitudeOrigin;
+    const longitudeDelta = longitude - longitudeOrigin;
+    return {
+      x: (latitudeDelta * longitudeY - latitudeY * longitudeDelta) / determinant,
+      y: (latitudeX * longitudeDelta - latitudeDelta * longitudeX) / determinant
+    };
+  }
+
+  function locationAccuracyLabel(accuracy) {
+    if (!Number.isFinite(accuracy) || accuracy <= 0) return '';
+    return `precisione circa ${Math.max(1, Math.round(accuracy))} m`;
+  }
+
+  function updateLocationControl({ pending = false } = {}) {
+    const active = state.userLocationTracking;
+    const accuracyLabel = locationAccuracyLabel(state.userLocationAccuracy);
+    const accessibleLabel = active
+      ? `Interrompi localizzazione${accuracyLabel ? `, ${accuracyLabel}` : ''}`
+      : 'Mostra la mia posizione';
+    locationToggleButton.classList.toggle('is-pending', pending);
+    locationToggleButton.setAttribute('aria-busy', String(pending));
+    locationToggleButton.setAttribute('aria-pressed', String(active));
+    locationToggleButton.setAttribute('aria-label', accessibleLabel);
+    locationToggleButton.title = active ? 'Interrompi localizzazione' : 'Localizzami';
+    locationToggleLabel.textContent = accessibleLabel;
+  }
+
+  function setLocationNotice(key, message) {
+    if (userLocationNotice === key) return;
+    userLocationNotice = key;
+    setStatus(message);
+  }
+
+  function renderUserLocation() {
+    const coordinates = state.userLocationCoordinates;
+    if (!coordinates || !image.naturalWidth || !image.naturalHeight) {
+      userLocation.classList.add('hidden');
+      return;
+    }
+    userLocation.style.left = `${coordinates.x * image.naturalWidth}px`;
+    userLocation.style.top = `${coordinates.y * image.naturalHeight}px`;
+    userLocation.title = locationAccuracyLabel(state.userLocationAccuracy) || 'Posizione del dispositivo';
+    userLocation.classList.remove('hidden');
+  }
+
+  function stopUserLocationTracking(announce = true) {
+    if (userLocationWatchId !== null && navigator.geolocation) {
+      navigator.geolocation.clearWatch(userLocationWatchId);
+    }
+    userLocationWatchId = null;
+    userLocationHasCentered = false;
+    userLocationNotice = '';
+    state.userLocationTracking = false;
+    state.userLocationCoordinates = null;
+    state.userLocationAccuracy = null;
+    userLocation.classList.add('hidden');
+    updateLocationControl();
+    if (announce) setStatus('Localizzazione disattivata');
+  }
+
+  function handleUserLocation(position) {
+    if (!state.userLocationTracking) return;
+    const latitude = Number(position?.coords?.latitude);
+    const longitude = Number(position?.coords?.longitude);
+    const coordinates = getMapCoordinatesFromGeographic(latitude, longitude);
+    state.userLocationAccuracy = Number(position?.coords?.accuracy);
+    updateLocationControl();
+    if (!coordinates || coordinates.x < 0 || coordinates.x > 1 || coordinates.y < 0 || coordinates.y > 1) {
+      state.userLocationCoordinates = null;
+      renderUserLocation();
+      setLocationNotice('outside', 'La posizione è fuori dall’area coperta dalla mappa');
+      return;
+    }
+    state.userLocationCoordinates = coordinates;
+    renderUserLocation();
+    if (!userLocationHasCentered) {
+      userLocationHasCentered = true;
+      zoomToMapPoint(coordinates.x, coordinates.y);
+      const accuracyLabel = locationAccuracyLabel(state.userLocationAccuracy);
+      setLocationNotice('found', `Posizione trovata${accuracyLabel ? ` · ${accuracyLabel}` : ''}`);
+    }
+  }
+
+  function handleUserLocationError(error) {
+    if (!state.userLocationTracking) return;
+    updateLocationControl();
+    if (error?.code === 1) {
+      stopUserLocationTracking(false);
+      setStatus('Permesso posizione negato: abilitalo nelle impostazioni del browser');
+      return;
+    }
+    if (error?.code === 3) {
+      setLocationNotice('timeout', 'Posizione non trovata: riprova all’aperto');
+      return;
+    }
+    setLocationNotice('unavailable', 'Posizione non disponibile su questo dispositivo');
+  }
+
+  function startUserLocationTracking() {
+    if (!navigator.geolocation) {
+      setStatus('Localizzazione non supportata da questo browser');
+      return;
+    }
+    if (!window.isSecureContext) {
+      setStatus('La localizzazione richiede un indirizzo HTTPS');
+      return;
+    }
+    state.userLocationTracking = true;
+    state.userLocationCoordinates = null;
+    state.userLocationAccuracy = null;
+    userLocationHasCentered = false;
+    userLocationNotice = '';
+    updateLocationControl({ pending: true });
+    setStatus('Ricerca della posizione…');
+    try {
+      userLocationWatchId = navigator.geolocation.watchPosition(
+        handleUserLocation,
+        handleUserLocationError,
+        { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
+      );
+    } catch (error) {
+      stopUserLocationTracking(false);
+      setStatus('Impossibile avviare la localizzazione');
+    }
   }
 
   /** Metri fra due punti della mappa, passando dalle coordinate geografiche.
@@ -2998,6 +3140,10 @@
   lensToggleButton.addEventListener('click', () => {
     setCrosshairLensEnabled(!state.crosshairLensEnabled);
   });
+  locationToggleButton.addEventListener('click', () => {
+    if (state.userLocationTracking) stopUserLocationTracking();
+    else startUserLocationTracking();
+  });
   document.getElementById('zoomInButton').addEventListener('click', () => zoomAt(1.25));
   document.getElementById('zoomOutButton').addEventListener('click', () => zoomAt(0.8));
   placeButton.addEventListener('click', () => {
@@ -3534,7 +3680,9 @@
   // è campagna vuota, e il mirino non avrebbe coordinate.
   if (image.complete && image.naturalWidth) fitImage();
   window.addEventListener('resize', fitImage);
+  window.addEventListener('pagehide', () => stopUserLocationTracking(false));
   setMarkerVisual();
+  updateLocationControl();
   loadCrosshairLensPreference();
   loadCoordinateToolsPreference();
   loadMarkerHistoryStore();

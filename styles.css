@@ -38,6 +38,10 @@ button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; 
 .history-map-connection-control { fill: transparent; pointer-events: all; cursor: pointer; }
 .history-map-connection-control:focus-visible { outline: none; fill: rgba(245,219,139,.18); }
 .history-map-points { position: absolute; z-index: 2; left: 0; top: 0; width: 0; height: 0; overflow: visible; pointer-events: none; }
+.user-location { position: absolute; z-index: 3; width: 14px; height: 14px; min-height: 0; transform: translate(-50%, -50%) scale(var(--history-map-point-scale, 1)); transform-origin: center; border-radius: 50%; pointer-events: none; }
+.user-location::before { position: absolute; inset: -8px; border: 1px solid rgba(111,183,255,.72); border-radius: 50%; background: rgba(57,148,238,.18); box-shadow: 0 3px 10px rgba(7,38,67,.34); content: ""; animation: user-location-pulse 2s cubic-bezier(.16,1,.3,1) infinite; }
+.user-location-dot { position: absolute; inset: 0; box-sizing: border-box; border: 2px solid #fff; border-radius: 50%; background: #258df4; box-shadow: 0 3px 10px rgba(0,0,0,.42); }
+@keyframes user-location-pulse { 0%, 100% { transform: scale(.82); opacity: .72; } 55% { transform: scale(1.12); opacity: .28; } }
 .history-map-point { position: absolute; width: 8px; height: 8px; min-height: 0; padding: 0; transform: translate(-50%, -50%) scale(var(--history-map-point-scale, 1)); transform-origin: center; border: 0; border-radius: 50%; background: transparent; box-shadow: none; backdrop-filter: none; pointer-events: none; }
 .history-map-point::before { position: absolute; inset: -18px; border: 2px solid transparent; border-radius: 50%; content: ""; }
 .history-map-point.is-connectable { pointer-events: auto; cursor: crosshair; }
@@ -135,6 +139,10 @@ h1 { margin: 0; font-size: 22px; letter-spacing: .08em; }
 .lens-toggle-button svg { fill: none; stroke: var(--accent-2); stroke-width: 1.9; stroke-linecap: round; }
 .lens-toggle-button[aria-pressed="false"] { color: var(--muted); border-color: rgba(255,255,255,.12); background: rgba(9,12,17,.82); }
 .lens-toggle-button[aria-pressed="false"] svg { stroke: var(--muted); }
+.location-toggle-button[aria-pressed="true"] { border-color: rgba(94,174,255,.82); color: #dceeff; background: rgba(24,91,157,.88); box-shadow: 0 7px 20px rgba(4,39,73,.38); }
+.location-toggle-button[aria-pressed="true"] svg { stroke: #8bc5ff; }
+.location-toggle-button.is-pending svg { animation: location-control-pulse 1s ease-in-out infinite; }
+@keyframes location-control-pulse { 50% { transform: scale(.78); opacity: .46; } }
 /* Va a capo invece di troncare. Le etichette delle vie portano il nome per
    esteso — «Mappa centrata su Chiesa dell'Immacolata CONCEZIONE» — e con i
    puntini di sospensione a sparire era proprio il nome, cioè l'unica cosa che
@@ -399,6 +407,7 @@ button:active { transform: translateY(1px) scale(.97); }
   .topbar { left: 12px; right: 12px; gap: 8px; }
   .topbar-actions { gap: 6px; }
   .topbar-actions .icon-button { flex-basis: 44px; width: 44px; height: 44px; min-height: 44px; }
+  .topbar > :first-child .eyebrow { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .color-select-grid { grid-template-columns: 1fr; }
   .color-name-form { grid-template-columns: 42px minmax(0, 1fr) 56px; gap: 6px; }
   .color-name-preview { width: 42px; height: 42px; }
@@ -412,6 +421,10 @@ button:active { transform: translateY(1px) scale(.97); }
   .marker-history-connect-button { min-width: 68px; padding: 0 7px; }
   .map-connection-toolbar { align-items: stretch; flex-wrap: wrap; width: calc(100% - 32px); }
   .map-connection-toolbar p { flex: 1 1 150px; align-self: center; max-width: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .user-location::before, .location-toggle-button.is-pending svg { animation: none; }
 }
 
 @media (max-height: 700px) {

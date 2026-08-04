@@ -39,7 +39,9 @@ altro.
 ## 2. Vincoli
 
 - Progetto statico: HTML, CSS e JavaScript puro.
-- Nessun backend, login, database o geolocalizzazione.
+- Nessun backend, login o database. La geolocalizzazione è facoltativa,
+  parte soltanto dopo un gesto dell'utente, resta in memoria e non viene
+  salvata né condivisa.
 - Deve funzionare su iPhone e Android.
 - Deve poter essere installato come PWA e funzionare offline dopo il primo
   caricamento.
@@ -98,10 +100,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=59` e
-   `app.js?v=54`.
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=60` e
+   `app.js?v=55`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v78`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v79`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
@@ -312,6 +314,28 @@ una futura calibrazione migliore correggerà anche i punti già salvati.
 
 ---
 
+## 5-sexies. Posizione del dispositivo
+
+Il pulsante **Localizzami** nella barra superiore avvia `watchPosition()` solo
+dopo un tocco esplicito. La posizione resta esclusivamente in memoria: non
+entra nella cronologia, nei PNG, negli export o in `localStorage`. Un secondo
+tocco interrompe il rilevamento e rimuove il punto blu.
+
+La conversione da latitudine/longitudine a `x`/`y` usa l'inversa della stessa
+trasformazione affine di `geographicCalibration`, così non introduce un
+secondo sistema di coordinate. Il primo rilevamento valido centra la mappa;
+quelli successivi spostano soltanto il punto, per non sottrarre il controllo
+del pan all'utente. Se la stima cade fuori dalla carta, il punto viene nascosto
+e l'interfaccia lo comunica senza modificare la vista.
+
+La geolocalizzazione richiede HTTPS sui dispositivi reali. Il browser può
+negarla, non renderla disponibile o restituire una precisione debole: sono
+tutti stati gestiti come messaggi temporanei, senza bloccare il resto
+dell'app. La posizione sulla scansione resta una stima cartografica e non va
+presentata come navigazione GPS precisa.
+
+---
+
 ## 6. Identità partecipante
 
 Il partecipante inserisce un nome al primo accesso. Il valore è salvato in
@@ -493,6 +517,10 @@ proprietario originale e aggiunge il partecipante corrente alla catena.
 - Gli strumenti coordinate mostrano x/y e una stima WGS84 in gradi decimali:
   **Copia x/y** è allineato alla riga normalizzata e **Copia per Maps** alla
   riga geografica; ricerca e copia JSON continuano a usare x/y.
+- **Localizzami** richiede il permesso solo dopo il tocco, mostra un punto blu
+  distinto dai punti della caccia e centra la carta soltanto al primo
+  rilevamento valido. Disattivarlo interrompe il rilevamento; posizione e
+  precisione non vengono salvate, esportate o incluse nel PNG.
 - Lo zoom massimo è 5 volte la scala iniziale; il mirino usa un canvas
   circolare come lente 2,35× e continua a restituire le stesse coordinate x/y
   del suo punto centrale. Un pulsante persistente attiva o disattiva

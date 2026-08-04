@@ -10,7 +10,7 @@
   <title>Mappa Squadra</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=59">
+  <link rel="stylesheet" href="styles.css?v=60">
 </head>
 <body>
   <main class="app-shell">
@@ -20,6 +20,9 @@
         <div class="history-map-layer" id="historyMapLayer">
           <svg class="history-map-connections" id="historyMapConnections"></svg>
           <div class="history-map-points" id="historyMapPoints"></div>
+          <div class="user-location hidden" id="userLocation" aria-hidden="true">
+            <span class="user-location-dot"></span>
+          </div>
         </div>
       </div>
 
@@ -36,6 +39,16 @@
               <path d="m15 15 4.5 4.5"></path>
             </svg>
             <span class="sr-only" id="lensToggleLabel">Lente attiva</span>
+          </button>
+          <button id="locationToggleButton" class="icon-button location-toggle-button" type="button" aria-pressed="false" aria-label="Mostra la mia posizione" title="Localizzami">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M12 3v3"></path>
+              <path d="M12 18v3"></path>
+              <path d="M3 12h3"></path>
+              <path d="M18 12h3"></path>
+            </svg>
+            <span class="sr-only" id="locationToggleLabel">Mostra la mia posizione</span>
           </button>
           <button id="resetButton" class="icon-button" type="button" aria-label="Torna alla vista iniziale" title="Home">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -374,6 +387,6 @@
     <canvas id="exportCanvas" hidden></canvas>
   </main>
 
-  <script src="app.js?v=54" defer></script>
+  <script src="app.js?v=55" defer></script>
 </body>
 </html>
