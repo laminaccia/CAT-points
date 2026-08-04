@@ -61,7 +61,7 @@ manifest.webmanifest    Installazione PWA
 assets/map-placeholder.jpg   La mappa servita (8192×5787 px, 4,7 MB)
 assets/map-placeholder.pdf   Sorgente con livello testuale ricercabile
 assets/streets.json          Indice dei punti — GENERATO, vedi §5-bis
-assets/icons/                icon-192.png, icon-512.png
+assets/icons/                icon-192.png, icon-512.png, sorgente cat-points-map.png
 data/sorgenti/               Le sorgenti dell'indice, curate a mano
 tools/merge-streets.py       Ricostruisce assets/streets.json dalle sorgenti
 ```
@@ -103,7 +103,7 @@ Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=60` e
    `app.js?v=56`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v82`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v83`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
