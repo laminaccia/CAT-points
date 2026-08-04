@@ -1,4 +1,4 @@
-# Mappa Squadra
+# CAT Points
 
 Prototipo locale di web app/PWA per indicare un punto su una mappa JPG e condividere il risultato come PNG.
 

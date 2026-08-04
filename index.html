@@ -6,9 +6,11 @@
   <meta name="theme-color" content="#090b10">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Mappa Squadra">
-  <title>Mappa Squadra</title>
+  <meta name="apple-mobile-web-app-title" content="CAT Points">
+  <meta name="application-name" content="CAT Points">
+  <title>CAT Points</title>
   <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
   <link rel="stylesheet" href="styles.css?v=60">
 </head>
@@ -28,7 +30,7 @@
 
       <div class="topbar">
         <div>
-          <p class="eyebrow">CACCIA AL TESORO</p>
+          <p class="eyebrow">CAT POINTS</p>
           <button id="playerNameButton" class="player-name-button" type="button">Inserisci nome</button>
         </div>
         <div class="topbar-actions">
@@ -159,7 +161,7 @@
 
       <div class="identity-dialog hidden" id="identityDialog" role="dialog" aria-modal="true" aria-labelledby="identityDialogTitle">
         <div class="dialog-card">
-          <p class="eyebrow">CACCIA AL TESORO</p>
+          <p class="eyebrow">CAT POINTS</p>
           <h2 id="identityDialogTitle">Come ti chiami?</h2>
           <p class="dialog-description">Inserisci un nome o un breve testo per firmare il tuo punto sulla mappa.</p>
           <form id="identityForm">
@@ -387,6 +389,6 @@
     <canvas id="exportCanvas" hidden></canvas>
   </main>
 
-  <script src="app.js?v=55" defer></script>
+  <script src="app.js?v=56" defer></script>
 </body>
 </html>

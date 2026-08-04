@@ -5,6 +5,28 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-08-04 — Nuova identità CAT Points e icona di Segesta
+
+*Agente: Codex con skill Design e Impeccable. Toccati `index.html`,
+`manifest.webmanifest`, `app.js`, `service-worker.js`, `README.md`, `AGENTS.md`
+e `assets/icons/`.*
+
+L'app si chiama ora **CAT Points** nel titolo del browser, nei metadati iOS,
+nel manifest PWA, nell'interfaccia, nel PNG condiviso e nei pacchetti esportati.
+L'icona combina un punto-mappa dorato con una sintesi geometrica del Tempio di
+Segesta: il simbolo resta leggibile a 192 px e usa un fondo scuro a piena
+superficie, adatto alle maschere di iOS e Android. La sorgente vettoriale è
+conservata in `assets/icons/cat-points.svg`; i PNG 192 e 512 sono stati
+rigenerati e dichiarati `any maskable` nel manifest.
+
+La mappa non è stata ricampionata, compressa o modificata: resta il JPEG
+8192×5787 con hash SHA-256
+`eef1179ccd843296014f5138e82c4cf7b447156766ad05e8efcfb89277e93538`.
+Verificati manifest, SVG, sintassi JavaScript, resa a 320×568, assenza di
+sovrapposizioni e controllo Impeccable senza rilievi. Versioni pronte per
+l'anteprima: `styles.css?v=60`, `app.js?v=56`, cache `mappa-squadra-v80`.
+Il commit resta locale e non va pubblicato finché l'utente non approva.
+
 ## 2026-08-04 — Anteprima locale della posizione del dispositivo
 
 *Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,

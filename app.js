@@ -1521,7 +1521,7 @@
       version: markerHistoryFormatVersion,
       app: {
         id: 'cat-points',
-        name: 'CAT-points',
+        name: 'CAT Points',
         url: catPointsSiteUrl,
         importInstructions: 'Apri CAT-points, entra nella Cronologia punti e usa “Importa punti”.'
       },
@@ -3554,7 +3554,7 @@
 
     ctx.fillStyle = '#f5db8b';
     ctx.font = '700 24px sans-serif';
-    ctx.fillText('CACCIA AL TESORO', 54, 74);
+    ctx.fillText('CAT POINTS', 54, 74);
     ctx.fillStyle = '#ffffff';
     ctx.font = '700 42px sans-serif';
     ctx.fillText(activeMarkerOwner || state.playerName || 'CACCIA AL TESORO', 54, 124);

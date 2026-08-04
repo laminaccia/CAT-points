@@ -1,6 +1,6 @@
 {
-  "name": "Mappa Squadra",
-  "short_name": "Mappa",
+  "name": "CAT Points",
+  "short_name": "CAT Points",
   "description": "Segna un punto sulla mappa e condividilo come immagine.",
   "start_url": "./",
   "display": "standalone",
@@ -8,7 +8,7 @@
   "theme_color": "#090b10",
   "orientation": "portrait",
   "icons": [
-    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ]
 }
