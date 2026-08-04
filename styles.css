@@ -414,6 +414,10 @@ button:active { transform: translateY(1px) scale(.97); }
 .dialog-description { margin: 10px 0 20px; color: var(--muted); font-size: 14px; line-height: 1.45; }
 .identity-dialog input { width: 100%; min-height: 52px; padding: 0 14px; border: 1px solid rgba(255,255,255,.18); border-radius: 14px; outline: 0; color: var(--text); background: rgba(255,255,255,.06); font: inherit; }
 .identity-feedback { min-height: 18px; margin: 8px 0 0; color: var(--accent-2); font-size: 12px; }
+/* Nota sulla presenza: è una precisazione, non un avviso. Sta sotto il campo,
+   staccata da un filo, e non alza la voce — chi entra deve saperlo, non
+   esserne allarmato. */
+.identity-privacy { margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; line-height: 1.5; }
 .identity-actions { display: grid; grid-template-columns: 1fr 1.35fr; gap: 10px; margin-top: 14px; }
 .identity-actions #cancelIdentityButton.hidden + .primary-button { grid-column: 1 / -1; }
 

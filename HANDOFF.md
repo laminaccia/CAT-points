@@ -5,6 +5,59 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-08-04 — Presenza: chi ha l'app aperta adesso
+
+*Agente: Claude. Aggiunti `presenza.js` e la cartella `presenza/`; toccati
+`index.html`, `styles.css`, `service-worker.js`, `AGENTS.md`, `PUBBLICARE.md`.
+`app.js` **non è stato toccato**.*
+
+L'utente voleva sapere, da amministratore, quali dispositivi e con quale nome
+usano l'app. Gli ho spiegato che il nome del dispositivo non è leggibile da un
+browser e che il sito statico non può registrare niente; dopo il quadro delle
+opzioni ha scelto **soltanto** la presenza in tempo reale, accettando
+esplicitamente la semantica «app aperta e davanti agli occhi». Niente archivio
+storico, niente cancello: vedi §5-septies di `AGENTS.md`, che spiega anche
+perché il battito non deve continuare da nascosto.
+
+`presenza.js` è scollegato da `app.js`: legge il nome dallo stesso
+`localStorage` in cui l'app lo scrive. È il motivo per cui non è stata toccata
+una riga delle 4.325 di `app.js` — il file si può cancellare e la mappa non se
+ne accorge. Il pezzo di server (`presenza/`) è un Worker Cloudflare con un
+Durable Object **in memoria**: la presenza vale 75 secondi, un database sarebbe
+peso inutile e sul piano gratuito KV si fermerebbe a mille scritture al giorno
+contro le circa diecimila di una partita.
+
+`ENDPOINT` è committato **vuoto**: la presenza è spenta, l'app si comporta
+esattamente come prima e non promette niente. Si accende incollando l'indirizzo
+del Worker dopo il deploy (`presenza/README.md`).
+
+**Difetto trovato e chiuso in verifica:** al primissimo avvio il battito
+partiva prima che il nome esistesse, quindi chi si era appena presentato non
+compariva nell'elenco per mezzo minuto — e l'organizzatore avrebbe pensato che
+non fosse entrato. Risolto agganciando il `submit` di `#identityForm`.
+
+**Trappola ripagata:** modificando `presenza.js` senza bumpare il `?v`, il
+browser continuava a eseguire la versione vecchia perfino con
+`fetch(..., { cache: 'reload' })`, perché `reload` scavalca la cache HTTP ma
+non il service worker. Annotato in §5 di `AGENTS.md`.
+
+Verificato: 13 prove sulla logica del Durable Object eseguite in Node (battito,
+niente duplicati, due dispositivi con lo stesso nome distinti, scadenza a 75 s,
+uscita immediata, campi troncati, corpo malformato, ordinamento); il client
+provato in browser contro un sostituto locale del Worker — battito all'invio
+del nome, uscita al passaggio in secondo piano, ritorno immediato al rientro;
+pannello dell'organizzatore reso a 375 px con il token che resta fuori dalla
+URL, 401 senza token; con `ENDPOINT` vuoto zero richieste di rete e nota
+nascosta (`display: none`). Console pulita, detector Impeccable senza rilievi.
+Versioni: `styles.css?v=63`, `presenza.js?v=1`, cache `mappa-squadra-v89`.
+
+**Resta all'utente:** il deploy del Worker (~10 minuti, gratis) e la scelta di
+pubblicare. Le due modifiche precedenti di Codex (posizione locale, cerchi e
+snap) risultano ancora committate ma non pubblicate: quando si pubblicherà,
+usciranno tutte insieme.
+
+---
+
 ## 2026-08-04 — Circonferenze e snap geometrici sulla mappa
 
 *Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,
