@@ -12,7 +12,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=60">
+  <link rel="stylesheet" href="styles.css?v=62">
 </head>
 <body>
   <main class="app-shell">
@@ -24,6 +24,10 @@
           <div class="history-map-points" id="historyMapPoints"></div>
           <div class="user-location hidden" id="userLocation" aria-hidden="true">
             <span class="user-location-dot"></span>
+          </div>
+          <div class="geometry-snap-indicator hidden" id="geometrySnapIndicator" aria-hidden="true">
+            <span class="geometry-snap-marker"></span>
+            <span class="geometry-snap-label" id="geometrySnapLabel"></span>
           </div>
         </div>
       </div>
@@ -108,7 +112,7 @@
 
       <div class="status-pill hidden" id="statusPill" role="status" aria-live="polite"></div>
 
-      <div class="map-connection-toolbar hidden" id="mapConnectionToolbar" role="group" aria-label="Collegamenti sulla mappa">
+      <div class="map-connection-toolbar hidden" id="mapConnectionToolbar" role="group" aria-label="Geometrie sulla mappa">
         <button id="startMapConnectionButton" class="map-connection-start" type="button">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="6" cy="17" r="2.5"></circle>
@@ -116,6 +120,14 @@
             <path d="m8 15.5 8-7"></path>
           </svg>
           <span id="mapConnectionButtonLabel">Collega punti</span>
+        </button>
+        <button id="startMapCircleButton" class="map-connection-start map-circle-start" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="7"></circle>
+            <circle cx="12" cy="12" r="1.8"></circle>
+            <path d="M12 5v14M5 12h14"></path>
+          </svg>
+          <span id="mapCircleButtonLabel">Crea cerchio</span>
         </button>
         <p id="mapConnectionInstruction" class="hidden" role="status" aria-live="polite"></p>
         <button id="cancelMapConnectionButton" class="map-connection-cancel hidden" type="button">Annulla</button>
@@ -137,6 +149,30 @@
         <div class="map-connection-editor-actions">
           <button id="resetMapConnectionCurveButton" class="secondary-wide" type="button">Rendi dritta</button>
           <button id="deleteMapConnectionButton" class="marker-history-delete" type="button">Elimina linea</button>
+        </div>
+      </section>
+
+      <section class="map-connection-editor map-circle-editor hidden" id="mapCircleEditor" role="dialog" aria-modal="false" aria-labelledby="mapCircleEditorTitle">
+        <div class="map-connection-editor-heading">
+          <div>
+            <p class="eyebrow">CERCHIO SULLA MAPPA</p>
+            <h2 id="mapCircleEditorTitle">Modifica cerchio</h2>
+          </div>
+          <button id="closeMapCircleEditorButton" class="dialog-close" type="button" aria-label="Chiudi editor cerchio">×</button>
+        </div>
+        <p id="mapCircleEditorDescription"></p>
+        <label class="map-circle-radius-field" for="mapCircleRadiusInput">
+          <span>Raggio</span>
+          <span class="map-circle-radius-control">
+            <input id="mapCircleRadiusInput" type="number" min="1" max="5000" step="1" inputmode="decimal">
+            <span>metri</span>
+          </span>
+        </label>
+        <p class="map-circle-snap-help">Snap automatici: punto, medio, intersezione, centro, quadrante e vicino.</p>
+        <div class="map-connection-editor-actions map-circle-editor-actions">
+          <button id="redefineMapCircleCenterButton" class="secondary-wide" type="button">Ridefinisci centro</button>
+          <button id="redefineMapCircleRadiusButton" class="secondary-wide" type="button">Ridefinisci raggio</button>
+          <button id="deleteMapCircleButton" class="marker-history-delete" type="button">Elimina cerchio</button>
         </div>
       </section>
 
@@ -373,10 +409,10 @@
               </section>
               <div class="marker-history-connections-panel">
                 <div class="marker-history-connections-heading">
-                  <strong>Linee tra punti</strong>
+                  <strong>Linee e cerchi</strong>
                   <span id="historyConnectionCount">0 create</span>
                 </div>
-                <p id="historyConnectionHelp">Usa “Vedi insieme” e “Collega punti” sulla mappa, oppure scegli “Collega” qui sotto.</p>
+                <p id="historyConnectionHelp">In “Vedi insieme” puoi collegare punti o creare cerchi con snap geometrici.</p>
                 <div class="marker-history-connections-list" id="historyConnectionsList"></div>
                 <button id="cancelHistoryConnectionButton" class="secondary-wide hidden" type="button">Annulla primo punto</button>
               </div>
@@ -389,6 +425,6 @@
     <canvas id="exportCanvas" hidden></canvas>
   </main>
 
-  <script src="app.js?v=56" defer></script>
+  <script src="app.js?v=61" defer></script>
 </body>
 </html>

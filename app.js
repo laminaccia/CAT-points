@@ -6,6 +6,8 @@
   const historyMapConnections = document.getElementById('historyMapConnections');
   const historyMapPoints = document.getElementById('historyMapPoints');
   const userLocation = document.getElementById('userLocation');
+  const geometrySnapIndicator = document.getElementById('geometrySnapIndicator');
+  const geometrySnapLabel = document.getElementById('geometrySnapLabel');
   const marker = document.getElementById('marker');
   const markerLabel = document.getElementById('markerLabel');
   const markerHistoryLabelVisual = document.getElementById('markerHistoryLabelVisual');
@@ -39,7 +41,9 @@
   const locationToggleLabel = document.getElementById('locationToggleLabel');
   const mapConnectionToolbar = document.getElementById('mapConnectionToolbar');
   const startMapConnectionButton = document.getElementById('startMapConnectionButton');
+  const startMapCircleButton = document.getElementById('startMapCircleButton');
   const mapConnectionButtonLabel = document.getElementById('mapConnectionButtonLabel');
+  const mapCircleButtonLabel = document.getElementById('mapCircleButtonLabel');
   const mapConnectionInstruction = document.getElementById('mapConnectionInstruction');
   const cancelMapConnectionButton = document.getElementById('cancelMapConnectionButton');
   const mapConnectionEditor = document.getElementById('mapConnectionEditor');
@@ -49,6 +53,13 @@
   const closeMapConnectionEditorButton = document.getElementById('closeMapConnectionEditorButton');
   const resetMapConnectionCurveButton = document.getElementById('resetMapConnectionCurveButton');
   const deleteMapConnectionButton = document.getElementById('deleteMapConnectionButton');
+  const mapCircleEditor = document.getElementById('mapCircleEditor');
+  const mapCircleEditorDescription = document.getElementById('mapCircleEditorDescription');
+  const mapCircleRadiusInput = document.getElementById('mapCircleRadiusInput');
+  const closeMapCircleEditorButton = document.getElementById('closeMapCircleEditorButton');
+  const redefineMapCircleCenterButton = document.getElementById('redefineMapCircleCenterButton');
+  const redefineMapCircleRadiusButton = document.getElementById('redefineMapCircleRadiusButton');
+  const deleteMapCircleButton = document.getElementById('deleteMapCircleButton');
   const searchForm = document.getElementById('searchForm');
   const streetSearch = document.getElementById('streetSearch');
   const searchButton = document.getElementById('searchButton');
@@ -122,6 +133,7 @@
   const markerHistoryVisibilityStorageKey = 'mappa-marker-history-visibility-v1';
   const markerHistorySelectionOrderStorageKey = 'mappa-ordine-selezione';
   const markerHistoryConnectionsStorageKey = 'mappa-marker-history-connections-v1';
+  const markerHistoryCirclesStorageKey = 'mappa-marker-history-circles-v1';
   const overviewCrosshairStorageKey = 'mappa-overview-crosshair-v1';
   const markerHistoryTabStorageKey = 'mappa-marker-history-tab-v1';
   const crosshairLensStorageKey = 'mappa-crosshair-lens-v1';
@@ -201,8 +213,15 @@
   let markerHistoryPointsHidden = false;
   const markerHistoryHiddenStorageKey = 'mappa-punti-nascosti';
   let markerHistoryConnectionsStore = [];
+  let markerHistoryCirclesStore = [];
   let pendingHistoryConnectionEndpoint = null;
   let mapConnectionMode = false;
+  let mapCircleMode = false;
+  let mapCirclePhase = '';
+  let pendingMapCircleCenter = null;
+  let editingMapCircleId = '';
+  let currentGeometrySnap = null;
+  let geometrySnapContext = null;
   let activeMapConnectionId = '';
   let markerHistoryViewKey = '';
   let activeHistoryEntryId = null;
@@ -236,6 +255,7 @@
     overviewMode: false,
     overviewCrosshairVisible: false,
     crosshairLensEnabled: true,
+    crosshairDisplayMode: 'lens',
     markerHistoryTab: 'points',
     markerColors: [defaultMarkerColor],
     markerText: '',
@@ -431,6 +451,53 @@
     }
   }
 
+  function normalizeMapAnchor(value) {
+    const x = Number(value?.x);
+    const y = Number(value?.y);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+    return {
+      x: clamp(x, 0, 1),
+      y: clamp(y, 0, 1),
+      snapType: String(value?.snapType || 'free').slice(0, 24),
+      label: String(value?.label || 'Libero').slice(0, 80)
+    };
+  }
+
+  function normalizeMapCircleRadius(value) {
+    const radius = Number(value);
+    return Number.isFinite(radius) ? clamp(radius, 1, 5000) : 1;
+  }
+
+  function loadMarkerHistoryCircles() {
+    try {
+      const savedCircles = JSON.parse(localStorage.getItem(markerHistoryCirclesStorageKey) || '[]');
+      markerHistoryCirclesStore = Array.isArray(savedCircles)
+        ? savedCircles.slice(0, markerHistoryLimit).map((circle) => ({
+          id: String(circle?.id || createLocalId('cerchio')),
+          center: normalizeMapAnchor(circle?.center),
+          radiusPoint: normalizeMapAnchor(circle?.radiusPoint),
+          radiusMeters: normalizeMapCircleRadius(circle?.radiusMeters),
+          createdAt: normalizeIsoDate(circle?.createdAt)
+        })).filter((circle) => circle.center)
+        : [];
+    } catch (error) {
+      markerHistoryCirclesStore = [];
+    }
+  }
+
+  function persistMarkerHistoryCircles() {
+    try {
+      localStorage.setItem(markerHistoryCirclesStorageKey, JSON.stringify(markerHistoryCirclesStore));
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  function getMarkerHistoryCircle(circleId) {
+    return markerHistoryCirclesStore.find((circle) => circle.id === circleId) || null;
+  }
+
   function getMarkerHistoryEndpointRecord(endpoint) {
     if (!endpoint) return null;
     const entry = (Array.isArray(markerHistoryStore[endpoint.sourceKey])
@@ -480,13 +547,26 @@
 
   function updateMapConnectionToolbar() {
     const selectedCount = selectedMarkerHistoryCount();
-    const available = state.overviewMode && !markerHistoryPointsHidden && selectedCount >= 2;
-    mapConnectionToolbar.classList.toggle('hidden', !available || Boolean(activeMapConnectionId));
+    const available = state.overviewMode && !markerHistoryPointsHidden && (selectedCount >= 1 || mapCircleMode);
+    const editingGeometry = Boolean(activeMapConnectionId || (editingMapCircleId && !mapCircleMode));
+    mapConnectionToolbar.classList.toggle('hidden', !available || editingGeometry);
+    startMapConnectionButton.disabled = selectedCount < 2;
     startMapConnectionButton.classList.toggle('is-active', mapConnectionMode);
     startMapConnectionButton.setAttribute('aria-pressed', String(mapConnectionMode));
     mapConnectionButtonLabel.textContent = mapConnectionMode ? 'Scegli i punti' : 'Collega punti';
-    cancelMapConnectionButton.classList.toggle('hidden', !mapConnectionMode);
-    mapConnectionInstruction.classList.toggle('hidden', !mapConnectionMode);
+    startMapConnectionButton.classList.toggle('hidden', mapCircleMode);
+    startMapCircleButton.classList.toggle('hidden', mapConnectionMode);
+    startMapCircleButton.classList.toggle('is-active', mapCircleMode);
+    startMapCircleButton.setAttribute('aria-pressed', String(mapCircleMode));
+    mapCircleButtonLabel.textContent = mapCircleMode ? 'Scegli sulla mappa' : 'Crea cerchio';
+    cancelMapConnectionButton.classList.toggle('hidden', !mapConnectionMode && !mapCircleMode);
+    mapConnectionInstruction.classList.toggle('hidden', !mapConnectionMode && !mapCircleMode);
+    if (mapCircleMode) {
+      mapConnectionInstruction.textContent = mapCirclePhase.includes('radius')
+        ? 'Scegli un punto sul raggio: lo snap più vicino viene evidenziato.'
+        : 'Scegli il centro: usa uno snap oppure un punto libero.';
+      return;
+    }
     const pendingRecord = getMarkerHistoryEndpointRecord(pendingHistoryConnectionEndpoint);
     mapConnectionInstruction.textContent = pendingRecord
       ? `Da ${pendingRecord.name}: tocca il secondo punto.`
@@ -500,6 +580,13 @@
     updateMapConnectionToolbar();
   }
 
+  function closeMapCircleEditor() {
+    editingMapCircleId = '';
+    mapCircleEditor.classList.add('hidden');
+    renderHistoryMapConnectionLines();
+    updateMapConnectionToolbar();
+  }
+
   function openMapConnectionEditor(connectionId) {
     const connection = getMarkerHistoryConnection(connectionId);
     if (!connection) return;
@@ -507,6 +594,8 @@
     const second = getMarkerHistoryEndpointRecord(connection.second);
     if (!first || !second) return;
     mapConnectionMode = false;
+    cancelMapCircleMode(false);
+    closeMapCircleEditor();
     pendingHistoryConnectionEndpoint = null;
     activeMapConnectionId = connection.id;
     mapConnectionEditorDescription.textContent = `${first.name} ↔ ${second.name}`;
@@ -517,6 +606,49 @@
     renderHistoryMapPoints();
     updateMapConnectionToolbar();
     mapConnectionCurveInput.focus({ preventScroll: true });
+  }
+
+  function openMapCircleEditor(circleId) {
+    const circle = getMarkerHistoryCircle(circleId);
+    if (!circle) return;
+    mapConnectionMode = false;
+    pendingHistoryConnectionEndpoint = null;
+    cancelMapCircleMode(false);
+    closeMapConnectionEditor();
+    editingMapCircleId = circle.id;
+    mapCircleEditorDescription.textContent = `Centro: ${circle.center.label} · Raggio ${Math.round(circle.radiusMeters)} m`;
+    mapCircleRadiusInput.value = String(Math.round(circle.radiusMeters));
+    mapCircleEditor.classList.remove('hidden');
+    closeMarkerHistory();
+    renderHistoryMapPoints();
+    updateMapConnectionToolbar();
+  }
+
+  function updateActiveMapCircleRadius(value, announce = false) {
+    const circle = getMarkerHistoryCircle(editingMapCircleId);
+    const numericValue = Number(value);
+    if (!circle || !Number.isFinite(numericValue) || numericValue < 1 || numericValue > 5000) {
+      mapCircleRadiusInput.setCustomValidity('Inserisci un raggio da 1 a 5000 metri.');
+      return;
+    }
+    mapCircleRadiusInput.setCustomValidity('');
+    circle.radiusMeters = normalizeMapCircleRadius(numericValue);
+    mapCircleRadiusInput.value = String(Math.round(circle.radiusMeters));
+    mapCircleEditorDescription.textContent = `Centro: ${circle.center.label} · Raggio ${Math.round(circle.radiusMeters)} m`;
+    const persisted = persistMarkerHistoryCircles();
+    renderHistoryMapConnectionLines();
+    renderMarkerHistoryConnectionsPanel();
+    if (announce) setStatus(persisted ? 'Raggio salvato' : 'Raggio aggiornato solo per questa sessione');
+  }
+
+  function removeMarkerHistoryCircle(circleId) {
+    if (!markerHistoryCirclesStore.some((circle) => circle.id === circleId)) return;
+    markerHistoryCirclesStore = markerHistoryCirclesStore.filter((circle) => circle.id !== circleId);
+    const persisted = persistMarkerHistoryCircles();
+    if (editingMapCircleId === circleId) closeMapCircleEditor();
+    renderHistoryMapPoints();
+    renderMarkerHistory();
+    setStatus(persisted ? 'Cerchio rimosso' : 'Cerchio rimosso solo per questa sessione');
   }
 
   function updateActiveMapConnectionCurve(value, announce = false) {
@@ -553,10 +685,12 @@
   }
 
   function applyOverviewCrosshairVisibility() {
-    if (!state.overviewMode) return;
-    crosshair.classList.toggle('hidden', !state.overviewCrosshairVisible);
-    placeButton.textContent = state.overviewCrosshairVisible ? 'Segna questo punto' : 'Mostra mirino';
-    if (state.overviewCrosshairVisible) scheduleCrosshairLensRender();
+    const visible = !state.markerPlaced
+      && state.crosshairDisplayMode !== 'hidden'
+      && (!state.overviewMode || state.overviewCrosshairVisible);
+    crosshair.classList.toggle('hidden', !visible);
+    if (state.overviewMode) placeButton.textContent = visible ? 'Segna questo punto' : 'Mostra mirino';
+    if (visible) scheduleCrosshairLensRender();
   }
 
   function setOverviewCrosshairVisible(visible) {
@@ -603,15 +737,15 @@
   function leaveOverviewMode(showCrosshair = true) {
     state.overviewMode = false;
     mapConnectionMode = false;
+    cancelMapCircleMode(false);
     pendingHistoryConnectionEndpoint = null;
     activeMapConnectionId = '';
+    editingMapCircleId = '';
     mapConnectionEditor.classList.add('hidden');
+    mapCircleEditor.classList.add('hidden');
     updateMapConnectionToolbar();
     placeButton.textContent = 'Segna questo punto';
-    if (showCrosshair) {
-      crosshair.classList.remove('hidden');
-      scheduleCrosshairLensRender();
-    }
+    if (showCrosshair) applyOverviewCrosshairVisibility();
   }
 
   function selectedMarkerHistoryIds(sourceKey) {
@@ -670,6 +804,8 @@
       mapConnectionMode = false;
       pendingHistoryConnectionEndpoint = null;
       closeMapConnectionEditor();
+      cancelMapCircleMode(false);
+      closeMapCircleEditor();
     }
     const persisted = persistMarkerHistoryPointsHidden();
     updateMarkerHistoryMapSummary();
@@ -731,8 +867,11 @@
     markerHistorySelectionOrder = [];
     pendingHistoryConnectionEndpoint = null;
     mapConnectionMode = false;
+    cancelMapCircleMode(false);
     activeMapConnectionId = '';
+    editingMapCircleId = '';
     mapConnectionEditor.classList.add('hidden');
+    mapCircleEditor.classList.add('hidden');
     // Svuotata la selezione, «nascosto» non si riferisce più a niente: se
     // restasse acceso resterebbe in agguato per la scelta successiva, e chi
     // riseleziona un punto non lo vedrebbe comparire. Nascondere serve a
@@ -749,12 +888,15 @@
   function renderMarkerHistoryConnectionsPanel() {
     historyConnectionsList.replaceChildren();
     const connectionCount = markerHistoryConnectionsStore.length;
-    historyConnectionCount.textContent = connectionCount === 1 ? '1 creata' : `${connectionCount} create`;
+    const circleCount = markerHistoryCirclesStore.length;
+    const lineLabel = connectionCount === 1 ? '1 linea' : `${connectionCount} linee`;
+    const circleLabel = circleCount === 1 ? '1 cerchio' : `${circleCount} cerchi`;
+    historyConnectionCount.textContent = `${lineLabel} · ${circleLabel}`;
     cancelHistoryConnectionButton.classList.toggle('hidden', !pendingHistoryConnectionEndpoint);
     const pendingRecord = getMarkerHistoryEndpointRecord(pendingHistoryConnectionEndpoint);
     historyConnectionHelp.textContent = pendingRecord
       ? `Primo punto: ${pendingRecord.name}. Scegli “Collega qui” sul secondo, anche da un’altra lista.`
-      : 'Usa “Vedi insieme” e “Collega punti” sulla mappa, oppure scegli “Collega” qui sotto.';
+      : 'In “Vedi insieme” puoi collegare punti o creare cerchi con snap geometrici.';
 
     markerHistoryConnectionsStore.forEach((connection) => {
       const first = getMarkerHistoryEndpointRecord(connection.first);
@@ -779,6 +921,30 @@
       removeButton.textContent = 'Togli';
       removeButton.setAttribute('aria-label', `Rimuovi linea tra ${first.name} e ${second.name}`);
       removeButton.addEventListener('click', () => removeMarkerHistoryConnection(connection.id));
+      actions.append(editButton, removeButton);
+      item.append(description, actions);
+      historyConnectionsList.append(item);
+    });
+
+    markerHistoryCirclesStore.forEach((circle) => {
+      const item = document.createElement('div');
+      item.className = 'marker-history-connection-item';
+      const description = document.createElement('span');
+      description.textContent = `Cerchio · ${Math.round(circle.radiusMeters)} m · ${circle.center.label}`;
+      const actions = document.createElement('div');
+      actions.className = 'marker-history-connection-actions';
+      const editButton = document.createElement('button');
+      editButton.className = 'secondary-wide';
+      editButton.type = 'button';
+      editButton.textContent = 'Modifica';
+      editButton.setAttribute('aria-label', `Modifica cerchio di raggio ${Math.round(circle.radiusMeters)} metri`);
+      editButton.addEventListener('click', () => openMapCircleEditor(circle.id));
+      const removeButton = document.createElement('button');
+      removeButton.className = 'marker-history-delete';
+      removeButton.type = 'button';
+      removeButton.textContent = 'Togli';
+      removeButton.setAttribute('aria-label', `Rimuovi cerchio di raggio ${Math.round(circle.radiusMeters)} metri`);
+      removeButton.addEventListener('click', () => removeMarkerHistoryCircle(circle.id));
       actions.append(editButton, removeButton);
       item.append(description, actions);
       historyConnectionsList.append(item);
@@ -845,9 +1011,60 @@
     setStatus('Creazione linea annullata');
   }
 
+  function hideGeometrySnapIndicator() {
+    currentGeometrySnap = null;
+    geometrySnapIndicator.classList.add('hidden');
+  }
+
+  function cancelMapCircleMode(announce = true) {
+    const wasActive = mapCircleMode;
+    const circleToReopen = editingMapCircleId;
+    mapCircleMode = false;
+    mapCirclePhase = '';
+    pendingMapCircleCenter = null;
+    geometrySnapContext = null;
+    hideGeometrySnapIndicator();
+    renderHistoryMapConnectionLines();
+    updateMapConnectionToolbar();
+    if (announce && wasActive) {
+      if (circleToReopen) openMapCircleEditor(circleToReopen);
+      setStatus('Creazione cerchio annullata');
+    }
+  }
+
+  function startMapCircle({ phase = 'center', circleId = '' } = {}) {
+    const circle = getMarkerHistoryCircle(circleId);
+    if (!state.overviewMode && circle) {
+      markerHistoryPointsHidden = false;
+      persistMarkerHistoryPointsHidden();
+      state.markerPlaced = false;
+      state.overviewMode = true;
+      marker.classList.add('hidden');
+      mainControlsRow.classList.remove('hidden');
+      confirmRow.classList.add('hidden');
+      applyOverviewCrosshairVisibility();
+      zoomToMapPoint(circle.center.x, circle.center.y);
+      closeMarkerHistory();
+    }
+    if (!state.overviewMode || (!circle && selectedMarkerHistoryCount() < 1) || markerHistoryPointsHidden) return;
+    mapConnectionMode = false;
+    pendingHistoryConnectionEndpoint = null;
+    closeMapConnectionEditor();
+    mapCircleMode = true;
+    mapCirclePhase = phase;
+    editingMapCircleId = circleId;
+    pendingMapCircleCenter = phase.includes('radius') && circle ? { ...circle.center } : null;
+    geometrySnapContext = buildGeometrySnapContext();
+    mapCircleEditor.classList.add('hidden');
+    renderHistoryMapPoints();
+    updateMapConnectionToolbar();
+    setStatus(phase.includes('radius') ? 'Scegli il nuovo punto del raggio' : 'Scegli il centro del cerchio');
+  }
+
   function startMapConnection() {
     if (!state.overviewMode || selectedMarkerHistoryCount() < 2 || markerHistoryPointsHidden) return;
     mapConnectionMode = true;
+    cancelMapCircleMode(false);
     pendingHistoryConnectionEndpoint = null;
     closeMapConnectionEditor();
     renderHistoryMapPoints();
@@ -1748,10 +1965,9 @@
       state.markerPlaced = false;
       state.markerText = '';
       marker.classList.add('hidden');
-      crosshair.classList.remove('hidden');
       mainControlsRow.classList.remove('hidden');
       confirmRow.classList.add('hidden');
-      scheduleCrosshairLensRender();
+      applyOverviewCrosshairVisibility();
     }
     const persisted = persistMarkerHistoryStore() && persistMarkerHistorySources();
     markerHistoryViewKey = '';
@@ -1927,23 +2143,38 @@
     };
   }
 
-  function setCrosshairLensEnabled(enabled, persist = true) {
-    state.crosshairLensEnabled = enabled;
-    crosshair.classList.toggle('lens-disabled', !enabled);
-    lensToggleButton.setAttribute('aria-pressed', String(enabled));
-    lensToggleButton.setAttribute(
-      'aria-label',
-      enabled ? 'Disattiva lente di ingrandimento' : 'Attiva lente di ingrandimento'
-    );
-    lensToggleLabel.textContent = enabled ? 'Lente attiva' : 'Lente disattivata';
+  function setCrosshairDisplayMode(mode, persist = true) {
+    const normalizedMode = ['lens', 'plain', 'hidden'].includes(mode) ? mode : 'lens';
+    state.crosshairDisplayMode = normalizedMode;
+    state.crosshairLensEnabled = normalizedMode === 'lens';
+    crosshair.classList.toggle('lens-disabled', normalizedMode !== 'lens');
+    lensToggleButton.classList.toggle('is-crosshair-hidden', normalizedMode === 'hidden');
+    lensToggleButton.setAttribute('aria-pressed', String(normalizedMode === 'lens'));
+    const labels = {
+      lens: ['Disattiva lente di ingrandimento', 'Lente attiva'],
+      plain: ['Nascondi il mirino', 'Lente disattivata'],
+      hidden: ['Attiva lente e mirino', 'Mirino nascosto']
+    };
+    lensToggleButton.setAttribute('aria-label', labels[normalizedMode][0]);
+    lensToggleButton.title = labels[normalizedMode][1];
+    lensToggleLabel.textContent = labels[normalizedMode][1];
     if (persist) {
       try {
-        localStorage.setItem(crosshairLensStorageKey, enabled ? '1' : '0');
+        const storedValue = normalizedMode === 'lens' ? '1' : normalizedMode === 'plain' ? '0' : 'hidden';
+        localStorage.setItem(crosshairLensStorageKey, storedValue);
       } catch (error) {
         // La scelta resta valida per la sessione se lo storage non è disponibile.
       }
     }
+    applyOverviewCrosshairVisibility();
     scheduleCrosshairLensRender();
+  }
+
+  function cycleCrosshairDisplayMode() {
+    const nextMode = state.crosshairDisplayMode === 'lens'
+      ? 'plain'
+      : state.crosshairDisplayMode === 'plain' ? 'hidden' : 'lens';
+    setCrosshairDisplayMode(nextMode);
   }
 
   function loadCrosshairLensPreference() {
@@ -1953,7 +2184,8 @@
     } catch (error) {
       savedPreference = null;
     }
-    setCrosshairLensEnabled(savedPreference !== '0', false);
+    const mode = savedPreference === '0' ? 'plain' : savedPreference === 'hidden' ? 'hidden' : 'lens';
+    setCrosshairDisplayMode(mode, false);
   }
 
   function renderCrosshairLens() {
@@ -2707,6 +2939,323 @@
     };
   }
 
+  function historyConnectionPolyline(coordinates, curve, segmentCount = 18) {
+    const normalizedCurve = normalizeHistoryConnectionCurve(curve);
+    const deltaX = coordinates.x2 - coordinates.x1;
+    const deltaY = coordinates.y2 - coordinates.y1;
+    const distance = Math.hypot(deltaX, deltaY);
+    if (!distance || Math.abs(normalizedCurve) < .005) {
+      return [
+        { x: coordinates.x1, y: coordinates.y1 },
+        { x: coordinates.x2, y: coordinates.y2 }
+      ];
+    }
+    const curveOffset = normalizedCurve * Math.min(distance * .55, image.naturalWidth * .16);
+    const control = {
+      x: (coordinates.x1 + coordinates.x2) / 2 - (deltaY / distance) * curveOffset,
+      y: (coordinates.y1 + coordinates.y2) / 2 + (deltaX / distance) * curveOffset
+    };
+    return Array.from({ length: segmentCount + 1 }, (_, index) => {
+      const t = index / segmentCount;
+      const inverse = 1 - t;
+      return {
+        x: inverse * inverse * coordinates.x1 + 2 * inverse * t * control.x + t * t * coordinates.x2,
+        y: inverse * inverse * coordinates.y1 + 2 * inverse * t * control.y + t * t * coordinates.y2
+      };
+    });
+  }
+
+  function mapCircleGeometry(circle, segmentCount = 72) {
+    const center = getGeographicCoordinates(circle?.center);
+    const radius = normalizeMapCircleRadius(circle?.radiusMeters);
+    if (!center) return null;
+    const longitudeScale = 111320 * Math.max(.2, Math.cos(center.latitude * Math.PI / 180));
+    const normalizedPoints = Array.from({ length: segmentCount }, (_, index) => {
+      const angle = index / segmentCount * Math.PI * 2;
+      return getMapCoordinatesFromGeographic(
+        center.latitude + Math.cos(angle) * radius / 111320,
+        center.longitude + Math.sin(angle) * radius / longitudeScale
+      );
+    }).filter(Boolean);
+    if (normalizedPoints.length < 3) return null;
+    const points = normalizedPoints.map((point) => ({
+      x: point.x * image.naturalWidth,
+      y: point.y * image.naturalHeight
+    }));
+    return {
+      points,
+      normalizedPoints,
+      path: `${points.map((point, index) => `${index ? 'L' : 'M'} ${point.x} ${point.y}`).join(' ')} Z`,
+      quadrants: [0, .25, .5, .75].map((ratio) => normalizedPoints[Math.round(ratio * segmentCount) % segmentCount])
+    };
+  }
+
+  function visibleConnectionGeometries() {
+    if (!image.naturalWidth || !image.naturalHeight) return [];
+    return markerHistoryConnectionsStore.map((connection) => {
+      const first = getMarkerHistoryEndpointRecord(connection.first);
+      const second = getMarkerHistoryEndpointRecord(connection.second);
+      if (!first || !second) return null;
+      if (!selectedMarkerHistoryIds(connection.first.sourceKey).has(connection.first.entryId)
+        || !selectedMarkerHistoryIds(connection.second.sourceKey).has(connection.second.entryId)) return null;
+      const coordinates = {
+        x1: clamp(Number(first.entry.x), 0, 1) * image.naturalWidth,
+        y1: clamp(Number(first.entry.y), 0, 1) * image.naturalHeight,
+        x2: clamp(Number(second.entry.x), 0, 1) * image.naturalWidth,
+        y2: clamp(Number(second.entry.y), 0, 1) * image.naturalHeight
+      };
+      if (Object.values(coordinates).some((value) => !Number.isFinite(value))) return null;
+      return { connection, first, second, coordinates, points: historyConnectionPolyline(coordinates, connection.curve) };
+    }).filter(Boolean);
+  }
+
+  function segmentIntersection(firstStart, firstEnd, secondStart, secondEnd) {
+    const firstDelta = { x: firstEnd.x - firstStart.x, y: firstEnd.y - firstStart.y };
+    const secondDelta = { x: secondEnd.x - secondStart.x, y: secondEnd.y - secondStart.y };
+    const denominator = firstDelta.x * secondDelta.y - firstDelta.y * secondDelta.x;
+    if (Math.abs(denominator) < 1e-8) return null;
+    const offset = { x: secondStart.x - firstStart.x, y: secondStart.y - firstStart.y };
+    const firstRatio = (offset.x * secondDelta.y - offset.y * secondDelta.x) / denominator;
+    const secondRatio = (offset.x * firstDelta.y - offset.y * firstDelta.x) / denominator;
+    if (firstRatio <= .001 || firstRatio >= .999 || secondRatio <= .001 || secondRatio >= .999) return null;
+    return {
+      x: firstStart.x + firstDelta.x * firstRatio,
+      y: firstStart.y + firstDelta.y * firstRatio
+    };
+  }
+
+  function projectOnSegment(point, start, end) {
+    const deltaX = end.x - start.x;
+    const deltaY = end.y - start.y;
+    const lengthSquared = deltaX * deltaX + deltaY * deltaY;
+    if (!lengthSquared) return { ...start };
+    const ratio = clamp(((point.x - start.x) * deltaX + (point.y - start.y) * deltaY) / lengthSquared, 0, 1);
+    return { x: start.x + deltaX * ratio, y: start.y + deltaY * ratio };
+  }
+
+  function mapCoordinatesFromClient(clientX, clientY) {
+    const rect = stage.getBoundingClientRect();
+    if (!image.naturalWidth || !image.naturalHeight || !state.scale) return null;
+    return {
+      x: clamp((clientX - rect.left - state.x) / (image.naturalWidth * state.scale), 0, 1),
+      y: clamp((clientY - rect.top - state.y) / (image.naturalHeight * state.scale), 0, 1)
+    };
+  }
+
+  function geometrySnapCandidate(x, y, snapType, label, priority = 5) {
+    return { x, y, snapType, label, priority };
+  }
+
+  function buildGeometrySnapContext() {
+    const candidates = [];
+    getSelectedMarkerHistoryEntries().forEach(({ entry }) => {
+      const x = Number(entry.x);
+      const y = Number(entry.y);
+      if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+      candidates.push(geometrySnapCandidate(
+        clamp(x, 0, 1), clamp(y, 0, 1), 'point',
+        `Punto · ${normalizeHistoryLabel(entry.label) || entry.text || 'senza etichetta'}`, 0
+      ));
+    });
+    const connectionGeometries = visibleConnectionGeometries();
+    connectionGeometries.forEach(({ connection, first, second, coordinates }) => {
+      const curvedMidpoint = historyConnectionShape(coordinates, connection.curve).midpoint;
+      candidates.push(geometrySnapCandidate(
+        curvedMidpoint.x / image.naturalWidth,
+        curvedMidpoint.y / image.naturalHeight,
+        'midpoint', `Medio · ${first.name}–${second.name}`, 2
+      ));
+    });
+    connectionGeometries.forEach((firstGeometry, firstIndex) => {
+      connectionGeometries.slice(firstIndex + 1).forEach((secondGeometry) => {
+        firstGeometry.points.slice(0, -1).forEach((firstStart, firstSegmentIndex) => {
+          secondGeometry.points.slice(0, -1).forEach((secondStart, secondSegmentIndex) => {
+            const intersection = segmentIntersection(
+              firstStart, firstGeometry.points[firstSegmentIndex + 1],
+              secondStart, secondGeometry.points[secondSegmentIndex + 1]
+            );
+            if (!intersection) return;
+            candidates.push(geometrySnapCandidate(
+              intersection.x / image.naturalWidth,
+              intersection.y / image.naturalHeight,
+              'intersection', 'Intersezione', 1
+            ));
+          });
+        });
+      });
+    });
+    const circleGeometries = markerHistoryCirclesStore.map((circle) => {
+      const geometry = mapCircleGeometry(circle);
+      if (!geometry) return null;
+      candidates.push(geometrySnapCandidate(circle.center.x, circle.center.y, 'center', 'Centro · cerchio', 1));
+      geometry.quadrants.forEach((point) => {
+        candidates.push(geometrySnapCandidate(point.x, point.y, 'quadrant', 'Quadrante · cerchio', 2));
+      });
+      return { circle, geometry };
+    }).filter(Boolean);
+    return { candidates, connectionGeometries, circleGeometries };
+  }
+
+  function resolveGeometrySnap(clientX, clientY) {
+    const freePoint = mapCoordinatesFromClient(clientX, clientY);
+    if (!freePoint) return null;
+    const pointer = { x: freePoint.x * image.naturalWidth, y: freePoint.y * image.naturalHeight };
+    const context = geometrySnapContext || buildGeometrySnapContext();
+    geometrySnapContext = context;
+    const candidates = [...context.candidates];
+    context.connectionGeometries.forEach(({ points }) => {
+      let nearest = null;
+      points.slice(0, -1).forEach((start, index) => {
+        const projected = projectOnSegment(pointer, start, points[index + 1]);
+        const distance = Math.hypot(projected.x - pointer.x, projected.y - pointer.y);
+        if (!nearest || distance < nearest.distance) nearest = { ...projected, distance };
+      });
+      if (nearest) candidates.push(geometrySnapCandidate(
+        nearest.x / image.naturalWidth, nearest.y / image.naturalHeight,
+        'nearest-line', 'Vicino · linea', 6
+      ));
+    });
+    context.circleGeometries.forEach(({ geometry }) => {
+      let nearest = null;
+      geometry.points.forEach((point) => {
+        const distance = Math.hypot(point.x - pointer.x, point.y - pointer.y);
+        if (!nearest || distance < nearest.distance) nearest = { ...point, distance };
+      });
+      if (nearest) candidates.push(geometrySnapCandidate(
+        nearest.x / image.naturalWidth, nearest.y / image.naturalHeight,
+        'nearest-circle', 'Vicino · cerchio', 6
+      ));
+    });
+    const aperture = 28;
+    const ranked = candidates.map((candidate) => ({
+      ...candidate,
+      distance: Math.hypot(
+        (candidate.x - freePoint.x) * image.naturalWidth * state.scale,
+        (candidate.y - freePoint.y) * image.naturalHeight * state.scale
+      )
+    })).filter((candidate) => candidate.distance <= aperture)
+      .sort((first, second) => first.distance - second.distance || first.priority - second.priority);
+    return ranked[0] || geometrySnapCandidate(freePoint.x, freePoint.y, 'free', 'Libero', 9);
+  }
+
+  function showGeometrySnap(snap) {
+    if (!snap || !mapCircleMode) {
+      hideGeometrySnapIndicator();
+      return;
+    }
+    currentGeometrySnap = snap;
+    geometrySnapIndicator.style.left = `${snap.x * image.naturalWidth}px`;
+    geometrySnapIndicator.style.top = `${snap.y * image.naturalHeight}px`;
+    geometrySnapIndicator.classList.remove('hidden');
+    geometrySnapIndicator.classList.toggle('is-free', snap.snapType === 'free');
+    geometrySnapLabel.textContent = snap.label;
+  }
+
+  function circleAnchorFromSnap(snap) {
+    return normalizeMapAnchor(snap);
+  }
+
+  function completeMapCirclePick(snap) {
+    if (!mapCircleMode || !snap) return;
+    const anchor = circleAnchorFromSnap(snap);
+    if (!anchor) return;
+    if (mapCirclePhase === 'center-edit') {
+      const circle = getMarkerHistoryCircle(editingMapCircleId);
+      if (!circle) return cancelMapCircleMode(false);
+      circle.center = anchor;
+      persistMarkerHistoryCircles();
+      cancelMapCircleMode(false);
+      openMapCircleEditor(circle.id);
+      setStatus('Centro del cerchio aggiornato');
+      return;
+    }
+    if (!pendingMapCircleCenter) {
+      pendingMapCircleCenter = anchor;
+      mapCirclePhase = 'radius';
+      updateMapConnectionToolbar();
+      renderHistoryMapConnectionLines();
+      setStatus(`Centro agganciato: ${anchor.label}. Ora scegli il raggio`);
+      return;
+    }
+    const radiusMeters = distanzaInMetri(pendingMapCircleCenter, anchor);
+    if (!Number.isFinite(radiusMeters) || radiusMeters < 1) {
+      setStatus('Il raggio deve essere di almeno 1 metro');
+      return;
+    }
+    let circle = getMarkerHistoryCircle(editingMapCircleId);
+    if (mapCirclePhase === 'radius-edit' && circle) {
+      circle.radiusPoint = anchor;
+      circle.radiusMeters = normalizeMapCircleRadius(radiusMeters);
+    } else {
+      circle = {
+        id: createLocalId('cerchio'),
+        center: pendingMapCircleCenter,
+        radiusPoint: anchor,
+        radiusMeters: normalizeMapCircleRadius(radiusMeters),
+        createdAt: new Date().toISOString()
+      };
+      markerHistoryCirclesStore.push(circle);
+    }
+    const persisted = persistMarkerHistoryCircles();
+    cancelMapCircleMode(false);
+    renderHistoryMapPoints();
+    renderMarkerHistoryConnectionsPanel();
+    openMapCircleEditor(circle.id);
+    setStatus(persisted ? `Cerchio creato · raggio ${Math.round(circle.radiusMeters)} m` : 'Cerchio creato solo per questa sessione');
+  }
+
+  function renderMapCirclePath(circle, { preview = false } = {}) {
+    const geometry = mapCircleGeometry(circle);
+    if (!geometry) return;
+    const underlay = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    underlay.classList.add('history-map-connection-underlay');
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    line.classList.add('history-map-connection-line');
+    const hit = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    hit.classList.add('history-map-connection-hit');
+    [underlay, line, hit].forEach((element) => element.setAttribute('d', geometry.path));
+    if (preview) {
+      underlay.classList.add('is-preview');
+      line.classList.add('is-preview');
+      historyMapConnections.append(underlay, line);
+      return;
+    }
+    const centerHandle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    centerHandle.classList.add('history-map-connection-handle');
+    centerHandle.setAttribute('cx', String(circle.center.x * image.naturalWidth));
+    centerHandle.setAttribute('cy', String(circle.center.y * image.naturalHeight));
+    const radiusControl = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    radiusControl.classList.add('history-map-connection-control');
+    const eastPoint = geometry.normalizedPoints[Math.round(geometry.normalizedPoints.length / 4)];
+    radiusControl.setAttribute('cx', String(eastPoint.x * image.naturalWidth));
+    radiusControl.setAttribute('cy', String(eastPoint.y * image.naturalHeight));
+    const openEditor = (event) => {
+      event.stopPropagation();
+      if (mapCircleMode) {
+        completeMapCirclePick(resolveGeometrySnap(event.clientX, event.clientY));
+        return;
+      }
+      openMapCircleEditor(circle.id);
+    };
+    hit.dataset.mapInteraction = 'true';
+    hit.addEventListener('click', openEditor);
+    radiusControl.dataset.mapInteraction = 'true';
+    radiusControl.setAttribute('role', 'button');
+    radiusControl.setAttribute('tabindex', '0');
+    radiusControl.setAttribute('aria-label', `Modifica cerchio di raggio ${Math.round(circle.radiusMeters)} metri`);
+    radiusControl.addEventListener('click', openEditor);
+    radiusControl.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      openMapCircleEditor(circle.id);
+    });
+    const isActive = circle.id === editingMapCircleId;
+    underlay.classList.toggle('is-active', isActive);
+    line.classList.toggle('is-active', isActive);
+    centerHandle.classList.toggle('is-active', isActive);
+    historyMapConnections.append(underlay, line, hit, centerHandle, radiusControl);
+  }
+
   function renderHistoryMapConnectionLines() {
     historyMapConnections.replaceChildren();
     // Le linee spariscono con i punti che uniscono: restare a mezz'aria su una
@@ -2716,6 +3265,8 @@
     historyMapConnections.setAttribute('width', String(image.naturalWidth));
     historyMapConnections.setAttribute('height', String(image.naturalHeight));
     historyMapConnections.setAttribute('viewBox', `0 0 ${image.naturalWidth} ${image.naturalHeight}`);
+
+    markerHistoryCirclesStore.forEach((circle) => renderMapCirclePath(circle));
 
     markerHistoryConnectionsStore.forEach((connection) => {
       const first = getMarkerHistoryEndpointRecord(connection.first);
@@ -2752,6 +3303,10 @@
       hit.dataset.mapInteraction = 'true';
       hit.addEventListener('click', (event) => {
         event.stopPropagation();
+        if (mapCircleMode) {
+          completeMapCirclePick(resolveGeometrySnap(event.clientX, event.clientY));
+          return;
+        }
         openMapConnectionEditor(connection.id);
       });
       control.dataset.mapInteraction = 'true';
@@ -2760,6 +3315,10 @@
       control.setAttribute('aria-label', `Modifica linea tra ${firstName} e ${secondName}`);
       control.addEventListener('click', (event) => {
         event.stopPropagation();
+        if (mapCircleMode) {
+          completeMapCirclePick(resolveGeometrySnap(event.clientX, event.clientY));
+          return;
+        }
         openMapConnectionEditor(connection.id);
       });
       control.addEventListener('keydown', (event) => {
@@ -2773,6 +3332,12 @@
       handle.classList.toggle('is-active', isActive);
       historyMapConnections.append(underlay, line, hit, handle, control);
     });
+    if (mapCircleMode && pendingMapCircleCenter && currentGeometrySnap) {
+      const previewRadius = distanzaInMetri(pendingMapCircleCenter, currentGeometrySnap);
+      if (Number.isFinite(previewRadius) && previewRadius >= 1) {
+        renderMapCirclePath({ center: pendingMapCircleCenter, radiusMeters: previewRadius }, { preview: true });
+      }
+    }
     updateHistoryMapOverlayScale();
   }
 
@@ -2807,8 +3372,8 @@
       point.title = `${historyLabel || markerText || 'Punto'} · ${ownerName}`;
       point.dataset.mapInteraction = 'true';
       point.setAttribute('aria-label', `Scegli ${historyLabel || markerText || 'punto'} della lista di ${ownerName}`);
-      point.tabIndex = mapConnectionMode ? 0 : -1;
-      point.classList.toggle('is-connectable', mapConnectionMode);
+      point.tabIndex = mapConnectionMode || mapCircleMode ? 0 : -1;
+      point.classList.toggle('is-connectable', mapConnectionMode || mapCircleMode);
       const endpoint = { sourceKey, entryId: String(entry.id) };
       const isPending = pendingHistoryConnectionEndpoint
         && historyConnectionEndpointKey(pendingHistoryConnectionEndpoint) === historyConnectionEndpointKey(endpoint);
@@ -2816,6 +3381,13 @@
       point.classList.toggle('is-swatch', !markerText);
       point.addEventListener('click', (event) => {
         event.stopPropagation();
+        if (mapCircleMode) {
+          completeMapCirclePick(geometrySnapCandidate(
+            clamp(x, 0, 1), clamp(y, 0, 1), 'point',
+            `Punto · ${historyLabel || markerText || 'senza etichetta'}`, 0
+          ));
+          return;
+        }
         if (!mapConnectionMode) return;
         chooseHistoryConnectionEndpoint(sourceKey, entry, { fromMap: true });
       });
@@ -2923,9 +3495,9 @@
     leaveOverviewMode(false);
     state.markerPlaced = false;
     marker.classList.add('hidden');
-    crosshair.classList.remove('hidden');
     mainControlsRow.classList.remove('hidden');
     confirmRow.classList.add('hidden');
+    applyOverviewCrosshairVisibility();
     updateCrosshairCoordinates();
     renderHistoryMapPoints();
     scheduleCrosshairLensRender();
@@ -2945,9 +3517,9 @@
     markerTextInput.value = '';
     markerHistoryLabelInput.value = '';
     marker.classList.add('hidden');
-    crosshair.classList.remove('hidden');
     mainControlsRow.classList.remove('hidden');
     confirmRow.classList.add('hidden');
+    applyOverviewCrosshairVisibility();
     setMarkerVisual();
     updateCrosshairCoordinates();
     renderHistoryMapPoints();
@@ -2969,9 +3541,9 @@
     markerTextInput.value = '';
     markerHistoryLabelInput.value = '';
     marker.classList.add('hidden');
-    crosshair.classList.remove('hidden');
     mainControlsRow.classList.remove('hidden');
     confirmRow.classList.add('hidden');
+    applyOverviewCrosshairVisibility();
     setMarkerVisual();
     renderHistoryMapPoints();
     searchFeedback.textContent = '';
@@ -3092,7 +3664,7 @@
 
   stage.addEventListener('pointerdown', (event) => {
     const clickedControl = event.target.closest?.('button, input, form, [data-map-interaction], .search-results, .coordinate-panel, .marker-dialog, .identity-dialog, .map-connection-editor');
-    if (state.markerPlaced || clickedControl) return;
+    if (state.markerPlaced || clickedControl || mapCircleMode) return;
     stage.setPointerCapture(event.pointerId);
     state.dragging = true;
     state.lastX = event.clientX;
@@ -3100,6 +3672,11 @@
   });
 
   stage.addEventListener('pointermove', (event) => {
+    if (mapCircleMode) {
+      showGeometrySnap(resolveGeometrySnap(event.clientX, event.clientY));
+      renderHistoryMapConnectionLines();
+      return;
+    }
     if (!state.dragging || state.markerPlaced) return;
     state.x += event.clientX - state.lastX;
     state.y += event.clientY - state.lastY;
@@ -3111,6 +3688,13 @@
 
   stage.addEventListener('pointerup', () => { state.dragging = false; });
   stage.addEventListener('pointercancel', () => { state.dragging = false; });
+  stage.addEventListener('pointerleave', () => {
+    if (mapCircleMode) hideGeometrySnapIndicator();
+  });
+  stage.addEventListener('click', (event) => {
+    if (!mapCircleMode || event.target.closest?.('button, input, form, [data-map-interaction], .map-connection-editor')) return;
+    completeMapCirclePick(resolveGeometrySnap(event.clientX, event.clientY));
+  });
 
   stage.addEventListener('wheel', (event) => {
     // I pannelli che scorrono per conto loro tengono la rotella: senza questo
@@ -3138,7 +3722,7 @@
   stage.addEventListener('touchend', () => { state.pinchDistance = 0; });
 
   lensToggleButton.addEventListener('click', () => {
-    setCrosshairLensEnabled(!state.crosshairLensEnabled);
+    cycleCrosshairDisplayMode();
   });
   locationToggleButton.addEventListener('click', () => {
     if (state.userLocationTracking) stopUserLocationTracking();
@@ -3148,8 +3732,14 @@
   document.getElementById('zoomOutButton').addEventListener('click', () => zoomAt(0.8));
   placeButton.addEventListener('click', () => {
     if (state.overviewMode && crosshair.classList.contains('hidden')) {
+      if (state.crosshairDisplayMode === 'hidden') setCrosshairDisplayMode('plain');
       setOverviewCrosshairVisible(true);
       setStatus('Mirino visibile nella vista d’insieme');
+      return;
+    }
+    if (!state.overviewMode && state.crosshairDisplayMode === 'hidden') {
+      setCrosshairDisplayMode('plain');
+      setStatus('Mirino riattivato senza lente');
       return;
     }
     if (state.overviewMode) leaveOverviewMode(false);
@@ -3180,7 +3770,11 @@
   });
   cancelHistoryConnectionButton.addEventListener('click', cancelPendingHistoryConnection);
   startMapConnectionButton.addEventListener('click', startMapConnection);
-  cancelMapConnectionButton.addEventListener('click', cancelPendingHistoryConnection);
+  startMapCircleButton.addEventListener('click', () => startMapCircle());
+  cancelMapConnectionButton.addEventListener('click', () => {
+    if (mapCircleMode) cancelMapCircleMode();
+    else cancelPendingHistoryConnection();
+  });
   closeMapConnectionEditorButton.addEventListener('click', closeMapConnectionEditor);
   resetMapConnectionCurveButton.addEventListener('click', () => updateActiveMapConnectionCurve(0, true));
   deleteMapConnectionButton.addEventListener('click', () => removeMarkerHistoryConnection(activeMapConnectionId));
@@ -3189,6 +3783,22 @@
     const connection = getMarkerHistoryConnection(activeMapConnectionId);
     if (connection) setStatus(`Curvatura: ${historyConnectionCurveLabel(connection.curve)}`);
   });
+  closeMapCircleEditorButton.addEventListener('click', closeMapCircleEditor);
+  redefineMapCircleCenterButton.addEventListener('click', () => startMapCircle({
+    phase: 'center-edit',
+    circleId: editingMapCircleId
+  }));
+  redefineMapCircleRadiusButton.addEventListener('click', () => startMapCircle({
+    phase: 'radius-edit',
+    circleId: editingMapCircleId
+  }));
+  deleteMapCircleButton.addEventListener('click', () => removeMarkerHistoryCircle(editingMapCircleId));
+  mapCircleRadiusInput.addEventListener('input', () => {
+    mapCircleRadiusInput.setCustomValidity('');
+    const value = Number(mapCircleRadiusInput.value);
+    if (Number.isFinite(value) && value >= 1 && value <= 5000) updateActiveMapCircleRadius(value);
+  });
+  mapCircleRadiusInput.addEventListener('change', () => updateActiveMapCircleRadius(mapCircleRadiusInput.value, true));
   exportMarkerHistoryButton.addEventListener('click', exportAndShareMarkerHistory);
   markerHistorySourceSelect.addEventListener('change', () => {
     markerHistoryViewKey = markerHistorySourceSelect.value === markerHistoryPlayerKey()
@@ -3395,6 +4005,8 @@
     if (event.key === 'Escape' && !streetListDialog.classList.contains('hidden')) closeManualStreetPointList();
     if (event.key === 'Escape' && !markerHistoryDialog.classList.contains('hidden')) closeMarkerHistory();
     if (event.key === 'Escape' && !mapConnectionEditor.classList.contains('hidden')) closeMapConnectionEditor();
+    if (event.key === 'Escape' && !mapCircleEditor.classList.contains('hidden')) closeMapCircleEditor();
+    else if (event.key === 'Escape' && mapCircleMode) cancelMapCircleMode();
     else if (event.key === 'Escape' && mapConnectionMode) cancelPendingHistoryConnection();
   });
 
@@ -3691,6 +4303,7 @@
   loadMarkerHistorySelectionOrder();
   readMarkerHistoryPointsHidden();
   loadMarkerHistoryConnections();
+  loadMarkerHistoryCircles();
   loadOverviewCrosshairPreference();
   loadMarkerHistoryTabPreference();
   migrateMarkerHistoryToCreationOrder();

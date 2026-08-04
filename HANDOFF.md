@@ -5,6 +5,43 @@ prima di chiudere: cosa ha cambiato, cosa ha scoperto, cosa resta aperto.
 
 ---
 
+## 2026-08-04 — Circonferenze e snap geometrici sulla mappa
+
+*Agente: Codex con skill Impeccable. Toccati `index.html`, `styles.css`,
+`app.js`, `service-worker.js` e `AGENTS.md`.*
+
+La vista **Mappa e linee** gestisce ora anche circonferenze persistenti. Il
+comando **Crea cerchio** chiede centro e punto del raggio; entrambi possono
+essere agganciati a un punto esistente, al medio o all'intersezione di linee,
+al centro o ai quadranti di un cerchio, alla geometria più vicina oppure a un
+punto libero. Un indicatore con etichetta anticipa lo snap entro un'apertura di
+28 px. I candidati statici e le intersezioni vengono calcolati una sola volta
+all'avvio del comando, così il puntamento resta fluido anche con più geometrie.
+
+Il raggio è salvato in metri in `mappa-marker-history-circles-v1` e il
+tracciato viene derivato dalla calibrazione WGS84 esistente senza modificare
+le coordinate x/y. Dalla mappa o dalla cronologia ogni cerchio apre un editor:
+si può inserire il raggio numericamente, ridefinire centro o raggio con gli
+stessi snap ed eliminarlo. Modifica ed eliminazione funzionano anche entrando
+dalla cronologia fuori dalla vista d'insieme. Le linee esistenti mantengono
+curvatura, selezione ed eliminazione precedenti.
+
+Dopo la prova utente, toolbar ed editor delle geometrie sono stati spostati
+nella fascia inferiore mobile. Durante il disegno il pulsante del comando
+attivo sparisce, lasciando soltanto istruzione e **Annulla**; l'editor del
+cerchio è compatto, con le tre azioni sulla stessa riga. Il pulsante lente ora
+cicla inoltre tra lente attiva, lente disattivata con mirino visibile e mirino
+nascosto, quindi torna alla lente attiva. Il terzo stato usa la stessa chiave
+locale e resta compatibile con i precedenti valori booleani.
+
+Verificati sintassi JS e service worker, `git diff --check`, controllo
+Impeccable senza rilievi, creazione con centro agganciato e libero, modifica
+numerica, ridefinizione del centro, eliminazione, persistenza dopo reload,
+assenza di errori console e layout a 320×568, 390×844 e 1200×800. Versioni:
+`styles.css?v=62`, `app.js?v=61`, cache `mappa-squadra-v88`. Anteprima locale
+su `http://127.0.0.1:8026/?preview=circles-layout-v2`; modifica non ancora
+pubblicata.
+
 ## 2026-08-04 — Nuova identità CAT Points e icona cartografica
 
 *Agente: Codex con skill Design e Impeccable. Toccati `index.html`,

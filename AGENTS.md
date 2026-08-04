@@ -100,10 +100,10 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=60` e
-   `app.js?v=56`.
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=62` e
+   `app.js?v=61`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v83`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v88`, e precarica la lista `ASSETS` all'installazione.
 
 **Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
 `index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
@@ -387,10 +387,11 @@ estremi originali `{ sourceKey, entryId }`, quindi dalla lista aggregata si
 possono collegare direttamente punti appartenenti a liste diverse.
 
 La lente del mirino ha un interruttore circolare indipendente nella barra
-superiore, accanto al pulsante `x/y`. La scelta usa
-`mappa-crosshair-lens-v1`, è attiva al primo accesso e resta sul dispositivo.
-Quando è spenta il canvas viene svuotato e diventa trasparente: cerchio e punto
-centrale restano visibili, ma la carta non viene ingrandita. `#statusPill`
+superiore, accanto al pulsante `x/y`. Ogni tocco percorre tre stati: lente
+attiva, lente spenta con cerchio e punto ancora visibili, mirino completamente
+nascosto; il tocco successivo riattiva lente e mirino. La scelta usa
+`mappa-crosshair-lens-v1`, accetta ancora i vecchi valori `1`/`0`, è attiva al
+primo accesso e resta sul dispositivo. `#statusPill`
 continua a mostrare gli avvisi temporanei nell'area della mappa e li nasconde
 dopo 2,8 secondi; il messaggio di istruzione predefinito non viene più
 visualizzato.
@@ -418,6 +419,13 @@ non crea livelli interattivi concorrenti. Il messaggio di ricerca resta
 visibile per errori e nessun risultato, ma viene nascosto quando l'elenco stesso
 comunica già le corrispondenze.
 
+Su mobile toolbar ed editor delle geometrie sono ancorati appena sopra i
+comandi inferiori: l'area centrale della carta deve restare libera. Durante la
+scelta di centro, raggio o estremi il pulsante del comando già attivo sparisce
+e restano soltanto istruzione e **Annulla**. L'editor del cerchio nasconde i
+testi esplicativi secondari e dispone le tre azioni su una riga; su desktop
+continua invece a usare il pannello laterale completo.
+
 I collegamenti tra punti usano `mappa-marker-history-connections-v1`. Ogni
 estremo conserva soltanto `{ sourceKey, entryId }`, quindi può riferirsi anche
 a due liste diverse senza duplicarne i dati. Una linea viene disegnata solo
@@ -428,6 +436,19 @@ vista d'insieme **Collega punti** attiva la scelta diretta dei due estremi sulla
 mappa; ogni linea ha un punto di presa centrale che apre l'editor per curvarla,
 raddrizzarla o eliminarla. Il campo `curve`, compreso tra -1 e 1, è facoltativo:
 i collegamenti salvati prima dell'editor vengono letti come linee dritte.
+
+Le circonferenze usano `mappa-marker-history-circles-v1` e convivono nello
+stesso livello SVG delle linee. Si costruiscono indicando prima il centro e poi
+un punto del raggio; entrambi accettano punti esistenti, punti liberi e snap
+geometrici a medio, intersezione, centro, quadrante e punto più vicino. Lo snap
+ha un'apertura di 28 px, mostra marcatore e nome prima della conferma e conserva
+nel cerchio una copia delle coordinate: non crea dipendenze fragili da una
+linea o da un punto che potrebbero essere eliminati in seguito. Il raggio è
+salvato in metri e il tracciato viene ricalcolato attraverso la calibrazione
+WGS84, quindi sulla scansione può apparire leggermente ellittico o ruotato ma
+rappresenta una circonferenza geografica. Centro e raggio si possono
+ridefinire con gli stessi snap; il raggio si può anche inserire numericamente e
+ogni cerchio può essere eliminato dall'editor o dalla cronologia.
 
 Le cronologie condivise usano il formato `cat-points.marker-history` versione
 3 e il suffisso `*.catpoints.json`. Il pacchetto non è un JSON anonimo:
@@ -498,6 +519,11 @@ proprietario originale e aggiunge il partecipante corrente alla catena.
   linee persistono sul dispositivo, vengono mostrate soltanto con entrambi gli
   estremi visibili, si possono selezionare direttamente sulla mappa e possono
   essere curvate, raddrizzate o rimosse singolarmente.
+- In **Vedi insieme** si può creare una circonferenza scegliendo centro e
+  raggio con snap a punti, medi, intersezioni, centri, quadranti e geometria più
+  vicina, oppure usando un punto libero. Il raggio è espresso in metri e ogni
+  circonferenza resta salvata, modificabile e rimovibile anche dopo il
+  ricaricamento.
 - Da 900 px la mappa occupa l'intera viewport, i controlli restano centrati e
   la cronologia sfrutta due colonne; sotto tale soglia le funzioni restano
   complete, toccabili e prive di sovrapposizioni.
@@ -523,8 +549,8 @@ proprietario originale e aggiunge il partecipante corrente alla catena.
   precisione non vengono salvate, esportate o incluse nel PNG.
 - Lo zoom massimo è 5 volte la scala iniziale; il mirino usa un canvas
   circolare come lente 2,35× e continua a restituire le stesse coordinate x/y
-  del suo punto centrale. Un pulsante persistente attiva o disattiva
-  l'ingrandimento senza rimuovere il cerchio del mirino.
+  del suo punto centrale. Lo stesso pulsante persistente cicla tra lente
+  attiva, lente disattivata e mirino nascosto, poi torna alla lente attiva.
 - Il pulsante di copia usa Clipboard API quando disponibile.
 - La PWA si apre anche offline dopo il primo caricamento. *(verificato il
   2026-07-29 col server spento: mappa, ricerca e mirino funzionano)*
