@@ -49,16 +49,10 @@ gioco.
 
 Per aggiornare: stessa schermata, **Create new deployment**, si ricarica.
 
-Cosa **non** caricare: `data/`, `tools/`, `presenza/`, `AGENTS.md`,
-`CLAUDE.md`, `CODEX.md`, `HANDOFF.md`, `PUBBLICARE.md`, `.claude/`. Non fanno
-male, ma sono materiale di lavoro e resterebbero pubblici. Serve solo:
-`index.html`, `styles.css`, `app.js`, `presenza.js`, `service-worker.js`,
-`manifest.webmanifest`, `assets/`.
-
-> `presenza/` è il Worker della presenza e si pubblica per conto suo, su
-> Cloudflare, con `npx wrangler deploy` — vedi `presenza/README.md`. Il file
-> `presenza.js` invece **sì**, va col sito: finché la sua costante `ENDPOINT`
-> è vuota non fa niente.
+Cosa **non** caricare: `data/`, `tools/`, `AGENTS.md`, `CLAUDE.md`,
+`CODEX.md`, `HANDOFF.md`, `PUBBLICARE.md`, `.claude/`. Non fanno male, ma sono
+materiale di lavoro e resterebbero pubblici. Serve solo: `index.html`,
+`styles.css`, `app.js`, `service-worker.js`, `manifest.webmanifest`, `assets/`.
 
 ### Cloudflare Pages, collegato a git
 

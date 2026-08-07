@@ -1,11 +1,10 @@
-const CACHE = 'mappa-squadra-v89';
+const CACHE = 'mappa-squadra-v90';
 const MAP_PATH = '/assets/map-placeholder.jpg';
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
   './app.js',
-  './presenza.js',
   './manifest.webmanifest',
   './assets/streets.json',
   './assets/map-placeholder.pdf',

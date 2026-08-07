@@ -12,7 +12,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
   <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
-  <link rel="stylesheet" href="styles.css?v=63">
+  <link rel="stylesheet" href="styles.css?v=62">
 </head>
 <body>
   <main class="app-shell">
@@ -204,10 +204,6 @@
             <label class="sr-only" for="playerNameInput">Nome o testo breve</label>
             <input id="playerNameInput" type="text" autocomplete="name" maxlength="50" placeholder="Nome o testo breve" required>
             <p class="identity-feedback" id="identityFeedback" role="status" aria-live="polite"></p>
-            <!-- Resta nascosta finché `presenza.js` non ha un indirizzo a cui
-                 mandare i battiti: se la presenza è spenta, l'app non deve
-                 dichiarare una cosa che non fa. -->
-            <p class="identity-privacy hidden" id="presenzaNota">Mentre tieni l’app aperta, l’organizzatore vede questo nome nell’elenco di chi è collegato. Nient’altro: né dove sei, né cosa segni sulla mappa.</p>
             <div class="identity-actions">
               <button id="cancelIdentityButton" class="secondary-wide hidden" type="button">Annulla</button>
               <button class="primary-button" type="submit">Continua</button>
@@ -430,6 +426,5 @@
   </main>
 
   <script src="app.js?v=61" defer></script>
-  <script src="presenza.js?v=1" defer></script>
 </body>
 </html>

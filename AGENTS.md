@@ -56,7 +56,6 @@ altro.
 index.html              Struttura dell'app: mappa, mirino, punto, 5 dialog
 styles.css              Interfaccia e stile (tema scuro/oro)
 app.js                  Pan, zoom, punto, ricerca, esportazione, condivisione
-presenza.js             Chi ha l'app aperta adesso — SPENTO finché non si configura, §5-septies
 service-worker.js       Cache offline
 manifest.webmanifest    Installazione PWA
 assets/map-placeholder.jpg   La mappa servita (8192×5787 px, 4,7 MB)
@@ -65,7 +64,6 @@ assets/streets.json          Indice dei punti — GENERATO, vedi §5-bis
 assets/icons/                icon-192.png, icon-512.png, sorgente cat-points-map.png
 data/sorgenti/               Le sorgenti dell'indice, curate a mano
 tools/merge-streets.py       Ricostruisce assets/streets.json dalle sorgenti
-presenza/                    Il Worker Cloudflare della presenza — NON è parte del sito
 ```
 
 Per sostituire la mappa: cambiare `assets/map-placeholder.jpg` mantenendo lo
@@ -102,21 +100,14 @@ condivisione nativa hanno senso solo su telefono.
 
 Ci sono **due meccanismi di cache sovrapposti** e vanno mossi insieme.
 
-1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=63`,
-   `app.js?v=61` e `presenza.js?v=1`.
+1. `index.html` carica i file con un `?v=N`: oggi `styles.css?v=62` e
+   `app.js?v=61`.
 2. `service-worker.js` ha un nome di cache versionato, oggi
-   `mappa-squadra-v89`, e precarica la lista `ASSETS` all'installazione.
+   `mappa-squadra-v90`, e precarica la lista `ASSETS` all'installazione.
 
-**Chi modifica `styles.css`, `app.js` o `presenza.js` deve incrementare il suo
-`?v=N` in `index.html` E il numero in `CACHE`**, altrimenti il vecchio service
-worker resta attivo e continua a servire i file vecchi.
-
-> Verificato sul campo il 2026-08-04: modificando `presenza.js` senza bumpare
-> il `?v`, il browser continuava a eseguire la versione precedente perfino a
-> una `fetch(..., { cache: 'reload' })` — perché `reload` scavalca la cache
-> HTTP, **non il service worker**, che serviva la sua copia dell'URL esatto.
-> In verifica, se un cambiamento sembra non arrivare, deregistrare il service
-> worker e svuotare `caches` prima di dare la colpa al codice.
+**Chi modifica `styles.css` o `app.js` deve incrementare il suo `?v=N` in
+`index.html` E il numero in `CACHE`**, altrimenti il vecchio service worker
+resta attivo e continua a servire i file vecchi.
 
 ### Come stanno insieme il `?v=N` e la cache
 
@@ -342,66 +333,6 @@ negarla, non renderla disponibile o restituire una precisione debole: sono
 tutti stati gestiti come messaggi temporanei, senza bloccare il resto
 dell'app. La posizione sulla scansione resta una stima cartografica e non va
 presentata come navigazione GPS precisa.
-
----
-
-## 5-septies. Presenza — chi ha l'app aperta adesso
-
-Deciso con l'utente il 2026-08-04. Risponde a **una** domanda: chi sta usando
-CAT Points in questo momento. Non tiene un archivio degli accessi passati e non
-impedisce a nessuno di entrare — se un giorno servisse una di queste due cose,
-sono lavori diversi, da non far crescere dentro questo.
-
-### Due cose da sapere prima di toccarla
-
-**Il nome del dispositivo non esiste, per il browser.** Non si può sapere che
-un telefono si chiama «iPhone di Benedetto»: quel nome vive dentro iOS e nessun
-sito lo legge. L'unico nome che significhi qualcosa è quello che la persona
-scrive al primo avvio, che l'app già chiede e salva in `mappa-player-name`.
-Non cercare un modo per ricavarlo dal dispositivo: non c'è.
-
-**«Presente» vuol dire «ha l'app in primo piano».** Il battito parte *solo*
-mentre `document.visibilityState` è `visible`, e si ferma appena il telefono va
-in tasca. È una scelta: iOS congela i timer di un'app in secondo piano, quindi
-un battito che continuasse «quando può» darebbe un elenco dipendente dai
-capricci del browser invece che dalla realtà. Fermandolo di proposito,
-l'elenco promette esattamente quello che mantiene. **Non "aggiustare" questo
-comportamento facendo battere l'app anche da nascosta**: è il difetto, non la
-correzione.
-
-### Com'è fatta
-
-`presenza.js` è **volutamente scollegato da `app.js`**: legge il nome dallo
-stesso `localStorage` in cui l'app lo salva, quindi non c'è nessun aggancio da
-mantenere fra i due e il file si può cancellare senza toccare una riga delle
-oltre quattromila di `app.js`. L'unico punto di contatto è sull'HTML — il
-`submit` di `#identityForm`, che serve a far comparire subito chi si è appena
-presentato invece di aspettare il tick dei 30 secondi.
-
-- battito ogni **30 s**, solo se visibile e solo se un nome esiste;
-- il server considera presente chi si è fatto sentire negli ultimi **75 s**
-  (due battiti e mezzo: un pacchetto perso non fa sparire nessuno);
-- `sendBeacon` su `pagehide` e sul passaggio a nascosto: è l'unico invio che il
-  browser porta a termine mentre sospende la pagina;
-- `Content-Type: text/plain` di proposito, per non far scattare la richiesta
-  OPTIONS di verifica CORS;
-- ogni errore di rete è ignorato in silenzio: offline è il caso normale.
-
-Il pezzo di server sta in `presenza/` (Worker Cloudflare + Durable Object in
-memoria, nessun database) e **non va caricato col sito**. Le istruzioni sono in
-`presenza/README.md`.
-
-### Accendere e spegnere
-
-`presenza.js` ha una costante `ENDPOINT` marcata `✏️ MODIFICA QUI`. **Finché
-resta vuota la presenza è spenta**: nessuna richiesta, nessun errore, l'app si
-comporta come prima e la nota nel dialogo del nome resta nascosta. È quello che
-permette di pubblicare l'app senza aver ancora creato il Worker — ed è lo stato
-in cui il file è committato.
-
-La nota nel dialogo («l'organizzatore vede questo nome…») **si scopre solo se
-la presenza è accesa**. Non renderla visibile in modo fisso: l'app non deve
-dichiarare una cosa che non fa.
 
 ---
 
